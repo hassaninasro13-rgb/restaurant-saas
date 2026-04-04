@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap Menu</title>
+<script>
+(function () {
+  var s = window.location.search || '';
+  if (/[?&]slug=/.test(s)) {
+    window.location.replace('pages/index.html' + s);
+  } else {
+    window.location.replace('pages/login.html');
+  }
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0;url=pages/login.html"></noscript>
+</head>
+<body>
+<p><a href="pages/login.html">Connexion restaurateur</a> · <a href="pages/index.html">Menu public (ajoutez ?slug=votre-slug)</a></p>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap Menu — Catégories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<style>
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .cat-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow .15s, transform .15s;
+    cursor: grab;
+  }
+  .cat-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .cat-card-banner {
+    height: 90px;
+    background: var(--cream2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card-banner img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .cat-card-body { padding: 16px; }
+  .cat-card-name { font-weight: 700; font-size: 1rem; margin-bottom: 3px; }
+  .cat-card-meta {
+    font-size: .78rem; color: var(--ink3);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .cat-card-actions { display: flex; gap: 8px; }
+
+  .add-cat-panel {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .add-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .add-cat-header h3 { font-size: 1rem; }
+  .add-cat-toggle {
+    width: 32px; height: 32px;
+    background: var(--cream2);
+    border: none;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background .15s;
+  }
+  .add-cat-toggle:hover { background: var(--cream3); }
+  .add-cat-body { display: none; }
+  .add-cat-body.open { display: block; }
+
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    padding: 12px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .emoji-btn {
+    aspect-ratio: 1;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .1s;
+  }
+  .emoji-btn:hover { border-color: var(--accent); background: var(--accent-lt); }
+  .emoji-btn.selected { border-color: var(--accent); background: var(--accent-lt); }
+  .selected-emoji-display {
+    font-size: 2.5rem;
+    text-align: center;
+    padding: 12px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .15s;
+    border: 2px dashed var(--border2);
+  }
+  .selected-emoji-display:hover { background: var(--accent-lt); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">OneTap</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">OneTap</div>
+      <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Aperçu
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Commandes
+      </a>
+      <div class="sidebar-section-label">Menu</div>
+      <a href="add-categories.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Catégories
+      </a>
+      <a href="add-products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Produits
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title">Catégories</h1>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="toggleAddPanel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvelle catégorie
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div id="alert-area"></div>
+
+      <!-- ADD CATEGORY PANEL -->
+      <div class="add-cat-panel" id="add-panel">
+        <div class="add-cat-header" onclick="toggleAddPanel()">
+          <h3 id="panel-title">➕ Ajouter une catégorie</h3>
+          <button class="add-cat-toggle" id="panel-toggle">−</button>
+        </div>
+        <div class="add-cat-body open" id="panel-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Nom de la catégorie *</label>
+              <input type="text" id="cat-name" class="input" placeholder="Ex: Plats chauds, Boissons, Desserts...">
+            </div>
+            <div class="field">
+              <label>Description <span style="color:var(--ink3);font-weight:400">(facultatif)</span></label>
+              <input type="text" id="cat-desc" class="input" placeholder="Courte description">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Icône</label>
+              <div class="selected-emoji-display" id="emoji-display" onclick="toggleEmojiPicker()">
+                <span id="chosen-emoji">🍽️</span>
+              </div>
+              <div id="emoji-picker" style="display:none;margin-top:8px;">
+                <div class="emoji-grid" id="emoji-grid"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Position</label>
+              <input type="number" id="cat-position" class="input" placeholder="0" min="0" value="0">
+              <p style="font-size:.75rem;color:var(--ink3);margin-top:4px;">Ordre d'affichage (0 = premier)</p>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+            <button class="btn btn-secondary" onclick="resetForm()">Annuler</button>
+            <button class="btn btn-primary" id="btn-save" onclick="saveCategory()">
+              Enregistrer la catégorie
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES LIST -->
+      <div class="section-header">
+        <h3>Mes catégories <span id="cat-count" style="color:var(--ink3);font-weight:400;font-size:.85rem"></span></h3>
+        <a href="add-products.html" style="font-size:.83rem;color:var(--accent);font-weight:500;">Gérer les produits →</a>
+      </div>
+
+      <div id="categories-container">
+        <div class="empty-state">
+          <div class="empty-state-icon" style="font-size:2rem">📂</div>
+          <h3>Chargement...</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
+import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import { getRestaurant, hideLoader, toast } from '../js/shared.js';
+import {
+  listCategoriesWithProductCounts,
+  getCategoryForRestaurant,
+  insertCategoryForRestaurant,
+  updateCategoryForRestaurant,
+  setCategoryVisibleForRestaurant,
+  deleteCategoryForRestaurant,
+} from '../supabase/categories.js';
+
+let restaurant = null;
+let editingId = null;
+let selectedEmoji = '🍽️';
+const panelOpen = { value: true };
+
+const FOOD_EMOJIS = ['🍽️','🥗','🍕','🍔','🌮','🍜','🍣','🥩','🍗','🥘','🫕','🍛','🍚','🥙','🌯','🥪','🍱','🫙','🥡','🍤','🍟','🧆','🥚','🍳','🧇','🥞','🧈','🥓','🌭','🫔','🍖','🦴','🍠','🧀','🥦','🥕','🥑','🍅','🫑','🧅','🌽','🥬','🍄','🥜','🫘','🌾','🍞','🥖','🥐','🧁','🎂','🍰','🍫','🍬','🍭','🍮','🧋','☕','🍵','🫖','🥤','🧃','🍶','🍷','🍸','🍹','🍺','🥂','🍾','🫗','🥛','🍼','🧊','💧'];
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  let { data: rest } = await getRestaurant(session.user.id);
+  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
+    await syncAuthContext(session.user.id);
+    ({ data: rest } = await getRestaurant(session.user.id));
+  }
+  if (!rest) { window.location.href = 'create-restaurant.html'; return; }
+  restaurant = rest;
+  document.getElementById('sb-rest-name').textContent = rest.name;
+  buildEmojiGrid();
+  await loadCategories();
+  const editId = new URLSearchParams(location.search).get('edit');
+  if (editId) await window.editCategory(editId);
+  hideLoader();
+})();
+
+function buildEmojiGrid() {
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = FOOD_EMOJIS.map(e =>
+    `<button class="emoji-btn ${e === selectedEmoji ? 'selected' : ''}"
+      onclick="pickEmoji('${e}')" type="button">${e}</button>`
+  ).join('');
+}
+
+window.pickEmoji = function(emoji) {
+  selectedEmoji = emoji;
+  document.getElementById('chosen-emoji').textContent = emoji;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.toggle('selected', b.textContent === emoji));
+  document.getElementById('emoji-picker').style.display = 'none';
+};
+
+window.toggleEmojiPicker = function() {
+  const p = document.getElementById('emoji-picker');
+  p.style.display = p.style.display === 'none' ? '' : 'none';
+};
+
+window.toggleAddPanel = function() {
+  panelOpen.value = !panelOpen.value;
+  document.getElementById('panel-body').classList.toggle('open', panelOpen.value);
+  document.getElementById('panel-toggle').textContent = panelOpen.value ? '−' : '+';
+};
+
+async function loadCategories() {
+  const { data: cats } = await listCategoriesWithProductCounts(restaurant.id);
+
+  const container = document.getElementById('categories-container');
+  document.getElementById('cat-count').textContent = cats?.length ? `(${cats.length})` : '';
+
+  if (!cats || cats.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon" style="font-size:2rem">📂</div>
+        <h3>Aucune catégorie</h3>
+        <p>Ajoutez votre première catégorie pour organiser votre menu.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="cat-grid">${cats.map(c => `
+    <div class="cat-card" id="cat-${c.id}">
+      <div class="cat-card-banner">
+        ${c.image_url ? `<img src="${c.image_url}" alt="${c.name}">` : `<span>${c.description?.charAt(0) || '🍽️'}</span>`}
+        ${!c.is_visible ? '<span class="badge badge-gray" style="position:absolute;top:8px;right:8px;">Masqué</span>' : ''}
+      </div>
+      <div class="cat-card-body">
+        <div class="cat-card-name">${c.name}</div>
+        <div class="cat-card-meta">
+          <span>${c.products?.[0]?.count ?? 0} produit(s)</span>
+          <span>·</span>
+          <span>Position ${c.position}</span>
+        </div>
+        ${c.description ? `<p style="font-size:.8rem;color:var(--ink3);margin-bottom:12px;">${c.description}</p>` : ''}
+        <div class="cat-card-actions">
+          <button class="btn btn-secondary btn-sm" onclick="editCategory('${c.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Modifier
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleVisible('${c.id}', ${c.is_visible})">
+            ${c.is_visible ? 'Masquer' : 'Afficher'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}', '${c.name}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+window.saveCategory = async function() {
+  const name = document.getElementById('cat-name').value.trim();
+  if (!name) { toast('Le nom est obligatoire', 'error'); return; }
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  const fields = {
+    name,
+    description: document.getElementById('cat-desc').value.trim() || null,
+    position: parseInt(document.getElementById('cat-position').value) || 0,
+  };
+
+  let error;
+  if (editingId) {
+    ({ error } = await updateCategoryForRestaurant(editingId, restaurant.id, fields));
+  } else {
+    ({ error } = await insertCategoryForRestaurant(restaurant.id, fields));
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Enregistrer la catégorie';
+
+  if (error) { toast(error.message, 'error'); return; }
+  toast(editingId ? 'Catégorie modifiée !' : 'Catégorie ajoutée !', 'success');
+  resetForm();
+  await loadCategories();
+};
+
+window.editCategory = async function(id) {
+  const { data: c } = await getCategoryForRestaurant(id, restaurant.id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('cat-name').value = c.name;
+  document.getElementById('cat-desc').value = c.description || '';
+  document.getElementById('cat-position').value = c.position;
+  document.getElementById('panel-title').textContent = '✏️ Modifier la catégorie';
+  document.getElementById('btn-save').textContent = 'Mettre à jour';
+  if (!panelOpen.value) toggleAddPanel();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.resetForm = function() {
+  editingId = null;
+  document.getElementById('cat-name').value = '';
+  document.getElementById('cat-desc').value = '';
+  document.getElementById('cat-position').value = '0';
+  document.getElementById('panel-title').textContent = '➕ Ajouter une catégorie';
+  document.getElementById('btn-save').textContent = 'Enregistrer la catégorie';
+  selectedEmoji = '🍽️';
+  document.getElementById('chosen-emoji').textContent = '🍽️';
+};
+
+window.toggleVisible = async function(id, current) {
+  const { error } = await setCategoryVisibleForRestaurant(id, restaurant.id, !current);
+  if (error) { toast(error.message, 'error'); return; }
+  toast(current ? 'Catégorie masquée' : 'Catégorie visible', 'success');
+  await loadCategories();
+};
+
+window.deleteCategory = async function(id, name) {
+  if (!confirm(`Supprimer la catégorie "${name}" ? Tous ses produits seront également supprimés.`)) return;
+  const { error } = await deleteCategoryForRestaurant(id, restaurant.id);
+  if (error) { toast(error.message, 'error'); return; }
+  toast('Catégorie supprimée', 'success');
+  await loadCategories();
+};
+
+window.handleSignOut = async () => { await signOut(); };
+</script>
+</body>
+</html>

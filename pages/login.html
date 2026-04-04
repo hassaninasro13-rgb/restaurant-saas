@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap Menu — Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* LEFT PANEL */
+  .auth-visual {
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-visual::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(232,92,44,.3) 0%, transparent 70%);
+    top: -100px; left: -100px;
+    pointer-events: none;
+  }
+  .auth-visual::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(232,92,44,.15) 0%, transparent 70%);
+    bottom: 60px; right: -60px;
+    pointer-events: none;
+  }
+  .auth-brand {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -.03em;
+    position: relative;
+    z-index: 1;
+  }
+  .auth-brand span { color: #fff; }
+  .auth-tagline {
+    font-size: .85rem;
+    color: rgba(255,255,255,.4);
+    margin-top: 4px;
+  }
+  .auth-visual-content {
+    position: relative;
+    z-index: 1;
+  }
+  .auth-visual-headline {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .auth-visual-headline em {
+    color: var(--accent);
+    font-style: normal;
+  }
+  .auth-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style: none;
+  }
+  .auth-feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,.6);
+    font-size: .88rem;
+  }
+  .auth-feature-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .auth-visual-footer {
+    color: rgba(255,255,255,.25);
+    font-size: .75rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* RIGHT PANEL */
+  .auth-form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+    background: var(--cream);
+  }
+  .auth-form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+  .auth-form-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .auth-form-sub {
+    color: var(--ink2);
+    font-size: .88rem;
+    margin-bottom: 32px;
+  }
+  .auth-tabs {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    background: #fff;
+    margin-bottom: 28px;
+    gap: 4px;
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 9px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink3);
+    transition: all .15s;
+  }
+  .auth-tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(232,92,44,.3);
+  }
+  .auth-footer-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: .83rem;
+    color: var(--ink3);
+  }
+  .auth-footer-link a {
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  @media (max-width: 800px) {
+    body { grid-template-columns: 1fr; }
+    .auth-visual { display: none; }
+    .auth-form-panel { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT VISUAL -->
+<aside class="auth-visual">
+  <div>
+    <div class="auth-brand">OneTap<span>Menu</span></div>
+    <div class="auth-tagline">Système de menu digital pour l'Algérie</div>
+  </div>
+  <div class="auth-visual-content">
+    <div class="auth-visual-headline">
+      Votre menu en ligne,<br><em>en 5 minutes.</em>
+    </div>
+    <ul class="auth-feature-list">
+      <li><span class="auth-feature-dot"></span>Menu digital avec QR code</li>
+      <li><span class="auth-feature-dot"></span>Commandes WhatsApp automatiques</li>
+      <li><span class="auth-feature-dot"></span>Tableau de bord en temps réel</li>
+      <li><span class="auth-feature-dot"></span>Gestion des catégories et produits</li>
+      <li><span class="auth-feature-dot"></span>Analytics et rapports</li>
+    </ul>
+  </div>
+  <div class="auth-visual-footer">© 2025 OneTap Menu — Made in Algeria 🇩🇿</div>
+</aside>
+
+<!-- RIGHT FORM -->
+<main class="auth-form-panel">
+  <div class="auth-form-container">
+    <h1 class="auth-form-title">Bienvenue</h1>
+    <p class="auth-form-sub">Connectez-vous ou créez votre compte gratuitement</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-register" onclick="showTab('register')">Inscription</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div id="login-alert"></div>
+      <div class="field">
+        <label for="login-email">Adresse email</label>
+        <input type="email" id="login-email" class="input" placeholder="vous@exemple.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="login-password">Mot de passe</label>
+        <input type="password" id="login-password" class="input" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" id="btn-login" onclick="handleLogin()">
+        Se connecter
+      </button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none">
+      <div id="register-alert"></div>
+      <div class="field">
+        <label for="reg-email">Adresse email</label>
+        <input type="email" id="reg-email" class="input" placeholder="vous@exemple.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="reg-password">Mot de passe</label>
+        <input type="password" id="reg-password" class="input" placeholder="Minimum 8 caractères" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="reg-password2">Confirmer le mot de passe</label>
+        <input type="password" id="reg-password2" class="input" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" id="btn-register" onclick="handleRegister()">
+        Créer mon compte
+      </button>
+      <p style="font-size:.8rem;color:var(--ink3);text-align:center;margin-top:14px;">
+        En créant un compte, vous acceptez nos conditions d'utilisation.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<script type="module">
+import { supabase, toast } from '../js/shared.js';
+import { checkIsPlatformAdmin } from '../supabase/subscriptions.js';
+
+window.showTab = function(tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+};
+
+function setAlert(id, html, type = 'error') {
+  document.getElementById(id).innerHTML = html
+    ? `<div class="alert alert-${type}">${html}</div>` : '';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="spinner"></span>'
+    : (btnId === 'btn-login' ? 'Se connecter' : 'Créer mon compte');
+}
+
+window.handleLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { setAlert('login-alert', 'Veuillez remplir tous les champs.'); return; }
+
+  setLoading('btn-login', true);
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  setLoading('btn-login', false);
+
+  if (error) { setAlert('login-alert', error.message); return; }
+
+  if (await checkIsPlatformAdmin()) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  const { data: rest } = await supabase
+    .from('restaurants').select('id').eq('user_id', data.user.id).single();
+
+  window.location.href = rest ? 'dashboard.html' : 'create-restaurant.html';
+};
+
+window.handleRegister = async function() {
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const password2 = document.getElementById('reg-password2').value;
+
+  if (!email || !password) { setAlert('register-alert', 'Veuillez remplir tous les champs.'); return; }
+  if (password.length < 8) { setAlert('register-alert', 'Le mot de passe doit contenir au moins 8 caractères.'); return; }
+  if (password !== password2) { setAlert('register-alert', 'Les mots de passe ne correspondent pas.'); return; }
+
+  setLoading('btn-register', true);
+  const { error } = await supabase.auth.signUp({ email, password });
+  setLoading('btn-register', false);
+
+  if (error) { setAlert('register-alert', error.message); return; }
+
+  setAlert('register-alert', 'Compte créé ! Vérifiez votre email puis connectez-vous.', 'success');
+  setTimeout(() => showTab('login'), 2000);
+};
+
+// Check if already logged in
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+  if (await checkIsPlatformAdmin()) {
+    window.location.href = 'admin.html';
+    return;
+  }
+  const { data: rest } = await supabase
+    .from('restaurants').select('id').eq('user_id', session.user.id).single();
+  window.location.href = rest ? 'dashboard.html' : 'create-restaurant.html';
+})();
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const loginVisible = document.getElementById('form-login').style.display !== 'none';
+    if (loginVisible) handleLogin(); else handleRegister();
+  }
+});
+</script>
+</body>
+</html>

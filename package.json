@@ -1,0 +1,9 @@
+{
+  "name": "onetap-menu",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/inject-env.mjs",
+    "vercel-build": "npm run build"
+  }
+}

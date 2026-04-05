@@ -66,6 +66,8 @@ This app expects Supabase tables created by your base schema plus migrations in 
 
 Run all migrations in order in the Supabase SQL editor (or CLI).
 
+**Products:** migration **`20260405010000_products_is_visible.sql`** adds **`products.is_visible`** (menu visibility, distinct from **`is_available`** / stock). Required for the current `products.js` filters (`listAvailableProductsForMenu`, `countAvailableProducts`).
+
 ## Supabase setup
 
 - Run SQL migrations under **`supabase/migrations/`** in the Supabase SQL editor (or CLI).

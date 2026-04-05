@@ -6,12 +6,37 @@ import { uploadProductImageToStorage } from './storage.js';
  * Images go to Storage bucket `products` under `{restaurantId}/{timestamp}.{ext}`.
  */
 
+const PRODUCT_WRITE_KEYS = new Set([
+  'category_id',
+  'name',
+  'description',
+  'price',
+  'compare_price',
+  'image_url',
+  'position',
+  'is_available',
+  'is_visible',
+]);
+
+/** Strip unknown keys and undefined values for safe PostgREST inserts/updates. */
+export function sanitizeProductFields(fields) {
+  const out = {};
+  if (!fields || typeof fields !== 'object') return out;
+  for (const k of PRODUCT_WRITE_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(fields, k) && fields[k] !== undefined) {
+      out[k] = fields[k];
+    }
+  }
+  return out;
+}
+
 export async function listProductsWithCategory(restaurantId) {
   return supabase
     .from('products')
     .select('*, categories(name)')
     .eq('restaurant_id', restaurantId)
-    .order('position');
+    .order('position', { ascending: true })
+    .order('name', { ascending: true });
 }
 
 export async function listAvailableProductsForMenu(restaurantId) {
@@ -20,7 +45,9 @@ export async function listAvailableProductsForMenu(restaurantId) {
     .select('*')
     .eq('restaurant_id', restaurantId)
     .eq('is_available', true)
-    .order('position');
+    .eq('is_visible', true)
+    .order('position', { ascending: true })
+    .order('name', { ascending: true });
 }
 
 export async function getProductById(id) {
@@ -38,10 +65,13 @@ export async function getProductForRestaurant(productId, restaurantId) {
 
 /** Insert: `restaurant_id` is forced; do not pass `restaurant_id` in fields to reassign. */
 export async function insertProductForRestaurant(restaurantId, fields) {
-  const { restaurant_id: _r, id: _i, ...rest } = fields;
+  const { restaurant_id: _r, id: _i, ...raw } = fields;
+  const rest = sanitizeProductFields(raw);
   return supabase.from('products').insert({
     ...rest,
     restaurant_id: restaurantId,
+    is_available: rest.is_available !== undefined ? rest.is_available : true,
+    is_visible: rest.is_visible !== undefined ? rest.is_visible : true,
   });
 }
 
@@ -50,12 +80,9 @@ export async function insertProduct(payload) {
 }
 
 export async function updateProductForRestaurant(productId, restaurantId, fields) {
-  const { restaurant_id: _r, id: _i, ...rest } = fields;
-  return supabase
-    .from('products')
-    .update(rest)
-    .eq('id', productId)
-    .eq('restaurant_id', restaurantId);
+  const { restaurant_id: _r, id: _i, ...raw } = fields;
+  const rest = sanitizeProductFields(raw);
+  return supabase.from('products').update(rest).eq('id', productId).eq('restaurant_id', restaurantId);
 }
 
 export async function updateProduct(id, payload) {
@@ -66,6 +93,14 @@ export async function setProductAvailableForRestaurant(productId, restaurantId, 
   return supabase
     .from('products')
     .update({ is_available: isAvailable })
+    .eq('id', productId)
+    .eq('restaurant_id', restaurantId);
+}
+
+export async function setProductVisibleForRestaurant(productId, restaurantId, isVisible) {
+  return supabase
+    .from('products')
+    .update({ is_visible: isVisible })
     .eq('id', productId)
     .eq('restaurant_id', restaurantId);
 }
@@ -89,9 +124,10 @@ export async function deleteProduct(id) {
 export async function countAvailableProducts(restaurantId) {
   return supabase
     .from('products')
-    .select('id', { count: 'exact' })
+    .select('id', { count: 'exact', head: true })
     .eq('restaurant_id', restaurantId)
-    .eq('is_available', true);
+    .eq('is_available', true)
+    .eq('is_visible', true);
 }
 
 /**

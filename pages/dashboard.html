@@ -897,9 +897,13 @@ async function loadDashboardProducts() {
     row.querySelector('.prod-title').textContent = p.name;
     row.querySelector('.prod-cat').textContent = p.categories?.name || '—';
     row.querySelector('.prod-price').textContent = fmtCurrency(p.price);
-    row.querySelector('.prod-stock').innerHTML = p.is_available
-      ? '<span class="badge badge-green">Dispo</span>'
-      : '<span class="badge badge-gray">Masqué</span>';
+    const vis = p.is_visible !== false;
+    const avail = p.is_available !== false;
+    row.querySelector('.prod-stock').innerHTML = !vis
+      ? '<span class="badge badge-gray">Hors menu</span>'
+      : !avail
+        ? '<span class="badge badge-amber">Rupture</span>'
+        : '<span class="badge badge-green">En vente</span>';
     row.querySelector(`[data-prod-del="${p.id}"]`).addEventListener('click', () => dashboardDeleteProduct(p.id));
   });
 }

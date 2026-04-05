@@ -93,7 +93,7 @@
     border-radius: var(--radius-lg);
     padding: 16px;
     display: grid;
-    grid-template-columns: 72px 1fr auto;
+    grid-template-columns: 72px 1fr minmax(132px, auto);
     gap: 14px;
     align-items: center;
     transition: box-shadow .12s;
@@ -152,6 +152,12 @@
   }
   .price-input-group .input {
     border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .img-opt-hint {
+    font-size: .72rem;
+    color: var(--ink3);
+    margin: 8px 0 0;
+    min-height: 1.2em;
   }
 
   @media (max-width: 1000px) {
@@ -233,11 +239,12 @@
               <div class="img-upload-placeholder" id="img-placeholder">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
                 <span>Cliquez ou déposez une image</span>
-                <small>JPG, PNG, WebP — Max 5 MB</small>
+                <small>JPG, PNG, WebP, HEIC… — redimensionnement automatique</small>
               </div>
               <img id="img-preview" class="img-preview" src="" alt="" style="display:none">
               <button class="img-remove-btn" id="img-remove-btn" onclick="removeImage(event)">✕</button>
             </div>
+            <p class="img-opt-hint" id="img-opt-status" aria-live="polite"></p>
           </div>
 
           <div class="field">
@@ -276,17 +283,30 @@
           <div class="field-row">
             <div class="field">
               <label>Position</label>
-              <input type="number" id="prod-position" class="input" placeholder="0" min="0" value="0">
+              <input type="number" id="prod-position" class="input" placeholder="0" min="0" step="1" value="0">
+              <p style="font-size:.72rem;color:var(--ink3);margin:6px 0 0;">Ordre dans la catégorie (0 = premier)</p>
             </div>
-            <div class="field">
-              <label>Disponible</label>
-              <div style="display:flex;align-items:center;gap:10px;padding-top:10px;">
-                <label class="toggle">
-                  <input type="checkbox" id="prod-available" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-                <span style="font-size:.88rem;color:var(--ink2)">En stock</span>
-              </div>
+          </div>
+
+          <div class="field">
+            <label>Visible sur le menu</label>
+            <div style="display:flex;align-items:center;gap:10px;padding-top:4px;">
+              <label class="toggle">
+                <input type="checkbox" id="prod-visible" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size:.88rem;color:var(--ink2)">Afficher aux clients sur le menu public</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Disponible / en stock</label>
+            <div style="display:flex;align-items:center;gap:10px;padding-top:4px;">
+              <label class="toggle">
+                <input type="checkbox" id="prod-available" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size:.88rem;color:var(--ink2)">Le produit peut être commandé (sinon affiché indisponible ou masqué selon votre choix)</span>
             </div>
           </div>
 
@@ -327,17 +347,32 @@ import {
   insertProductForRestaurant,
   updateProductForRestaurant,
   setProductAvailableForRestaurant,
+  setProductVisibleForRestaurant,
   deleteProductForRestaurant,
   uploadProductImage,
 } from '../supabase/products.js';
+import { optimizeProductImage, MAX_OPTIMIZED_PRODUCT_BYTES } from '../js/image-optimize.js';
 
 let restaurant = null;
 let categories = [];
 let allProducts = [];
 let editingId = null;
 let selectedFile = null;
+let previewObjectUrl = null;
 let imageRemovedForEdit = false;
 let currentFilter = null;
+
+function setImgOptStatus(text) {
+  const el = document.getElementById('img-opt-status');
+  if (el) el.textContent = text || '';
+}
+
+function revokePreviewObjectUrl() {
+  if (previewObjectUrl) {
+    URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = null;
+  }
+}
 
 (async () => {
   const session = await requireAuth();
@@ -417,7 +452,8 @@ function renderProducts() {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Modifier
         </button>
-        <button type="button" class="btn btn-ghost btn-sm" data-action="toggle"></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="toggle-stock"></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="toggle-menu"></button>
         <button type="button" class="btn btn-danger btn-sm" data-action="delete">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
         </button>
@@ -438,13 +474,20 @@ function renderProducts() {
       s.textContent = fmtCurrency(p.compare_price);
       priceEl.appendChild(s);
     }
-    row.querySelector('.product-item-badges').innerHTML = p.is_available
-      ? '<span class="badge badge-green">Disponible</span>'
-      : '<span class="badge badge-gray">Indisponible</span>';
+    const vis = p.is_visible !== false;
+    const avail = p.is_available !== false;
+    const badges = [];
+    if (!vis) badges.push('<span class="badge badge-gray">Hors menu</span>');
+    else if (!avail) badges.push('<span class="badge badge-amber">Indisponible</span>');
+    else badges.push('<span class="badge badge-green">En vente</span>');
+    row.querySelector('.product-item-badges').innerHTML = badges.join(' ');
     row.querySelector('[data-action="edit"]').onclick = () => editProduct(p.id);
-    const tbtn = row.querySelector('[data-action="toggle"]');
-    tbtn.textContent = p.is_available ? 'Masquer' : 'Activer';
-    tbtn.onclick = () => toggleAvail(p.id, p.is_available);
+    const stockBtn = row.querySelector('[data-action="toggle-stock"]');
+    stockBtn.textContent = avail ? 'Rupture' : 'Réactiver stock';
+    stockBtn.onclick = () => toggleAvail(p.id, avail);
+    const menuBtn = row.querySelector('[data-action="toggle-menu"]');
+    menuBtn.textContent = vis ? 'Retirer du menu' : 'Mettre sur le menu';
+    menuBtn.onclick = () => toggleMenuVis(p.id, vis);
     row.querySelector('[data-action="delete"]').onclick = () => deleteProduct(p.id);
   });
 }
@@ -461,32 +504,44 @@ window.handleDrop = function(e) {
   e.preventDefault();
   document.getElementById('img-drop-area').classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) previewImage(file);
+  if (file && file.type.startsWith('image/')) void previewImage(file);
 };
 window.handleImageSelect = function(input) {
   const file = input.files[0];
-  if (file) previewImage(file);
+  if (file) void previewImage(file);
 };
 
-function previewImage(file) {
-  if (file.size > 5 * 1024 * 1024) { toast('Image trop lourde (max 5 MB)', 'error'); return; }
-  selectedFile = file;
-  imageRemovedForEdit = false;
-  const reader = new FileReader();
-  reader.onload = e => {
+async function previewImage(file) {
+  setImgOptStatus('');
+  revokePreviewObjectUrl();
+  try {
+    setImgOptStatus('Optimisation de l’image…');
+    const { file: outFile, blob, meta } = await optimizeProductImage(file);
+    selectedFile = outFile;
+    imageRemovedForEdit = false;
+    previewObjectUrl = URL.createObjectURL(blob);
     const preview = document.getElementById('img-preview');
-    preview.src = e.target.result;
+    preview.src = previewObjectUrl;
     preview.style.display = '';
     document.getElementById('img-placeholder').style.display = 'none';
     document.getElementById('img-remove-btn').style.display = 'flex';
     document.getElementById('img-drop-area').classList.add('has-image');
-  };
-  reader.readAsDataURL(file);
+    const mbIn = (meta.inBytes / (1024 * 1024)).toFixed(1);
+    const mbOut = (meta.outBytes / (1024 * 1024)).toFixed(2);
+    setImgOptStatus(
+      `Prêt pour l’envoi (≤ 5 Mo) : ${meta.outW}×${meta.outH} px, JPEG — ${mbIn} Mo → ${mbOut} Mo`,
+    );
+  } catch (err) {
+    selectedFile = null;
+    toast(err?.message || 'Impossible d’optimiser cette image', 'error');
+    setImgOptStatus('');
+  }
 }
 
 window.removeImage = function(e) {
   e.stopPropagation();
   selectedFile = null;
+  revokePreviewObjectUrl();
   if (editingId) imageRemovedForEdit = true;
   document.getElementById('img-preview').src = '';
   document.getElementById('img-preview').style.display = 'none';
@@ -494,6 +549,7 @@ window.removeImage = function(e) {
   document.getElementById('img-remove-btn').style.display = 'none';
   document.getElementById('img-drop-area').classList.remove('has-image');
   document.getElementById('img-input').value = '';
+  setImgOptStatus('');
 };
 
 /* ── SAVE PRODUCT ── */
@@ -503,30 +559,55 @@ window.saveProduct = async function() {
   const price = parseFloat(document.getElementById('prod-price').value);
 
   if (!categoryId) { toast('Sélectionnez une catégorie', 'error'); return; }
+  if (!categories.some((c) => c.id === categoryId)) { toast('Catégorie invalide pour ce restaurant', 'error'); return; }
   if (!name) { toast('Le nom est obligatoire', 'error'); return; }
-  if (!price && price !== 0) { toast('Le prix est obligatoire', 'error'); return; }
+  if (!Number.isFinite(price) || price < 0) { toast('Indiquez un prix valide (≥ 0)', 'error'); return; }
 
   const btn = document.getElementById('btn-save-product');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
 
-  let image_url = editingId ? (allProducts.find(pr => pr.id === editingId)?.image_url || null) : null;
+  let image_url = editingId ? (allProducts.find((pr) => pr.id === editingId)?.image_url || null) : null;
   if (imageRemovedForEdit && !selectedFile) image_url = null;
 
   if (selectedFile) {
+    if (selectedFile.size > MAX_OPTIMIZED_PRODUCT_BYTES) {
+      toast('Image trop lourde après optimisation (max 5 Mo). Sélectionnez à nouveau.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer le produit';
+      return;
+    }
     const { publicUrl, error: upErr } = await uploadProductImage(restaurant.id, selectedFile);
-    if (publicUrl) image_url = publicUrl;
-    else if (upErr) toast('Erreur upload image: ' + upErr.message, 'error');
+    if (upErr || !publicUrl) {
+      toast(upErr ? `Upload image : ${upErr.message}` : 'Upload image échoué', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer le produit';
+      return;
+    }
+    image_url = publicUrl;
   }
 
-  const comparePrice = parseFloat(document.getElementById('prod-compare-price').value) || null;
+  const compareRaw = document.getElementById('prod-compare-price').value.trim();
+  let compare_price = null;
+  if (compareRaw !== '') {
+    const cp = parseFloat(compareRaw);
+    if (!Number.isFinite(cp) || cp < 0) {
+      toast('Prix barré invalide', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer le produit';
+      return;
+    }
+    compare_price = Math.round(cp);
+  }
+
   const fields = {
     category_id: categoryId,
     name,
     price: Math.round(price),
-    compare_price: comparePrice ? Math.round(comparePrice) : null,
+    compare_price,
     description: document.getElementById('prod-desc').value.trim() || null,
-    position: parseInt(document.getElementById('prod-position').value) || 0,
+    position: Math.max(0, parseInt(document.getElementById('prod-position').value, 10) || 0),
+    is_visible: document.getElementById('prod-visible').checked,
     is_available: document.getElementById('prod-available').checked,
     image_url,
   };
@@ -557,8 +638,9 @@ window.editProduct = async function(id) {
   document.getElementById('prod-price').value = p.price;
   document.getElementById('prod-compare-price').value = p.compare_price || '';
   document.getElementById('prod-desc').value = p.description || '';
-  document.getElementById('prod-position').value = p.position;
-  document.getElementById('prod-available').checked = p.is_available;
+  document.getElementById('prod-position').value = p.position ?? 0;
+  document.getElementById('prod-visible').checked = p.is_visible !== false;
+  document.getElementById('prod-available').checked = p.is_available !== false;
   document.getElementById('form-title').textContent = '✏️ Modifier le produit';
   document.getElementById('btn-cancel-edit').style.display = '';
 
@@ -582,6 +664,7 @@ window.resetForm = function() {
     document.getElementById(id).value = '';
   });
   document.getElementById('prod-position').value = '0';
+  document.getElementById('prod-visible').checked = true;
   document.getElementById('prod-available').checked = true;
   document.getElementById('form-title').textContent = '➕ Nouveau produit';
   document.getElementById('btn-cancel-edit').style.display = 'none';
@@ -591,7 +674,14 @@ window.resetForm = function() {
 window.toggleAvail = async function(id, current) {
   const { error } = await setProductAvailableForRestaurant(id, restaurant.id, !current);
   if (error) { toast(error.message, 'error'); return; }
-  toast(current ? 'Produit masqué' : 'Produit activé', 'success');
+  toast(current ? 'Marqué indisponible' : 'Marqué disponible', 'success');
+  await loadProducts();
+};
+
+window.toggleMenuVis = async function(id, currentlyVisible) {
+  const { error } = await setProductVisibleForRestaurant(id, restaurant.id, !currentlyVisible);
+  if (error) { toast(error.message, 'error'); return; }
+  toast(currentlyVisible ? 'Retiré du menu public' : 'Affiché sur le menu public', 'success');
   await loadProducts();
 };
 

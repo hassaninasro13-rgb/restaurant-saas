@@ -1,4 +1,5 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+/** Pinned minor version avoids surprise breaking changes from esm.sh `@2` latest. */
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './runtime-config.js';
 import { isSupabaseConfigured } from './config.js';
 

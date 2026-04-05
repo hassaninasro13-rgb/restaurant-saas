@@ -2,8 +2,12 @@
   "name": "onetap-menu",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "node scripts/inject-env.mjs",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "preview": "npx --yes serve . -l 3333"
   }
 }

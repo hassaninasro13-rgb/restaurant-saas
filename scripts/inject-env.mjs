@@ -24,7 +24,7 @@ function parseEnvFile(filePath) {
   const out = {};
   let text = fs.readFileSync(filePath, 'utf8');
   if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
-  for (let line of text.split(/\n')) {
+  for (let line of text.split('\n')) {
     line = line.trim();
     if (!line || line.startsWith('#')) continue;
     const eq = line.indexOf('=');

@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<script src="supabase-env.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneTap Menu — Connexion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -261,7 +262,7 @@ function setAlert(id, html, type = 'error') {
 function gateSupabaseUi() {
   if (isSupabaseConfigured()) return;
   const msg =
-    'Supabase n’est pas configuré : sur Vercel, ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY (Production et Aperçu), puis redéployez. En local : remplissez un fichier .env à la racine et lancez npm run build. Sans cela, la connexion échoue (« Failed to fetch »).';
+    'Supabase n’est pas configuré : pages/supabase-env.js ne contient pas vos clés (build manquant). Sur Vercel : Project → Settings → Environment Variables → VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY (Production et Aperçu), puis Redeploy. En local : .env à la racine puis npm run build.';
   setAlert('login-alert', msg);
   setAlert('register-alert', msg);
   document.getElementById('btn-login').disabled = true;
@@ -289,7 +290,18 @@ window.handleLogin = async function() {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   setLoading('btn-login', false);
 
-  if (error) { setAlert('login-alert', error.message); return; }
+  if (error) {
+    const m = String(error.message || '');
+    if (/failed to fetch|networkerror|load failed/i.test(m)) {
+      setAlert(
+        'login-alert',
+        'Impossible de joindre Supabase (réseau ou URL). Vérifiez : 1) Projet Supabase actif (Dashboard → pas « paused »). 2) Authentication → URL configuration : Site URL = votre domaine Vercel ; Redirect URLs incluent https://…/pages/login.html. 3) Redeploy après variables d’environnement.',
+      );
+    } else {
+      setAlert('login-alert', m);
+    }
+    return;
+  }
 
   if (await checkIsPlatformAdmin()) {
     window.location.href = 'admin.html';
@@ -324,7 +336,18 @@ window.handleRegister = async function() {
   });
   setLoading('btn-register', false);
 
-  if (error) { setAlert('register-alert', error.message); return; }
+  if (error) {
+    const m = String(error.message || '');
+    if (/failed to fetch|networkerror|load failed/i.test(m)) {
+      setAlert(
+        'register-alert',
+        'Impossible de joindre Supabase. Vérifiez l’URL du projet, le projet non suspendu, et Supabase → Authentication → URL configuration pour votre domaine.',
+      );
+    } else {
+      setAlert('register-alert', m);
+    }
+    return;
+  }
 
   setAlert('register-alert', 'Compte créé ! Vérifiez votre email puis connectez-vous.', 'success');
   setTimeout(() => showTab('login'), 2000);

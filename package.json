@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "node scripts/inject-env.mjs",
-    "vercel-build": "npm run build",
+    "vercel-build": "npm run build && node scripts/verify-supabase-env.mjs",
     "preview": "npx --yes serve . -l 3333"
   }
 }

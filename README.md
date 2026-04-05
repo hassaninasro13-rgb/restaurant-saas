@@ -19,26 +19,27 @@ Aliases supported by **`scripts/inject-env.mjs`**: `SUPABASE_URL`, `SUPABASE_ANO
 
 **Why login shows "Failed to fetch"**
 
-The browser loads credentials from **`supabase/runtime-config.js`**. If that file still contains placeholders, every request to Supabase fails at the network layer. Fix: inject real values at **build** time (Vercel env vars or local `npm run build`).
+Usually either (1) **`pages/supabase-env.js`** was not generated with real keys at **build** time, or (2) the Supabase project is paused / URL mis-copied, or (3) **Authentication → URL configuration** in Supabase does not allow your deployed origin. **`npm run build`** writes **`pages/supabase-env.js`** and **`js/supabase-env.js`**; each page loads **`supabase-env.js`** (same folder) **before** ES modules.
 
 **Local development**
 
-1. Copy **`.env.example`** to **`.env`** at the repo root and paste your URL and anon key from Supabase → Project Settings → API.
-2. Run **`npm run build`** — this overwrites **`supabase/runtime-config.js`** (the script reads `.env` automatically; you do not need to `export` variables).
-3. Serve the site over HTTP(S) (e.g. `npx serve .` from the repo root) and open **`/pages/login.html`**.
+1. Copy **`.env.example`** to **`.env`** at the repo root and paste your URL and anon key from Supabase → **Project Settings** → **API**.
+2. Run **`npm run build`** — this generates **`pages/supabase-env.js`** and **`js/supabase-env.js`** (the script reads `.env` automatically).
+3. Serve the site (e.g. **`npm run preview`**) and open **`/pages/login.html`**.
 
-Alternatively, edit **`supabase/runtime-config.js`** directly for quick tests (do not commit real secrets to a public repo).
+**`supabase/runtime-config.js`** only reads `globalThis.__ONETAP_SUPABASE__` set by **`pages/supabase-env.js`**; do not put secrets there manually.
 
 ## Deploy on Vercel
 
 1. Push this repository to GitHub (or GitLab / Bitbucket).
 2. In [Vercel](https://vercel.com) → **Add New Project** → import the repo.
-3. **Framework preset:** Other (static). **`vercel.json`** sets **`buildCommand`** to **`npm run vercel-build`**, which runs **`npm run build`** and **must** write valid `supabase/runtime-config.js`.
+3. **`vercel.json`** sets **`framework: null`** and **`buildCommand`** to **`npm run vercel-build`**, which runs **`npm run build`** then **`scripts/verify-supabase-env.mjs`** so **`pages/supabase-env.js`** and **`js/supabase-env.js`** exist before deploy.
 4. **Environment variables** (Project → Settings → Environment Variables). Add for **Production** and **Preview** (Preview deployments fail the build if these are missing):
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`  
    Redeploy after adding or changing variables so a new build runs with the values.
 5. Deploy. Site root serves **`index.html`**; static paths **`/pages/*`**, **`/css/*`**, **`/js/*`**, **`/supabase/*`** are served as files.
+6. Leave **Output Directory** empty (project root). The app loads **`/pages/supabase-env.js`** from the same directory as **`/pages/login.html`**, so auth still works if **`js/`** is not exposed; both paths are generated on every build.
 
 **Supabase Auth (production)**
 
@@ -103,13 +104,15 @@ index.html          # Entry: slug → public menu, else → login
 pages/              # HTML pages (menu, dashboard, orders, …)
 css/                # Styles
 js/shared.js        # Shared UI helpers + auth re-exports
-supabase/           # Client modules + runtime-config.js (credentials)
-scripts/inject-env.mjs   # Build: write runtime-config from env
+pages/supabase-env.js  # Generated at build (also js/supabase-env.js): URL + anon key
+supabase/           # Client modules + runtime-config.js (reads globalThis)
+scripts/inject-env.mjs   # Build: write both supabase-env.js copies
+scripts/verify-supabase-env.mjs   # Vercel: fail deploy if boot files missing
 ```
 
 ## Scripts
 
 | Command | Purpose |
 |---------|---------|
-| `npm run build` | Writes `supabase/runtime-config.js` when env vars are set |
-| `npm run vercel-build` | Used by Vercel; same as `build` |
+| `npm run build` | Generates `pages/supabase-env.js` + `js/supabase-env.js` |
+| `npm run vercel-build` | `build` + verify script (used by Vercel) |

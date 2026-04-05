@@ -12,32 +12,58 @@ Static HTML/JS app: public menu by restaurant slug (no login), Supabase backend,
 
 | Variable | Where |
 |----------|--------|
-| `VITE_SUPABASE_URL` | Project URL (e.g. `https://xxxxx.supabase.co`) |
-| `VITE_SUPABASE_ANON_KEY` | **anon / public** key only |
+| `VITE_SUPABASE_URL` | HTTPS project URL (e.g. `https://xxxxx.supabase.co`) |
+| `VITE_SUPABASE_ANON_KEY` | **anon / public** key only (long JWT-like string) |
 
-Aliases supported by the build script: `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+Aliases supported by **`scripts/inject-env.mjs`**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+
+**Why login shows "Failed to fetch"**
+
+The browser loads credentials from **`supabase/runtime-config.js`**. If that file still contains placeholders, every request to Supabase fails at the network layer. Fix: inject real values at **build** time (Vercel env vars or local `npm run build`).
 
 **Local development**
 
-1. Copy `.env.example` to `.env` and fill values (optional if you edit files by hand).
-2. Either:
-   - Run **`npm run build`** with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set in the environment so **`scripts/inject-env.mjs`** overwrites `supabase/runtime-config.js`, or  
-   - Edit **`supabase/runtime-config.js`** directly with your project URL and anon key (do not commit real secrets if the repo is public).
+1. Copy **`.env.example`** to **`.env`** at the repo root and paste your URL and anon key from Supabase → Project Settings → API.
+2. Run **`npm run build`** — this overwrites **`supabase/runtime-config.js`** (the script reads `.env` automatically; you do not need to `export` variables).
+3. Serve the site over HTTP(S) (e.g. `npx serve .` from the repo root) and open **`/pages/login.html`**.
+
+Alternatively, edit **`supabase/runtime-config.js`** directly for quick tests (do not commit real secrets to a public repo).
 
 ## Deploy on Vercel
 
 1. Push this repository to GitHub (or GitLab / Bitbucket).
 2. In [Vercel](https://vercel.com) → **Add New Project** → import the repo.
-3. **Framework preset:** Other (static). Vercel will run **`npm install`** (no dependencies required) and **`vercel-build`** → **`npm run build`**, which injects Supabase env into `supabase/runtime-config.js`.
-4. **Environment variables** (Project → Settings → Environment Variables), for *Production* (and Preview if you want):
+3. **Framework preset:** Other (static). **`vercel.json`** sets **`buildCommand`** to **`npm run vercel-build`**, which runs **`npm run build`** and **must** write valid `supabase/runtime-config.js`.
+4. **Environment variables** (Project → Settings → Environment Variables). Add for **Production** and **Preview** (Preview deployments fail the build if these are missing):
    - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_SUPABASE_ANON_KEY`  
+   Redeploy after adding or changing variables so a new build runs with the values.
 5. Deploy. Site root serves **`index.html`**; static paths **`/pages/*`**, **`/css/*`**, **`/js/*`**, **`/supabase/*`** are served as files.
+
+**Supabase Auth (production)**
+
+In the Supabase dashboard → **Authentication** → **URL configuration**:
+
+- Set **Site URL** to your production origin (e.g. `https://your-app.vercel.app`).
+- Add **Redirect URLs** that include your login page, e.g. `https://your-app.vercel.app/pages/login.html` and `http://localhost:3000/pages/login.html` for local testing.
 
 **Smoke test after deploy**
 
 - Open `https://<your-domain>/index.html?slug=<a-real-slug>` — menu should load without login.
-- Open `https://<your-domain>/pages/login.html` — owner login.
+- Open `https://<your-domain>/pages/login.html` — signup/login should work (no "Failed to fetch").
+
+## Database tables (checklist)
+
+This app expects Supabase tables created by your base schema plus migrations in **`supabase/migrations/`**. There is **no** separate `subscriptions` table: subscription fields live on **`restaurants`** (`subscription_plan`, `subscription_expires_at`, **`manual_subscription_revenue`** after the manual-revenue migration).
+
+| Table / concept | Role |
+|-----------------|------|
+| **`restaurants`** | Owners, slugs, menu visibility, subscription columns |
+| **`orders`** (+ **`order_items`** if used) | Customer orders; RLS extended for platform admin reads in **`20260404210000_admin_is_active_orders_rls.sql`** |
+| **`platform_admins`** | Admin emails (lowercase); used for admin UI and subscription guard triggers |
+| Subscriptions | Columns on **`restaurants`**, not a standalone table |
+
+Run all migrations in order in the Supabase SQL editor (or CLI).
 
 ## Supabase setup
 

@@ -244,6 +244,17 @@
 <script type="module">
 import { supabase, toast } from '../js/shared.js';
 import { checkIsPlatformAdmin } from '../supabase/subscriptions.js';
+import { isSupabaseConfigured } from '../supabase/config.js';
+
+function gateSupabaseUi() {
+  if (isSupabaseConfigured()) return;
+  const msg =
+    'Supabase n’est pas configuré : sur Vercel, ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY (Production et Aperçu), puis redéployez. En local : remplissez un fichier .env à la racine et lancez npm run build. Sans cela, la connexion échoue (« Failed to fetch »).';
+  setAlert('login-alert', msg);
+  setAlert('register-alert', msg);
+  document.getElementById('btn-login').disabled = true;
+  document.getElementById('btn-register').disabled = true;
+}
 
 window.showTab = function(tab) {
   document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
@@ -266,6 +277,10 @@ function setLoading(btnId, loading) {
 }
 
 window.handleLogin = async function() {
+  if (!isSupabaseConfigured()) {
+    setAlert('login-alert', 'Supabase n’est pas configuré. Voir le message ci-dessus ou le README.');
+    return;
+  }
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   if (!email || !password) { setAlert('login-alert', 'Veuillez remplir tous les champs.'); return; }
@@ -288,6 +303,10 @@ window.handleLogin = async function() {
 };
 
 window.handleRegister = async function() {
+  if (!isSupabaseConfigured()) {
+    setAlert('register-alert', 'Supabase n’est pas configuré. Voir le message ci-dessus ou le README.');
+    return;
+  }
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
   const password2 = document.getElementById('reg-password2').value;
@@ -296,8 +315,13 @@ window.handleRegister = async function() {
   if (password.length < 8) { setAlert('register-alert', 'Le mot de passe doit contenir au moins 8 caractères.'); return; }
   if (password !== password2) { setAlert('register-alert', 'Les mots de passe ne correspondent pas.'); return; }
 
+  const emailRedirectTo = new URL('login.html', window.location.href).href;
   setLoading('btn-register', true);
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo },
+  });
   setLoading('btn-register', false);
 
   if (error) { setAlert('register-alert', error.message); return; }
@@ -306,8 +330,11 @@ window.handleRegister = async function() {
   setTimeout(() => showTab('login'), 2000);
 };
 
+gateSupabaseUi();
+
 // Check if already logged in
 (async () => {
+  if (!isSupabaseConfigured()) return;
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
   if (await checkIsPlatformAdmin()) {

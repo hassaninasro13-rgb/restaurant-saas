@@ -1,6 +1,7 @@
 /**
  * Anonymous reads for the public menu (no auth).
- * URL: pages/index.html?slug=<restaurant-slug>
+ * Used by pages/menu.html and pages/index.html (menu + panier).
+ * URL: pages/menu.html?slug=<restaurant-slug>
  */
 import { getActiveRestaurantBySlug, getOpeningHoursForDay } from './restaurants.js';
 import { listVisibleCategoriesForMenu } from './categories.js';

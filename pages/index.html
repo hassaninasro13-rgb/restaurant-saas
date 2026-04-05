@@ -445,6 +445,243 @@
     font-size: .93rem;
   }
 
+  /* Full-page cart (index.html?slug=…&cart=1) */
+  #browse-zone[hidden] { display: none !important; }
+  .cat-tabs-wrap.is-hidden { display: none !important; }
+
+  .cart-page-view {
+    padding: 0 16px max(100px, env(safe-area-inset-bottom));
+    background: var(--cream);
+  }
+  .cart-page-view[hidden] { display: none !important; }
+
+  .cart-page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0 14px;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 4px;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 5;
+  }
+  .cart-page-back {
+    font-size: .86rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .cart-page-back:hover { text-decoration: underline; }
+  .cart-page-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .cart-page-list { padding-bottom: 8px; }
+  .cart-page-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cart-page-img {
+    width: 76px;
+    height: 76px;
+    border-radius: var(--radius);
+    background: var(--cream2);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+  }
+  .cart-page-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cart-page-main {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cart-page-name { font-weight: 700; font-size: .95rem; line-height: 1.25; }
+  .cart-page-unit { font-size: .82rem; color: var(--ink3); }
+  .cart-page-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .cart-page-line-total {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+  .btn-cart-remove {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--ink2);
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .btn-cart-remove:hover { border-color: var(--red); color: var(--red); }
+
+  .cart-page-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--ink3);
+    font-size: .93rem;
+  }
+  .cart-page-empty[hidden] { display: none !important; }
+
+  .cart-page-footer {
+    position: sticky;
+    bottom: 0;
+    padding: 16px 0 24px;
+    margin-top: 8px;
+    background: linear-gradient(180deg, transparent, var(--cream) 12px);
+  }
+  .cart-page-footer[hidden] { display: none !important; }
+  .cart-page-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .cart-page-total-row span:last-child {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .cart-page-checkout-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: var(--ink);
+    color: #fff;
+    font-size: 1.02rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .cart-page-checkout-btn:hover { background: var(--accent); }
+
+  .cart-page-main-block { padding-bottom: 8px; }
+  .cart-page-form-section {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--border);
+  }
+  .cart-page-form-section h3 {
+    font-size: .88rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    font-family: var(--font-display);
+  }
+  .cart-page-form-section .field { margin-bottom: 14px; }
+  .cart-page-form-section .field label {
+    font-size: .72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--ink2);
+  }
+  .cart-page-form-section .input,
+  .cart-page-form-section .textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: .9rem;
+  }
+  .cart-page-form-section .textarea { min-height: 72px; resize: vertical; }
+  .cart-page-subtotal-row {
+    font-size: .88rem;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-top: 12px;
+  }
+  .cart-page-subtotal-row span:last-child { font-weight: 600; color: var(--ink); }
+  .cart-page-checkout-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  .cart-page-order-success { padding: 24px 0 40px; text-align: center; }
+  .cart-page-order-success[hidden] { display: none !important; }
+  .cart-page-order-success .order-success-icon {
+    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+    background: var(--green-lt); color: var(--green); font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 800;
+  }
+  .cart-page-order-success h3 { font-size: 1.08rem; margin: 0 0 10px; font-family: var(--font-display); }
+  .cart-page-order-success .cart-order-success-lead {
+    font-size: .88rem; color: var(--ink2); line-height: 1.45; margin: 0 0 16px; text-align: left;
+  }
+  .cart-page-order-success #cart-wa-order-msg-preview {
+    width: 100%; min-height: 140px; font-size: .78rem; font-family: ui-monospace, monospace;
+    margin-bottom: 12px; background: var(--cream2); border-radius: var(--radius);
+    border: 1.5px solid var(--border); padding: 10px;
+  }
+  .cart-page-order-success .cart-success-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .cart-page-order-success .btn-whatsapp-send {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 14px 16px; background: #25D366; color: #fff; border: none;
+    border-radius: var(--radius-lg); font-size: .95rem; font-weight: 700; font-family: var(--font-display);
+    text-decoration: none; cursor: pointer;
+  }
+  .cart-page-order-success .btn-copy-msg {
+    width: 100%; padding: 12px; border-radius: var(--radius-lg); border: 1.5px solid var(--border);
+    background: #fff; font-weight: 600; font-size: .88rem; cursor: pointer; font-family: var(--font-body);
+  }
+
+  .source-order-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(90deg, var(--accent-lt), #fff3ea);
+    border-bottom: 1.5px solid var(--border);
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .source-order-banner[hidden] { display: none !important; }
+  .cart-source-pill {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 2px 0 0;
+    text-align: center;
+  }
+  .cart-source-pill[hidden] { display: none !important; }
+  .otype-source-locked {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--cream2);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    font-size: .88rem;
+    color: var(--ink2);
+  }
+
   @media (min-width: 640px) {
     body { box-shadow: 0 0 40px rgba(0,0,0,.1); }
   }
@@ -470,18 +707,94 @@
       <span id="rest-hours-badge"></span>
     </div>
   </div>
-  <div class="cat-tabs-wrap">
+  <div class="cat-tabs-wrap" id="menu-cat-tabs-wrap">
     <div class="cat-tabs" id="cat-tabs"></div>
+  </div>
+  <div class="source-order-banner" id="source-order-banner" hidden>
+    <span aria-hidden="true" id="source-order-banner-icon">📍</span>
+    <span><span id="source-order-banner-prefix">Source</span> · <strong id="source-order-label"></strong></span>
   </div>
 </div>
 
-<!-- MENU BODY -->
-<div class="menu-body" id="menu-body">
-  <div class="no-cat-msg">Chargement du menu...</div>
+<!-- MENU BROWSE -->
+<div id="browse-zone">
+  <div class="menu-body" id="menu-body">
+    <div class="no-cat-msg">Chargement du menu...</div>
+  </div>
+</div>
+
+<!-- CART PAGE (index.html?slug=…&cart=1) -->
+<div class="cart-page-view" id="cart-page-view" hidden>
+  <header class="cart-page-header">
+    <a href="#" class="cart-page-back" id="cart-page-back">← Menu</a>
+    <h2 class="cart-page-title">Panier</h2>
+    <p class="cart-source-pill" id="cart-source-pill" hidden></p>
+  </header>
+
+  <div class="cart-page-main-block" id="cart-page-main-block">
+    <div class="cart-page-list" id="cart-page-list"></div>
+    <p class="cart-page-empty" id="cart-page-empty" hidden>Votre panier est vide.</p>
+    <footer class="cart-page-footer" id="cart-page-footer" hidden>
+      <div class="cart-page-form-section">
+        <h3>Type de commande</h3>
+        <div class="order-type-btns" id="cart-order-type-btns"></div>
+      </div>
+      <div class="cart-page-form-section">
+        <h3>Vos coordonnées</h3>
+        <div class="field">
+          <label for="cart-order-name">Nom complet *</label>
+          <input type="text" id="cart-order-name" class="input" placeholder="Votre nom" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="cart-order-phone">Téléphone *</label>
+          <input type="tel" id="cart-order-phone" class="input" placeholder="0551 23 45 67" autocomplete="tel">
+        </div>
+        <div class="field" id="cart-address-field">
+          <label for="cart-order-address">Adresse de livraison *</label>
+          <textarea id="cart-order-address" class="textarea" placeholder="Adresse complète, quartier…"></textarea>
+        </div>
+        <div class="field">
+          <label for="cart-order-notes">Notes <span style="color:var(--ink3);font-weight:400">(facultatif)</span></label>
+          <input type="text" id="cart-order-notes" class="input" placeholder="Allergies, instructions…">
+        </div>
+      </div>
+      <div class="cart-page-total-row cart-page-subtotal-row" id="cart-page-subtotal-row" style="display:none;">
+        <span>Sous-total</span>
+        <span id="cart-page-subtotal">—</span>
+      </div>
+      <div class="cart-page-total-row cart-page-subtotal-row" id="cart-page-delivery-row" style="display:none;">
+        <span>Frais de livraison</span>
+        <span id="cart-page-delivery-fee">—</span>
+      </div>
+      <div class="cart-page-total-row">
+        <span>Total</span>
+        <span id="cart-page-total">—</span>
+      </div>
+      <button type="button" class="cart-page-checkout-btn" id="cart-page-send-order-btn"
+        aria-label="Send order — Envoyer la commande">
+        Commander
+      </button>
+      <p style="font-size:.76rem;color:var(--ink3);margin:10px 0 0;text-align:center;line-height:1.4;">
+        En validant, votre commande est enregistrée pour le restaurant (aucun paiement en ligne pour l’instant).
+      </p>
+    </footer>
+  </div>
+
+  <div class="cart-page-order-success" id="cart-page-order-success" hidden>
+    <div class="order-success-icon">✓</div>
+    <h3>Commande enregistrée</h3>
+    <p class="cart-order-success-lead" id="cart-order-success-lead"></p>
+    <textarea id="cart-wa-order-msg-preview" readonly rows="7" aria-label="Message pour le restaurant"></textarea>
+    <div class="cart-success-actions">
+      <a class="btn-whatsapp-send" id="cart-btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Ouvrir WhatsApp</a>
+      <button type="button" class="btn-copy-msg" id="cart-btn-wa-copy">Copier le message</button>
+      <button type="button" class="cart-page-checkout-btn" id="cart-order-success-done">Retour au menu</button>
+    </div>
+  </div>
 </div>
 
 <!-- CART FAB -->
-<button class="cart-fab hidden" id="cart-fab" onclick="openOrderModal()">
+<button type="button" class="cart-fab hidden" id="cart-fab" onclick="goToCartPage()">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
   <span id="cart-fab-text">Mon panier</span>
   <span class="cart-count" id="cart-count">0</span>
@@ -580,6 +893,8 @@
 import { hideLoader, fmtCurrency, toast } from '../js/shared.js';
 import { loadPublicMenuBySlug, getOpeningHoursForDay } from '../supabase/public-menu.js';
 import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orders.js';
+import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
+import { hydrateCart, persistCart as persistCartLs, clearCartStorage as clearCartStorageLs } from '../js/onetap-cart.js';
 
 let restaurant = null;
 let categories = [];
@@ -587,6 +902,8 @@ let products = [];
 let cart = {}; // { productId: { product, qty } }
 let orderType = 'delivery';
 let orderCounter = 1;
+/** Set after menu load when URL contains ?source=… or legacy ?table=… */
+let resolvedSource = null;
 
 function esc(s) {
   return String(s ?? '')
@@ -597,6 +914,7 @@ function esc(s) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const slug = urlParams.get('slug');
+const publicSourceParam = urlParams.get('source') || urlParams.get('table');
 
 (async () => {
   if (!slug || !slug.trim()) {
@@ -606,8 +924,9 @@ const slug = urlParams.get('slug');
         <p><strong>Lien du menu</strong></p>
         <p style="font-size:.88rem;color:var(--ink2);">Ajoutez le nom du restaurant dans l’adresse, par exemple :</p>
         <p style="font-family:monospace;font-size:.8rem;background:var(--cream2);padding:10px;border-radius:8px;word-break:break-all;">
-          index.html?slug=<em>votre-slug</em>
+          index.html?slug=<em>votre-slug</em>&amp;source=<em>takeaway</em>
         </p>
+        <p style="font-size:.82rem;color:var(--ink2);margin-top:8px;"><code style="font-size:.78rem;">source</code> ou <code style="font-size:.78rem;">table</code> (ancien).</p>
       </div>`;
     hideLoader();
     return;
@@ -639,7 +958,36 @@ const slug = urlParams.get('slug');
   restaurant = rest;
   categories = cats;
   products = prods;
-  cart = loadCartFromStorage();
+  cart = hydrateCart(slug, products);
+
+  if (publicSourceParam && String(publicSourceParam).trim()) {
+    const { data: srcRow, error: sErr } = await resolveOrderSourceForPublicOrder(
+      rest.id,
+      String(publicSourceParam).trim(),
+    );
+    if (sErr) toast('Impossible de vérifier la source.', 'error');
+    else if (srcRow) {
+      resolvedSource = srcRow;
+      const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵' };
+      const prefix = { table: 'Table', takeaway: 'À emporter', counter: 'Comptoir', delivery: 'Livraison' }[srcRow.type] || 'Source';
+      const b = document.getElementById('source-order-banner');
+      const lab = document.getElementById('source-order-label');
+      const ic = document.getElementById('source-order-banner-icon');
+      const pre = document.getElementById('source-order-banner-prefix');
+      const cp = document.getElementById('cart-source-pill');
+      if (ic) ic.textContent = icons[srcRow.type] || '📍';
+      if (pre) pre.textContent = prefix;
+      if (lab) lab.textContent = srcRow.name;
+      if (b) b.hidden = false;
+      if (cp) {
+        cp.textContent = `${prefix} · ${srcRow.name}`;
+        cp.hidden = false;
+      }
+    } else {
+      toast('Source introuvable. Vous pouvez commander sans canal dédié.', 'warning');
+    }
+  }
+
   document.title = `${rest.name} — Menu`;
 
   document.getElementById('rest-name').textContent = rest.name;
@@ -685,18 +1033,7 @@ const slug = urlParams.get('slug');
       ${isOpen ? (hours ? `Ouvert · ${hours.open_time}–${hours.close_time}` : 'Ouvert') : 'Fermé'}
     </div>`;
 
-  // Configure order types
-  if (!rest.delivery_enabled || !rest.pickup_enabled) {
-    const typeBtns = document.getElementById('order-type-btns');
-    if (!rest.delivery_enabled && rest.pickup_enabled) {
-      orderType = 'pickup';
-      typeBtns.innerHTML = `<button class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>À emporter</button>`;
-      document.getElementById('address-field').style.display = 'none';
-    } else if (rest.delivery_enabled && !rest.pickup_enabled) {
-      orderType = 'delivery';
-      typeBtns.innerHTML = `<button class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>Livraison</button>`;
-    }
-  }
+  applyRestaurantOrderTypeUi(rest);
 
   // Get order count for numbering
   const { count } = await countOrdersForRestaurant(rest.id);
@@ -704,53 +1041,219 @@ const slug = urlParams.get('slug');
 
   buildMenu();
   updateCartFAB();
+  syncCartPageVisibility();
   hideLoader();
 })();
 
-const CART_LS_PREFIX = 'onetap_cart_v1_';
-
-function cartStorageKey() {
-  return `${CART_LS_PREFIX}${String(slug || '').trim()}`;
-}
-
-function loadCartFromStorage() {
-  if (!slug || !String(slug).trim() || !products.length) return {};
-  try {
-    const raw = localStorage.getItem(cartStorageKey());
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return {};
-    const out = {};
-    for (const [id, qty] of Object.entries(parsed)) {
-      const n = Number(qty);
-      if (!Number.isFinite(n) || n < 1) continue;
-      const p = products.find((x) => x.id === id);
-      if (p) out[id] = { product: p, qty: Math.min(Math.floor(n), 999) };
-    }
-    return out;
-  } catch {
-    return {};
-  }
-}
-
 function persistCart() {
-  if (!slug || !String(slug).trim()) return;
-  const minimal = {};
-  for (const [id, v] of Object.entries(cart)) {
-    if (v && v.qty > 0) minimal[id] = v.qty;
-  }
-  try {
-    const key = cartStorageKey();
-    if (Object.keys(minimal).length === 0) localStorage.removeItem(key);
-    else localStorage.setItem(key, JSON.stringify(minimal));
-  } catch (_) {}
+  persistCartLs(String(slug || '').trim(), cart);
 }
 
 function clearCartStorage() {
-  try {
-    localStorage.removeItem(cartStorageKey());
-  } catch (_) {}
+  clearCartStorageLs(String(slug || '').trim());
 }
+
+function isCartPageMode() {
+  return new URLSearchParams(window.location.search).get('cart') === '1';
+}
+
+/** Sync modal + cart-page order-type buttons and address visibility. */
+function applyRestaurantOrderTypeUi(rest) {
+  const typeBtns = document.getElementById('order-type-btns');
+  const cartTypeBtns = document.getElementById('cart-order-type-btns');
+  const setBoth = (html, showAddress) => {
+    if (typeBtns) typeBtns.innerHTML = html;
+    if (cartTypeBtns) cartTypeBtns.innerHTML = html;
+    const vis = showAddress ? '' : 'none';
+    const af = document.getElementById('address-field');
+    const caf = document.getElementById('cart-address-field');
+    if (af) af.style.display = vis;
+    if (caf) caf.style.display = vis;
+  };
+  if (resolvedSource) {
+    const st = resolvedSource.type || 'table';
+    const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵' };
+    const labels = { table: 'Sur table', takeaway: 'À emporter', counter: 'Comptoir', delivery: 'Livraison' };
+    const icon = icons[st] || '📍';
+    const lab = labels[st] || 'Commande';
+    const lockedHtml = `<div class="otype-source-locked" role="status"><span aria-hidden="true">${icon}</span><span>${lab} — <strong>${esc(resolvedSource.name)}</strong></span></div>`;
+    if (st === 'delivery') {
+      orderType = 'delivery';
+      setBoth(lockedHtml, true);
+    } else if (st === 'takeaway' || st === 'counter') {
+      orderType = 'pickup';
+      setBoth(lockedHtml, false);
+    } else {
+      orderType = 'qr_table';
+      setBoth(lockedHtml, false);
+    }
+    return;
+  }
+  if (!rest.delivery_enabled || !rest.pickup_enabled) {
+    if (!rest.delivery_enabled && rest.pickup_enabled) {
+      orderType = 'pickup';
+      setBoth(
+        `<button type="button" class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>À emporter</button>`,
+        false,
+      );
+    } else if (rest.delivery_enabled && !rest.pickup_enabled) {
+      orderType = 'delivery';
+      setBoth(
+        `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>Livraison</button>`,
+        true,
+      );
+    }
+  } else {
+    orderType = 'delivery';
+    const bothHtml = `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>Livraison</button>
+          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>À emporter</button>`;
+    setBoth(bothHtml, true);
+  }
+}
+
+function readCheckoutFields() {
+  const c = isCartPageMode();
+  const name = (c ? document.getElementById('cart-order-name') : document.getElementById('order-name'))?.value?.trim() ?? '';
+  const phone = (c ? document.getElementById('cart-order-phone') : document.getElementById('order-phone'))?.value?.trim() ?? '';
+  const address = (c ? document.getElementById('cart-order-address') : document.getElementById('order-address'))?.value?.trim() ?? '';
+  const notes = (c ? document.getElementById('cart-order-notes') : document.getElementById('order-notes'))?.value?.trim() ?? '';
+  return { name, phone, address, notes };
+}
+
+function updateCartPageTotals() {
+  if (!restaurant) return;
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+  const deliveryFee = orderType === 'delivery' && restaurant.delivery_fee ? restaurant.delivery_fee : 0;
+  const total = subtotal + deliveryFee;
+  const subRow = document.getElementById('cart-page-subtotal-row');
+  const feeRow = document.getElementById('cart-page-delivery-row');
+  const subEl = document.getElementById('cart-page-subtotal');
+  const totalEl = document.getElementById('cart-page-total');
+  if (subEl) subEl.textContent = fmtCurrency(subtotal);
+  if (totalEl) totalEl.textContent = fmtCurrency(total);
+  if (subRow) subRow.style.display = items.length > 0 ? 'flex' : 'none';
+  if (feeRow) {
+    if (deliveryFee > 0 && items.length > 0) {
+      feeRow.style.display = 'flex';
+      const feeEl = document.getElementById('cart-page-delivery-fee');
+      if (feeEl) feeEl.textContent = fmtCurrency(deliveryFee);
+    } else feeRow.style.display = 'none';
+  }
+}
+
+window.goToCartPage = function () {
+  const u = new URL(window.location.href);
+  u.searchParams.set('cart', '1');
+  window.location.href = `${u.pathname}?${u.searchParams.toString()}`;
+};
+
+function syncCartPageVisibility() {
+  if (!slug || !String(slug).trim()) return;
+  const cartMode = isCartPageMode();
+  const tabs = document.getElementById('menu-cat-tabs-wrap');
+  const browse = document.getElementById('browse-zone');
+  const cartView = document.getElementById('cart-page-view');
+  if (!browse || !cartView) return;
+  if (cartMode) {
+    if (tabs) tabs.classList.add('is-hidden');
+    browse.hidden = true;
+    cartView.hidden = false;
+    const mb = document.getElementById('cart-page-main-block');
+    const succ = document.getElementById('cart-page-order-success');
+    if (mb) mb.hidden = false;
+    if (succ) succ.hidden = true;
+    renderCartPage();
+  } else {
+    if (tabs) tabs.classList.remove('is-hidden');
+    browse.hidden = false;
+    cartView.hidden = true;
+  }
+}
+
+function renderCartPage() {
+  const listEl = document.getElementById('cart-page-list');
+  const emptyEl = document.getElementById('cart-page-empty');
+  const footEl = document.getElementById('cart-page-footer');
+  if (!listEl || !emptyEl || !footEl) return;
+
+  const items = Object.values(cart);
+  if (items.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.hidden = false;
+    footEl.hidden = true;
+    return;
+  }
+
+  emptyEl.hidden = true;
+  footEl.hidden = false;
+
+  listEl.innerHTML = items
+    .map((i) => {
+      const p = i.product;
+      const imgUrl = safeHttpUrl(p.image_url);
+      const img = imgUrl
+        ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy">`
+        : '';
+      const pid = p.id;
+      return `
+    <div class="cart-page-row">
+      <div class="cart-page-img">${img || '🍽️'}</div>
+      <div class="cart-page-main">
+        <div class="cart-page-name">${esc(p.name)}</div>
+        <div class="cart-page-unit">${fmtCurrency(p.price)} l’unité</div>
+        <div class="qty-controls">
+          <button type="button" class="qty-btn" onclick="removeFromCart('${pid}')">−</button>
+          <span class="qty-num">${i.qty}</span>
+          <button type="button" class="qty-btn add" onclick="addToCart('${pid}')">+</button>
+        </div>
+      </div>
+      <div class="cart-page-side">
+        <div class="cart-page-line-total">${fmtCurrency(p.price * i.qty)}</div>
+        <button type="button" class="btn-cart-remove" onclick="cartRemoveLine('${pid}')">Retirer</button>
+      </div>
+    </div>`;
+    })
+    .join('');
+
+  updateCartPageTotals();
+}
+
+window.cartRemoveLine = function (productId) {
+  delete cart[productId];
+  persistCart();
+  renderCartPage();
+  updateCartFAB();
+  buildMenu();
+};
+
+document.getElementById('cart-page-back')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  const u = new URL(window.location.href);
+  u.searchParams.delete('cart');
+  const qs = u.searchParams.toString();
+  window.location.href = qs ? `${u.pathname}?${qs}` : u.pathname;
+});
+
+document.getElementById('cart-page-send-order-btn')?.addEventListener('click', () => placeOrder());
+
+document.getElementById('cart-btn-wa-copy')?.addEventListener('click', async () => {
+  const t = document.getElementById('cart-wa-order-msg-preview')?.value;
+  if (!t) return;
+  try {
+    await navigator.clipboard.writeText(t);
+    toast('Message copié', 'success');
+  } catch {
+    toast('Copie impossible sur cet appareil', 'error');
+  }
+});
+
+document.getElementById('cart-order-success-done')?.addEventListener('click', () => {
+  const u = new URL(window.location.href);
+  u.searchParams.delete('cart');
+  const qs = u.searchParams.toString();
+  window.location.href = qs ? `${u.pathname}?${qs}` : u.pathname;
+});
 
 function buildMenu() {
   // Category tabs
@@ -824,6 +1327,7 @@ window.addToCart = function(productId) {
   refreshProductRow(productId);
   updateCartFAB();
   persistCart();
+  if (isCartPageMode()) renderCartPage();
 };
 
 window.removeFromCart = function(productId) {
@@ -833,6 +1337,7 @@ window.removeFromCart = function(productId) {
   refreshProductRow(productId);
   updateCartFAB();
   persistCart();
+  if (isCartPageMode()) renderCartPage();
 };
 
 function refreshProductRow(productId) {
@@ -860,11 +1365,17 @@ window.scrollToSection = function(catId, btn) {
 };
 
 window.selectOrderType = function(type, btn) {
+  if (resolvedSource) return;
   orderType = type;
   document.querySelectorAll('.otype-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('address-field').style.display = type === 'delivery' ? '' : 'none';
+  const showAddr = type === 'delivery' ? '' : 'none';
+  const af = document.getElementById('address-field');
+  const caf = document.getElementById('cart-address-field');
+  if (af) af.style.display = showAddr;
+  if (caf) caf.style.display = showAddr;
   updateCartTotals();
+  updateCartPageTotals();
 };
 
 function updateCartTotals() {
@@ -927,14 +1438,14 @@ window.closeOrderModal = function() {
 };
 
 window.placeOrder = async function() {
-  const name = document.getElementById('order-name').value.trim();
-  const phone = document.getElementById('order-phone').value.trim();
-  const address = document.getElementById('order-address').value.trim();
-  const notes = document.getElementById('order-notes').value.trim();
+  const { name, phone, address, notes } = readCheckoutFields();
 
   if (!name) { toast('Veuillez saisir votre nom', 'error'); return; }
   if (!phone) { toast('Veuillez saisir votre téléphone', 'error'); return; }
-  if (orderType === 'delivery' && !address) { toast('Veuillez saisir votre adresse', 'error'); return; }
+  if (orderType === 'delivery' && !address) {
+    toast('Veuillez saisir votre adresse', 'error');
+    return;
+  }
 
   const items = Object.values(cart);
   if (items.length === 0) { toast('Votre panier est vide', 'error'); return; }
@@ -964,6 +1475,8 @@ window.placeOrder = async function() {
     subtotal,
     delivery_fee: deliveryFee,
     total_amount: total,
+    source_id: resolvedSource?.id ?? null,
+    source_name: resolvedSource?.name ?? null,
   };
   const itemRows = items.map(i => ({
     product_id: i.product.id,
@@ -973,14 +1486,28 @@ window.placeOrder = async function() {
   }));
 
   const btn = document.getElementById('checkout-submit-btn');
-  btn.disabled = true;
-  const prevLabel = btn.innerHTML;
-  btn.innerHTML = 'Enregistrement…';
+  const btnCart = document.getElementById('cart-page-send-order-btn');
+  const prevLabel = btn?.innerHTML;
+  const prevCartLabel = btnCart?.textContent;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = 'Enregistrement…';
+  }
+  if (btnCart) {
+    btnCart.disabled = true;
+    btnCart.textContent = 'Enregistrement…';
+  }
 
   const { data: savedOrder, error: orderErr } = await createOrderWithItems(orderRow, itemRows);
 
-  btn.disabled = false;
-  btn.innerHTML = prevLabel;
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = prevLabel;
+  }
+  if (btnCart) {
+    btnCart.disabled = false;
+    btnCart.textContent = prevCartLabel || 'Commander';
+  }
 
   if (orderErr || !savedOrder) {
     if (waPrep && !waPrep.closed) {
@@ -1004,13 +1531,17 @@ window.placeOrder = async function() {
     customerPhone: phone,
     customerAddress: address,
     customerNotes: notes,
+    sourceLabel: resolvedSource?.name || null,
+    sourceType: resolvedSource?.type || null,
   });
 
   const waNumber = (restaurant.whatsapp || restaurant.phone || '').replace(/\D/g, '');
   const waBtn = document.getElementById('btn-wa-open');
   const lead = document.getElementById('order-success-lead');
-
-  document.getElementById('wa-order-msg-preview').value = msg;
+  const waPreviewModal = document.getElementById('wa-order-msg-preview');
+  if (waPreviewModal) waPreviewModal.value = msg;
+  const cartWaPrev = document.getElementById('cart-wa-order-msg-preview');
+  if (cartWaPrev) cartWaPrev.value = msg;
 
   const WA_URL_SAFE_LEN = 1600;
   const encoded = encodeURIComponent(msg);
@@ -1021,9 +1552,12 @@ window.placeOrder = async function() {
         ? `https://wa.me/${waNumber}`
         : '';
 
+  let leadText = '';
   if (waNumber) {
-    waBtn.href = waUrlWithText || `https://wa.me/${waNumber}`;
-    waBtn.style.display = '';
+    if (waBtn) {
+      waBtn.href = waUrlWithText || `https://wa.me/${waNumber}`;
+      waBtn.style.display = '';
+    }
 
     if (waPrep && !waPrep.closed) {
       try {
@@ -1038,11 +1572,11 @@ window.placeOrder = async function() {
       window.open(waUrlWithText || `https://wa.me/${waNumber}`, '_blank', 'noopener,noreferrer');
     }
 
-    if (encoded.length > WA_URL_SAFE_LEN && lead) {
-      lead.textContent =
+    if (encoded.length > WA_URL_SAFE_LEN) {
+      leadText =
         'Le message est long : WhatsApp s’ouvre sans le texte prérempli. Copiez le message ci-dessous puis collez-le dans la conversation.';
-    } else if (lead) {
-      lead.textContent =
+    } else {
+      leadText =
         'WhatsApp devrait s’ouvrir avec le message. Sinon, utilisez le bouton « Ouvrir WhatsApp » ou copiez le texte.';
     }
   } else {
@@ -1051,19 +1585,49 @@ window.placeOrder = async function() {
         waPrep.close();
       } catch (_) {}
     }
-    waBtn.removeAttribute('href');
-    waBtn.style.display = 'none';
-    if (lead) {
-      lead.textContent =
-        'Le restaurant n’a pas encore renseigné de numéro WhatsApp. Copiez le texte ci-dessous si besoin — la commande est déjà enregistrée.';
+    if (waBtn) {
+      waBtn.removeAttribute('href');
+      waBtn.style.display = 'none';
+    }
+    leadText =
+      'Le restaurant n’a pas encore renseigné de numéro WhatsApp. Copiez le texte ci-dessous si besoin — la commande est déjà enregistrée.';
+  }
+
+  const cartWaBtn = document.getElementById('cart-btn-wa-open');
+  if (cartWaBtn) {
+    if (waNumber) {
+      cartWaBtn.href = waUrlWithText || `https://wa.me/${waNumber}`;
+      cartWaBtn.style.display = '';
+    } else {
+      cartWaBtn.removeAttribute('href');
+      cartWaBtn.style.display = 'none';
     }
   }
 
-  document.getElementById('order-checkout-panel').style.display = 'none';
-  document.getElementById('order-modal-footer').style.display = 'none';
-  const successEl = document.getElementById('order-success-panel');
-  successEl.style.display = 'block';
-  successEl.classList.add('is-visible');
+  const checkoutFromCartPage = isCartPageMode();
+  if (checkoutFromCartPage) {
+    closeOrderModal();
+    const modalEl = document.getElementById('order-modal');
+    if (modalEl) modalEl.style.display = 'none';
+    resetOrderModalView();
+    const mb = document.getElementById('cart-page-main-block');
+    if (mb) mb.hidden = true;
+    const cs = document.getElementById('cart-page-order-success');
+    if (cs) cs.hidden = false;
+    const cartLead = document.getElementById('cart-order-success-lead');
+    if (cartLead) cartLead.textContent = leadText;
+  } else {
+    if (lead) lead.textContent = leadText;
+    const checkoutPanel = document.getElementById('order-checkout-panel');
+    const modalFooter = document.getElementById('order-modal-footer');
+    if (checkoutPanel) checkoutPanel.style.display = 'none';
+    if (modalFooter) modalFooter.style.display = 'none';
+    const successEl = document.getElementById('order-success-panel');
+    if (successEl) {
+      successEl.style.display = 'block';
+      successEl.classList.add('is-visible');
+    }
+  }
 
   toast(
     waNumber
@@ -1093,8 +1657,15 @@ function buildWhatsappOrderMessage({
   customerPhone,
   customerAddress,
   customerNotes,
+  sourceLabel,
+  sourceType,
 }) {
-  const typeLabels = { delivery: '🛵 Livraison', pickup: '🏪 À emporter', dine_in: '🍽️ Sur place' };
+  const typeLabels = {
+    delivery: '🛵 Livraison',
+    pickup: '🏪 À emporter',
+    dine_in: '🍽️ Sur place',
+    qr_table: '🪑 Sur table (QR / source)',
+  };
   let msg = `🍽️ *Restaurant : ${restaurantName}*\n`;
   msg += `📌 *Commande ${orderNumber}*\n`;
   msg += `_Enregistrée dans le système._\n\n`;
@@ -1107,6 +1678,11 @@ function buildWhatsappOrderMessage({
   if (deliveryFee > 0) msg += `\n🚚 *Livraison : ${fmtCurrency(deliveryFee)}*`;
   msg += `\n🧾 *TOTAL À PAYER : ${fmtCurrency(total)}*\n`;
   msg += `\n📦 *${typeLabels[orderType] || orderType}*\n`;
+  if (sourceLabel) {
+    const st = sourceType || 'table';
+    const srcTag = { table: '🪑 Table', takeaway: '🥡 À emporter', counter: '🧾 Comptoir', delivery: '🛵 Livraison' }[st] || '📍 Source';
+    msg += `${srcTag} : *${sourceLabel}*\n`;
+  }
   msg += `👤 *${customerName}* — 📞 ${customerPhone}`;
   if (customerAddress) msg += `\n📍 ${customerAddress}`;
   if (customerNotes) msg += `\n📝 ${customerNotes}`;

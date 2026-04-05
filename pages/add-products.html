@@ -198,6 +198,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Produits
       </a>
+      <a href="order-sources.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Sources
+      </a>
     </nav>
     <div class="sidebar-footer">
       <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
@@ -351,7 +355,11 @@ import {
   deleteProductForRestaurant,
   uploadProductImage,
 } from '../supabase/products.js';
-import { optimizeProductImage, MAX_OPTIMIZED_PRODUCT_BYTES } from '../js/image-optimize.js';
+import {
+  optimizeProductImage,
+  MAX_OPTIMIZED_PRODUCT_BYTES,
+  fileLooksLikeImage,
+} from '../js/image-optimize.js';
 
 let restaurant = null;
 let categories = [];
@@ -500,11 +508,17 @@ window.handleDragOver = function(e) {
 window.handleDragLeave = function() {
   document.getElementById('img-drop-area').classList.remove('drag-over');
 };
-window.handleDrop = function(e) {
+window.handleDrop = async function(e) {
   e.preventDefault();
   document.getElementById('img-drop-area').classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) void previewImage(file);
+  if (!file) return;
+  if (await fileLooksLikeImage(file)) {
+    void previewImage(file);
+  } else {
+    console.warn('[OneTap products] drop rejected (not detected as image)', file.name, file.type);
+    toast('Déposez un fichier image (photo).', 'error');
+  }
 };
 window.handleImageSelect = function(input) {
   const file = input.files[0];
@@ -514,6 +528,11 @@ window.handleImageSelect = function(input) {
 async function previewImage(file) {
   setImgOptStatus('');
   revokePreviewObjectUrl();
+  console.log('[OneTap products] file selected', {
+    name: file?.name,
+    size: file?.size,
+    type: file?.type || '(empty)',
+  });
   try {
     setImgOptStatus('Optimisation de l’image…');
     const { file: outFile, blob, meta } = await optimizeProductImage(file);
@@ -531,9 +550,24 @@ async function previewImage(file) {
     setImgOptStatus(
       `Prêt pour l’envoi (≤ 5 Mo) : ${meta.outW}×${meta.outH} px, JPEG — ${mbIn} Mo → ${mbOut} Mo`,
     );
+    console.log('[OneTap products] optimized OK', {
+      inBytes: meta.inBytes,
+      outBytes: meta.outBytes,
+    });
   } catch (err) {
+    console.error('[OneTap products] optimize failed', err?.code || err?.name, err);
     selectedFile = null;
-    toast(err?.message || 'Impossible d’optimiser cette image', 'error');
+    let msg =
+      'Impossible de traiter cette photo. Réessayez ou choisissez une autre image.';
+    if (err?.name === 'ProductImageError' || err?.code) {
+      msg = err.message || msg;
+    } else {
+      const raw = String(err?.message || '');
+      if (/ne ressemble pas à une photo|type inconnu/i.test(raw)) msg = raw;
+      else if (/Impossible de lire/i.test(raw)) msg = raw;
+      else if (/trop lourde après compression|Compression JPEG/i.test(raw)) msg = raw;
+    }
+    toast(msg, 'error');
     setImgOptStatus('');
   }
 }
@@ -571,11 +605,28 @@ window.saveProduct = async function() {
   if (imageRemovedForEdit && !selectedFile) image_url = null;
 
   if (selectedFile) {
+    console.log('[OneTap products] pre-upload', {
+      size: selectedFile.size,
+      type: selectedFile.type,
+      limit: MAX_OPTIMIZED_PRODUCT_BYTES,
+    });
     if (selectedFile.size > MAX_OPTIMIZED_PRODUCT_BYTES) {
-      toast('Image trop lourde après optimisation (max 5 Mo). Sélectionnez à nouveau.', 'error');
-      btn.disabled = false;
-      btn.textContent = 'Enregistrer le produit';
-      return;
+      try {
+        console.warn('[OneTap products] second optimization pass before upload');
+        const again = await optimizeProductImage(selectedFile);
+        selectedFile = again.file;
+      } catch (e2) {
+        console.error('[OneTap products] second pass failed', e2?.code || e2?.name, e2);
+        const msg =
+          e2?.name === 'ProductImageError' || e2?.code
+            ? e2.message ||
+              'Impossible de traiter cette photo. Réessayez ou choisissez une autre image.'
+            : 'Le fichier optimisé dépasse encore 5 Mo. Choisissez une autre photo ou réessayez.';
+        toast(msg, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer le produit';
+        return;
+      }
     }
     const { publicUrl, error: upErr } = await uploadProductImage(restaurant.id, selectedFile);
     if (upErr || !publicUrl) {

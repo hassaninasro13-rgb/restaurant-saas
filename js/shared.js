@@ -67,15 +67,24 @@ export function slugify(str) {
     .replace(/^-|-$/g, '');
 }
 
+/** Kitchen workflow + legacy values still stored in older rows */
+export const ORDER_WORKFLOW_STATUSES = ['new', 'preparing', 'ready', 'completed'];
+
+export function isTerminalOrderStatus(status) {
+  const s = String(status || '');
+  return s === 'completed' || s === 'cancelled' || s === 'done' || s === 'delivered';
+}
+
 export function getStatusBadge(status) {
   const map = {
-    new:       ['Nouvelle', 'blue'],
-    confirmed: ['Confirmée', 'purple'],
+    new: ['Nouvelle', 'blue'],
     preparing: ['En préparation', 'amber'],
-    ready:     ['Prête', 'green'],
-    done:      ['Terminée', 'green'],
-    delivered: ['Livrée', 'green'],
+    ready: ['Prête', 'green'],
+    completed: ['Terminée', 'gray'],
     cancelled: ['Annulée', 'red'],
+    confirmed: ['Confirmée', 'purple'],
+    done: ['Terminée', 'gray'],
+    delivered: ['Livrée', 'gray'],
   };
   const [label, color] = map[status] || [status, 'gray'];
   return `<span class="badge badge-${color}">${label}</span>`;

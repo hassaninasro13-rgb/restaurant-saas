@@ -69,7 +69,7 @@
 
   .order-card-header {
     display: grid;
-    grid-template-columns: 130px 1fr 160px 120px 170px;
+    grid-template-columns: 130px 1fr 140px 100px minmax(200px, 1.2fr);
     align-items: center;
     gap: 16px;
     padding: 16px 20px;
@@ -94,6 +94,21 @@
   }
   .order-type-tag { font-size: .8rem; color: var(--ink3); margin-top: 3px; }
 
+  .order-source-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    background: var(--accent-lt);
+    color: var(--accent);
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .order-status-select {
     padding: 7px 12px;
     border: 1.5px solid var(--border);
@@ -107,6 +122,50 @@
     transition: border-color .12s;
   }
   .order-status-select:focus { border-color: var(--accent); }
+
+  .order-flow-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .order-flow-btn {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    font-size: .76rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-body);
+    background: #fff;
+    color: var(--ink2);
+    transition: background .12s, border-color .12s, color .12s;
+    white-space: nowrap;
+  }
+  .order-flow-btn:hover { border-color: var(--ink2); color: var(--ink); }
+  .order-flow-btn--primary {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .order-flow-btn--primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .order-flow-btn--danger {
+    border-color: var(--red-lt);
+    color: var(--red);
+    background: var(--red-lt);
+  }
+  .order-flow-btn--danger:hover { background: var(--red); color: #fff; border-color: var(--red); }
+  .order-flow-muted { font-size: .78rem; color: var(--ink3); font-weight: 600; }
+
+  .order-card-full.order-card--st-new { border-left: 4px solid var(--blue); }
+  .order-card-full.order-card--st-preparing,
+  .order-card-full.order-card--st-confirmed { border-left: 4px solid var(--amber); }
+  .order-card-full.order-card--st-ready { border-left: 4px solid var(--green); }
+  .order-card-full.order-card--st-completed,
+  .order-card-full.order-card--st-done,
+  .order-card-full.order-card--st-delivered { border-left: 4px solid var(--ink3); }
+  .order-card-full.order-card--st-cancelled { border-left: 4px solid var(--red); }
 
   .order-expand-btn {
     background: var(--cream2);
@@ -249,6 +308,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
         Commandes
       </a>
+      <a href="kitchen.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v0"/><path d="M19 22v-3"/></svg>
+        Cuisine
+      </a>
       <div class="sidebar-section-label">Menu</div>
       <a href="add-categories.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -257,6 +320,10 @@
       <a href="add-products.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Produits
+      </a>
+      <a href="order-sources.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Sources
       </a>
     </nav>
     <div class="sidebar-footer">
@@ -295,17 +362,16 @@
       <!-- FILTERS + SEARCH -->
       <div class="orders-toolbar">
         <div class="status-filters" id="status-filters">
-          <button class="sf-btn active" onclick="filterStatus('all', this)">Toutes</button>
-          <button class="sf-btn" onclick="filterStatus('new', this)">🔵 Nouvelles</button>
-          <button class="sf-btn" onclick="filterStatus('confirmed', this)">🟣 Confirmées</button>
-          <button class="sf-btn" onclick="filterStatus('preparing', this)">🟡 En préparation</button>
-          <button class="sf-btn" onclick="filterStatus('ready', this)">🟢 Prêtes</button>
-          <button class="sf-btn" onclick="filterStatus('done', this)">✅ Terminées</button>
-          <button class="sf-btn" onclick="filterStatus('cancelled', this)">❌ Annulées</button>
+          <button type="button" class="sf-btn active" onclick="filterStatus('all', this)">Toutes</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('new', this)">🔵 Nouvelles</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('preparing', this)">🟡 En préparation</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('ready', this)">🟢 Prêtes</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('completed', this)">✅ Terminées</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('cancelled', this)">❌ Annulées</button>
         </div>
         <div class="orders-search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="search-input" placeholder="Nom, téléphone, numéro..." oninput="handleSearch(this.value)">
+          <input type="text" id="search-input" placeholder="Nom, téléphone, n°, source…" oninput="handleSearch(this.value)">
         </div>
       </div>
 
@@ -329,6 +395,13 @@ let allOrders = [];
 let currentStatus = 'all';
 let searchQuery = '';
 let refreshInterval = null;
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
 
 (async () => {
   const session = await requireAuth();
@@ -363,22 +436,78 @@ function updateStats() {
   document.getElementById('s-new').textContent = allOrders.filter(o => o.status === 'new').length;
   document.getElementById('s-preparing').textContent = allOrders.filter(o => o.status === 'preparing').length;
   document.getElementById('s-ready').textContent = allOrders.filter(o => o.status === 'ready').length;
-  document.getElementById('s-done').textContent = recent.filter(o => o.status === 'done').length;
-  const revenue = recent.filter(o => o.status === 'done').reduce((s, o) => s + (o.total_amount || 0), 0);
+  const doneLike = (s) => ['completed', 'done', 'delivered'].includes(s);
+  document.getElementById('s-done').textContent = recent.filter(o => doneLike(o.status)).length;
+  const revenue = recent.filter(o => doneLike(o.status)).reduce((s, o) => s + (o.total_amount || 0), 0);
   document.getElementById('s-revenue').textContent = fmtCurrency(revenue);
 }
 
 function getFiltered() {
-  let filtered = currentStatus === 'all' ? allOrders : allOrders.filter(o => o.status === currentStatus);
+  let filtered = allOrders;
+  if (currentStatus !== 'all') {
+    filtered = allOrders.filter((o) => {
+      const s = o.status;
+      if (currentStatus === 'preparing') return s === 'preparing' || s === 'confirmed';
+      if (currentStatus === 'completed') return s === 'completed' || s === 'done' || s === 'delivered';
+      return s === currentStatus;
+    });
+  }
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     filtered = filtered.filter(o =>
       o.customer_name?.toLowerCase().includes(q) ||
       o.customer_phone?.includes(q) ||
-      o.order_number?.toLowerCase().includes(q)
+      o.order_number?.toLowerCase().includes(q) ||
+      o.source_name?.toLowerCase().includes(q) ||
+      o.table_name?.toLowerCase().includes(q) ||
+      String(o.table_number || '').toLowerCase().includes(q)
     );
   }
   return filtered;
+}
+
+/** Map legacy rows to a card accent class (confirmed → preparing lane). */
+function orderCardStatusClass(status) {
+  if (status === 'done' || status === 'delivered') return 'completed';
+  if (status === 'confirmed') return 'preparing';
+  return status || 'unknown';
+}
+
+/** Effective step for workflow buttons (legacy → current model). */
+function effectiveWorkflowStep(status) {
+  if (status === 'done' || status === 'delivered') return 'completed';
+  if (status === 'confirmed' || status === 'preparing') return 'preparing';
+  return status;
+}
+
+function buildStatusActionButtons(o) {
+  const s = o.status;
+  if (s === 'cancelled') {
+    return '<span class="order-flow-muted">Annulée</span>';
+  }
+  const step = effectiveWorkflowStep(s);
+  if (step === 'completed') {
+    return '<span class="order-flow-muted">Terminée</span>';
+  }
+  const id = o.id;
+  const parts = [];
+  if (step === 'new') {
+    parts.push(
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'preparing')">En préparation</button>`,
+    );
+  } else if (step === 'preparing') {
+    parts.push(
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'ready')">Prête</button>`,
+    );
+  } else if (step === 'ready') {
+    parts.push(
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'completed')">Terminée</button>`,
+    );
+  }
+  parts.push(
+    `<button type="button" class="order-flow-btn order-flow-btn--danger" onclick="event.stopPropagation(); updateStatus('${id}', 'cancelled')">Annuler</button>`,
+  );
+  return `<div class="order-flow-actions">${parts.join('')}</div>`;
 }
 
 function renderOrders() {
@@ -402,17 +531,23 @@ function renderOrders() {
 function buildOrderCard(o) {
   const items = o.order_items || [];
   const typeLabels = { delivery: '🛵 Livraison', pickup: '🏪 À emporter', dine_in: '🍽️ Sur place', qr_table: '📱 QR Table' };
+  const sourceDisp = o.source_name || o.table_name || o.table_number;
+  const sourcePill = sourceDisp
+    ? `<div class="order-source-pill" title="Source">📍 ${esc(String(sourceDisp))}</div>`
+    : '';
 
   const waMsg = encodeURIComponent(
     `✅ Votre commande ${o.order_number} est confirmée!\nMerci ${o.customer_name} 🙏`
   );
   const waLink = `https://wa.me/${o.customer_phone?.replace(/\D/g,'')}?text=${waMsg}`;
 
+  const stClass = orderCardStatusClass(o.status);
   return `
-  <div class="order-card-full" id="order-${o.id}">
+  <div class="order-card-full order-card--st-${stClass}" id="order-${o.id}">
     <div class="order-card-header" onclick="toggleOrder('${o.id}')">
       <div>
         <div class="order-num-tag">${o.order_number}</div>
+        ${sourcePill}
         <div class="order-date">${fmtDate(o.created_at)}</div>
       </div>
       <div>
@@ -424,16 +559,17 @@ function buildOrderCard(o) {
         <div class="order-type-tag">${typeLabels[o.order_type] || o.order_type}</div>
       </div>
       <div>${getStatusBadge(o.status)}</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <select class="order-status-select" onchange="updateStatus('${o.id}', this.value)" onclick="event.stopPropagation()">
-          ${['new','confirmed','preparing','ready','done','delivered','cancelled'].map(s =>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        ${buildStatusActionButtons(o)}
+        <select class="order-status-select" title="Changer le statut (toutes les valeurs)" onchange="updateStatus('${o.id}', this.value)" onclick="event.stopPropagation()">
+          ${['new','preparing','ready','completed','cancelled','confirmed','done','delivered'].map(s =>
             `<option value="${s}" ${o.status === s ? 'selected' : ''}>${{
-              new:'Nouvelle',confirmed:'Confirmée',preparing:'En préparation',
-              ready:'Prête',done:'Terminée',delivered:'Livrée',cancelled:'Annulée'
+              new:'Nouvelle', preparing:'En préparation', ready:'Prête', completed:'Terminée',
+              cancelled:'Annulée', confirmed:'Confirmée (anc.)', done:'Terminée (anc.)', delivered:'Livrée (anc.)',
             }[s]}</option>`
           ).join('')}
         </select>
-        <button class="order-expand-btn">▾</button>
+        <button type="button" class="order-expand-btn" aria-label="Détails">▾</button>
       </div>
     </div>
 
@@ -449,7 +585,7 @@ function buildOrderCard(o) {
           <div class="order-info-label">Livraison / Retrait</div>
           <div class="order-info-value">${typeLabels[o.order_type] || '—'}</div>
           ${o.customer_address ? `<div style="font-size:.8rem;color:var(--ink3);margin-top:4px;">${o.customer_address}</div>` : ''}
-          ${o.table_number ? `<div style="font-size:.8rem;color:var(--ink3)">Table: ${o.table_number}</div>` : ''}
+          ${(o.source_name || o.table_name || o.table_number) ? `<div style="font-size:.8rem;color:var(--ink3)">Source : ${esc(String(o.source_name || o.table_name || o.table_number))}</div>` : ''}
         </div>
         <div class="order-info-box">
           <div class="order-info-label">Notes</div>
@@ -507,12 +643,14 @@ window.handleSearch = function(q) {
 };
 
 window.updateStatus = async function(id, status) {
+  if (status === 'cancelled' && !confirm('Annuler cette commande ?')) return;
   const { error } = await updateOrderStatus(id, status);
-  if (error) { toast('Erreur: ' + error.message, 'error'); return; }
-  const o = allOrders.find(x => x.id === id);
-  if (o) o.status = status;
-  updateStats();
+  if (error) {
+    toast('Erreur : ' + error.message, 'error');
+    return;
+  }
   toast('Statut mis à jour', 'success');
+  await loadOrders();
 };
 
 window.handleSignOut = async () => { await signOut(); };

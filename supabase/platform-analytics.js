@@ -1,8 +1,8 @@
 import { supabase } from './client.js';
 import { isSubscriptionActive } from './subscriptions.js';
 
-/** Count order toward revenue (completed / delivered). */
-const REVENUE_STATUSES = new Set(['done', 'delivered']);
+/** Count order toward revenue (canonical + legacy). */
+const REVENUE_STATUSES = new Set(['completed', 'done', 'delivered']);
 
 /**
  * Paginated fetch of all orders (platform admin RLS).

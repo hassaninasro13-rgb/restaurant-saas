@@ -39,12 +39,13 @@ export async function countOrdersByStatus(restaurantId, status) {
     .eq('status', status);
 }
 
+/** Revenue / “done” KPIs: canonical `completed` plus legacy statuses. */
 export async function sumDoneOrdersTotalSince(restaurantId, isoDate) {
   return supabase
     .from('orders')
     .select('total_amount')
     .eq('restaurant_id', restaurantId)
-    .eq('status', 'done')
+    .in('status', ['completed', 'done', 'delivered'])
     .gte('created_at', isoDate);
 }
 

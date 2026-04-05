@@ -8,7 +8,7 @@
 (function () {
   var s = window.location.search || '';
   if (/[?&]slug=/.test(s)) {
-    window.location.replace('pages/index.html' + s);
+    window.location.replace('pages/menu.html' + s);
   } else {
     window.location.replace('pages/login.html');
   }
@@ -17,6 +17,6 @@
 <noscript><meta http-equiv="refresh" content="0;url=pages/login.html"></noscript>
 </head>
 <body>
-<p><a href="pages/login.html">Connexion restaurateur</a> · <a href="pages/index.html">Menu public (ajoutez ?slug=votre-slug)</a></p>
+<p><a href="pages/login.html">Connexion restaurateur</a> · <a href="pages/menu.html">Menu public (ajoutez ?slug=votre-slug)</a> · <a href="pages/index.html">Commander en ligne (panier)</a></p>
 </body>
 </html>

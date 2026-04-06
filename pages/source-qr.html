@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="supabase-env.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap — QR par source</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<style>
+  .qr-page-intro {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    font-size: .86rem;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+  .qr-page-intro code {
+    font-size: .74rem;
+    background: var(--cream2);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .qr-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .qr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .qr-source-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  .qr-source-card img {
+    width: 200px;
+    height: 200px;
+    display: block;
+    image-rendering: pixelated;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .qr-source-meta {
+    width: 100%;
+  }
+  .qr-source-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+  .qr-source-type-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .qr-type-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--cream2);
+    color: var(--ink2);
+  }
+  .qr-type-badge--table { background: var(--blue-lt); color: var(--blue); }
+  .qr-type-badge--takeaway { background: var(--green-lt); color: var(--green); }
+  .qr-type-badge--counter { background: var(--amber-lt); color: #8a5a00; }
+  .qr-type-badge--delivery { background: var(--accent-lt); color: var(--accent); }
+  .qr-type-badge--door { background: #e8e4ff; color: #4b3bbf; }
+  .qr-source-url {
+    font-size: .68rem;
+    color: var(--ink3);
+    word-break: break-all;
+    font-family: ui-monospace, monospace;
+    line-height: 1.35;
+    margin: 0 0 10px;
+    text-align: left;
+  }
+  .qr-placeholder {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .78rem;
+    color: var(--ink3);
+    border: 1.5px dashed var(--border2);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .qr-print-header {
+    display: none;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #000;
+  }
+  .qr-print-header h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+  }
+  .qr-print-header p {
+    margin: 0;
+    font-size: .85rem;
+    color: #333;
+  }
+
+  @media print {
+    .no-print,
+    #page-loader,
+    .sidebar,
+    .sidebar-footer {
+      display: none !important;
+    }
+    .app-shell {
+      display: block;
+    }
+    .main-content {
+      margin: 0 !important;
+      padding: 12px !important;
+      max-width: none !important;
+    }
+    .page-content {
+      padding: 0 !important;
+    }
+    .qr-page-intro,
+    .qr-toolbar {
+      display: none !important;
+    }
+    .qr-print-header {
+      display: block !important;
+    }
+    .qr-source-card {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      border: 1px solid #999;
+      box-shadow: none;
+    }
+    body {
+      background: #fff !important;
+    }
+    .topbar {
+      border: none;
+      padding: 0 0 8px !important;
+    }
+    .topbar-title {
+      font-size: 1rem !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">OneTap</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden aria-label="Accueil">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Aperçu
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Commandes
+      </a>
+      <a href="kitchen.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/></svg>
+        Cuisine
+      </a>
+      <div class="sidebar-section-label">Menu</div>
+      <a href="add-categories.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Catégories
+      </a>
+      <a href="add-products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg>
+        Produits
+      </a>
+      <a href="order-sources.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+        Sources
+      </a>
+      <a href="source-qr.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h6v2h-6z"/></svg>
+        QR sources
+      </a>
+      <div class="sidebar-section-label">Paramètres</div>
+      <a href="settings.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Paramètres
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item no-print" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title">QR par source</h1>
+      </div>
+      <div class="topbar-right no-print">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()">Imprimer</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="qr-print-header" id="qr-print-header">
+        <h2 id="qr-print-rest-name">—</h2>
+        <p>Codes QR menu — une source par carte</p>
+      </div>
+
+      <p class="qr-page-intro">
+        Chaque code pointe vers <code>menu.html?slug=…&amp;source=…</code> (menu public puis commande avec la bonne source).
+        Téléchargez les PNG pour l’impression ou utilisez <strong>Imprimer</strong> pour une planche directe.
+        <a href="order-sources.html" class="no-print" style="color:var(--accent);font-weight:600;">Gérer les sources →</a>
+      </p>
+
+      <div class="qr-toolbar no-print">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-regenerate-qr">Régénérer les QR</button>
+      </div>
+
+      <div class="qr-grid" id="qr-grid">
+        <div class="empty-state" style="grid-column:1/-1"><p>Chargement…</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
+import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import { getRestaurant, hideLoader, toast, applyStaffShellBranding } from '../js/shared.js';
+import { listOrderSources } from '../supabase/order-sources.js';
+
+let restaurant = null;
+
+const TYPE_LABELS = {
+  table: 'Table',
+  takeaway: 'À emporter',
+  counter: 'Comptoir',
+  delivery: 'Livraison',
+  door: 'Porte',
+};
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
+
+function menuUrlForSource(slug, sourceName) {
+  const q = new URLSearchParams({ slug: String(slug || '').trim(), source: String(sourceName) });
+  return new URL(`menu.html?${q}`, window.location.href).href;
+}
+
+function safeFilenamePart(s) {
+  return String(s || 'source')
+    .replace(/[^a-z0-9-_]/gi, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 48) || 'source';
+}
+
+function typeBadgeClass(t) {
+  return `qr-type-badge qr-type-badge--${String(t || 'table')}`;
+}
+
+async function buildQrGrid() {
+  const grid = document.getElementById('qr-grid');
+  if (!restaurant || !grid) return;
+
+  const { data, error } = await listOrderSources(restaurant.id);
+  if (error) {
+    toast(error.message, 'error');
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>Impossible de charger les sources.</p></div>`;
+    return;
+  }
+
+  const list = data || [];
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-icon" style="font-size:2rem">▦</div>
+        <h3>Aucune source</h3>
+        <p>Créez des sources dans <a href="order-sources.html">Sources de commande</a>, puis revenez ici.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list
+    .map((row) => {
+      const id = esc(row.id);
+      const url = menuUrlForSource(restaurant.slug, row.name);
+      const tlab = esc(TYPE_LABELS[row.type] || row.type);
+      return `
+    <article class="qr-source-card" data-source-id="${id}">
+      <div class="qr-placeholder" id="ph-${id}">Génération…</div>
+      <img id="img-${id}" alt="" width="200" height="200" style="display:none" />
+      <div class="qr-source-meta">
+        <p class="qr-source-name">${esc(row.name)}</p>
+        <div class="qr-source-type-row">
+          <span class="${typeBadgeClass(row.type)}">${tlab}</span>
+        </div>
+        <p class="qr-source-url">${esc(url)}</p>
+        <a class="btn btn-secondary btn-sm no-print" id="dl-${id}" href="#" download style="display:none">Télécharger PNG</a>
+      </div>
+    </article>`;
+    })
+    .join('');
+
+  let QRCode;
+  try {
+    const mod = await import('https://esm.sh/qrcode@1.5.3');
+    QRCode = mod.default;
+  } catch (e) {
+    console.warn(e);
+    grid.querySelectorAll('.qr-placeholder').forEach((el) => {
+      el.textContent = 'Module QR indisponible (réseau). Réessayez plus tard.';
+    });
+    toast('Génération QR impossible sans connexion.', 'error');
+    return;
+  }
+
+  const baseOpts = {
+    margin: 2,
+    errorCorrectionLevel: 'M',
+    color: { dark: '#1a120dff', light: '#ffffffff' },
+  };
+
+  const slugSafe = safeFilenamePart(restaurant.slug);
+
+  for (const row of list) {
+    const id = row.id;
+    const url = menuUrlForSource(restaurant.slug, row.name);
+    const ph = document.getElementById(`ph-${id}`);
+    const img = document.getElementById(`img-${id}`);
+    const dl = document.getElementById(`dl-${id}`);
+    try {
+      const displayDataUrl = await QRCode.toDataURL(url, { ...baseOpts, width: 200 });
+      const downloadDataUrl = await QRCode.toDataURL(url, { ...baseOpts, width: 720 });
+      if (ph) ph.style.display = 'none';
+      if (img) {
+        img.src = displayDataUrl;
+        img.style.display = 'block';
+      }
+      if (dl) {
+        dl.href = downloadDataUrl;
+        dl.download = `qr-${slugSafe}-${safeFilenamePart(row.name)}.png`;
+        dl.style.display = 'inline-flex';
+      }
+    } catch (err) {
+      console.warn(err);
+      if (ph) ph.textContent = 'Erreur QR';
+    }
+  }
+}
+
+document.getElementById('btn-regenerate-qr')?.addEventListener('click', () => buildQrGrid());
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  let { data: rest } = await getRestaurant(session.user.id);
+  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
+    await syncAuthContext(session.user.id);
+    ({ data: rest } = await getRestaurant(session.user.id));
+  }
+  if (!rest) {
+    window.location.href = 'create-restaurant.html';
+    return;
+  }
+  restaurant = rest;
+  applyStaffShellBranding(rest);
+  document.getElementById('sb-rest-name').textContent = rest.name;
+  const ph = document.getElementById('qr-print-rest-name');
+  if (ph) ph.textContent = rest.name;
+  await buildQrGrid();
+  hideLoader();
+})();
+
+window.handleSignOut = async () => { await signOut(); };
+</script>
+</body>
+</html>

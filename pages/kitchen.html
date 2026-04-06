@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<script src="supabase-env.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap Menu — Cuisine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<style>
+  .kitchen-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 960px) {
+    .kitchen-board { grid-template-columns: 1fr; }
+  }
+  .kitchen-col {
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    min-height: 220px;
+  }
+  .kitchen-col h2 {
+    margin: 0 0 14px;
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ink3);
+  }
+  .kitchen-col--new h2 { color: var(--blue); }
+  .kitchen-col--prep h2 { color: var(--amber); }
+  .kitchen-col--ready h2 { color: var(--green); }
+  .k-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent);
+  }
+  .k-card-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: .95rem;
+    color: var(--accent);
+  }
+  .k-card-meta { font-size: .8rem; color: var(--ink2); margin-top: 4px; }
+  .k-card-items { font-size: .72rem; color: var(--ink3); margin-top: 6px; }
+  .k-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .k-btn {
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .k-btn:hover { background: var(--accent); border-color: var(--accent); }
+  .kitchen-empty {
+    font-size: .85rem;
+    color: var(--ink3);
+    padding: 12px 4px;
+  }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">OneTap</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden data-i18n-aria="nav.overview">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label" data-i18n="nav.sectionMain">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span data-i18n="nav.overview">Aperçu</span>
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <span data-i18n="nav.orders">Commandes</span>
+      </a>
+      <a href="kitchen.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/></svg>
+        <span data-i18n="nav.kitchen">Cuisine</span>
+      </a>
+      <div class="sidebar-section-label" data-i18n="nav.sectionMenu">Menu</div>
+      <a href="add-categories.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span data-i18n="nav.categories">Catégories</span>
+      </a>
+      <a href="add-products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg>
+        <span data-i18n="nav.products">Produits</span>
+      </a>
+      <a href="order-sources.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+        <span data-i18n="nav.sources">Sources</span>
+      </a>
+      <a href="source-qr.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6v6H3zM15 3h6v6h-6z"/></svg>
+        <span data-i18n="nav.qrSources">QR sources</span>
+      </a>
+      <div class="sidebar-section-label" data-i18n="nav.sectionSettings">Paramètres</div>
+      <a href="settings.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+        <span data-i18n="nav.settings">Paramètres</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button type="button" class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/></svg>
+        <span data-i18n="nav.signOut">Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title" data-i18n="kitchen.title">Cuisine</h1>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadKitchen()" data-i18n="kitchen.refresh">Actualiser</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <p style="margin:0 0 18px;font-size:.88rem;color:var(--ink3);max-width:640px;line-height:1.45;" data-i18n="kitchen.subtitle">
+        Flux en direct des commandes à préparer.
+      </p>
+      <div class="kitchen-board" id="kitchen-board">
+        <div class="kitchen-col kitchen-col--new">
+          <h2 data-i18n="kitchen.colNew">Nouvelles</h2>
+          <div id="col-new"></div>
+        </div>
+        <div class="kitchen-col kitchen-col--prep">
+          <h2 data-i18n="kitchen.colPrep">En préparation</h2>
+          <div id="col-prep"></div>
+        </div>
+        <div class="kitchen-col kitchen-col--ready">
+          <h2 data-i18n="kitchen.colReady">Prêtes</h2>
+          <div id="col-ready"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
+import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import {
+  getRestaurant,
+  hideLoader,
+  fmtCurrency,
+  toast,
+  formatOrderSourceForDisplay,
+  getRestaurantCurrency,
+  getRestaurantLocale,
+  applyStaffShellBranding,
+  t,
+  hydrateI18n,
+} from '../js/shared.js';
+import { listOrdersWithItems, updateOrderStatus } from '../supabase/orders.js';
+
+let restaurant = null;
+let allOrders = [];
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
+
+function kitchenColumn(o) {
+  const s = o.status;
+  if (['cancelled', 'completed', 'done', 'delivered'].includes(s)) return null;
+  if (s === 'new') return 'new';
+  if (s === 'preparing' || s === 'confirmed') return 'prep';
+  if (s === 'ready') return 'ready';
+  return null;
+}
+
+function cardHtml(o, col) {
+  const n = (o.order_items || []).length;
+  const src = formatOrderSourceForDisplay(o);
+  const loc = getRestaurantLocale(restaurant);
+  let actions = '';
+  if (col === 'new') {
+    actions = `<button type="button" class="k-btn" onclick="kitchenAdvance('${o.id}','preparing')">${esc(t('kitchen.accept'))}</button>`;
+  } else if (col === 'prep') {
+    actions = `<button type="button" class="k-btn" onclick="kitchenAdvance('${o.id}','ready')">${esc(t('kitchen.markReady'))}</button>`;
+  } else if (col === 'ready') {
+    actions = `<button type="button" class="k-btn" onclick="kitchenAdvance('${o.id}','completed')">${esc(t('kitchen.complete'))}</button>`;
+  }
+  return `
+    <div class="k-card">
+      <div class="k-card-num">${esc(o.order_number)}</div>
+      <div class="k-card-meta">${esc(o.customer_name)} · ${fmtCurrency(o.total_amount, getRestaurantCurrency(restaurant), loc)}</div>
+      ${src ? `<div class="k-card-items">📍 ${esc(src)}</div>` : ''}
+      <div class="k-card-items">${esc(t('ord.items'))}: ${n}</div>
+      <div class="k-card-actions">${actions}</div>
+    </div>`;
+}
+
+function renderKitchen() {
+  const buckets = { new: [], prep: [], ready: [] };
+  for (const o of allOrders) {
+    const c = kitchenColumn(o);
+    if (c && buckets[c]) buckets[c].push(o);
+  }
+  for (const key of ['new', 'prep', 'ready']) {
+    const el = document.getElementById(`col-${key}`);
+    const list = buckets[key];
+    if (!list.length) {
+      el.innerHTML = `<div class="kitchen-empty">${esc(t('kitchen.empty'))}</div>`;
+    } else {
+      el.innerHTML = list.map((o) => cardHtml(o, key)).join('');
+    }
+  }
+}
+
+window.loadKitchen = async function() {
+  const { data } = await listOrdersWithItems(restaurant.id, 200);
+  allOrders = data || [];
+  renderKitchen();
+};
+
+window.kitchenAdvance = async function(id, status) {
+  const { error } = await updateOrderStatus(id, status);
+  if (error) {
+    toast(t('ord.updateErr') + ': ' + error.message, 'error');
+    return;
+  }
+  toast(t('ord.updateOk'), 'success');
+  await loadKitchen();
+};
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  let { data: rest } = await getRestaurant(session.user.id);
+  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
+    await syncAuthContext(session.user.id);
+    ({ data: rest } = await getRestaurant(session.user.id));
+  }
+  if (!rest) { window.location.href = 'create-restaurant.html'; return; }
+  restaurant = rest;
+  applyStaffShellBranding(rest);
+  hydrateI18n(document);
+  document.getElementById('sb-rest-name').textContent = rest.name;
+  await loadKitchen();
+  hideLoader();
+  setInterval(loadKitchen, 30000);
+})();
+
+window.handleSignOut = async () => { await signOut(); };
+</script>
+</body>
+</html>

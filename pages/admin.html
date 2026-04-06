@@ -338,7 +338,9 @@ function rowHtml(r) {
       <td>
         <select class="admin-plan-select" data-field="plan">
           <option value="free" ${r.subscription_plan === 'free' ? 'selected' : ''}>Free</option>
+          <option value="basic" ${r.subscription_plan === 'basic' ? 'selected' : ''}>Basic</option>
           <option value="pro" ${r.subscription_plan === 'pro' ? 'selected' : ''}>Pro</option>
+          <option value="enterprise" ${r.subscription_plan === 'enterprise' ? 'selected' : ''}>Enterprise</option>
         </select>
       </td>
       <td>

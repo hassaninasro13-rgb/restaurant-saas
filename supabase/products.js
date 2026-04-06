@@ -130,6 +130,14 @@ export async function countAvailableProducts(restaurantId) {
     .eq('is_visible', true);
 }
 
+/** All catalog products (for plan limit checks). */
+export async function countProductsForRestaurant(restaurantId) {
+  return supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('restaurant_id', restaurantId);
+}
+
 /**
  * Upload product image → bucket `products`, then save returned `publicUrl` in `products.image_url`.
  */

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="supabase-env.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap — Sources de commande</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<style>
+  .sources-intro {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    font-size: .88rem;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+  .sources-intro code {
+    font-size: .78rem;
+    background: var(--cream2);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .sources-add-panel {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .sources-add-panel h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    margin: 0 0 16px;
+  }
+  .sources-list { display: flex; flex-direction: column; gap: 10px; }
+  .source-row-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .source-row-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .source-row-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .source-type-badge {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--cream2);
+    color: var(--ink2);
+  }
+  .source-type-badge--table { background: var(--blue-lt); color: var(--blue); }
+  .source-type-badge--takeaway { background: var(--green-lt); color: var(--green); }
+  .source-type-badge--counter { background: var(--amber-lt); color: #8a5a00; }
+  .source-type-badge--delivery { background: var(--accent-lt); color: var(--accent); }
+  .source-type-badge--door { background: #e8e4ff; color: #4b3bbf; }
+  .source-row-url {
+    font-size: .72rem;
+    color: var(--ink3);
+    word-break: break-all;
+    margin-top: 6px;
+    font-family: ui-monospace, monospace;
+  }
+  .source-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">OneTap</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden aria-label="Accueil">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Aperçu
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Commandes
+      </a>
+      <a href="kitchen.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v0"/><path d="M19 22v-3"/></svg>
+        Cuisine
+      </a>
+      <div class="sidebar-section-label">Menu</div>
+      <a href="add-categories.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Catégories
+      </a>
+      <a href="add-products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Produits
+      </a>
+      <a href="order-sources.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Sources
+      </a>
+      <a href="source-qr.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h6v2h-6z"/></svg>
+        QR sources
+      </a>
+      <div class="sidebar-section-label">Paramètres</div>
+      <a href="settings.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Paramètres
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title">Sources de commande</h1>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="sources-intro">
+        Définissez des <strong>canaux</strong> (table, à emporter, comptoir, livraison). Chaque source a un
+        <strong>nom unique</strong> utilisé dans l’URL publique&nbsp;:
+        <code>menu.html?slug=…&amp;source=takeaway</code> ou <code>&amp;source=table-1</code>.
+        L’ancien paramètre <code>table=</code> reste accepté pour les QR déjà imprimés.
+        Le <strong>type</strong> adapte l’écran de commande (adresse pour la livraison, etc.).
+        → <a href="source-qr.html" style="color:var(--accent);font-weight:600;">Codes QR à imprimer</a>
+      </div>
+
+      <div class="sources-add-panel">
+        <h3>Ajouter une source</h3>
+        <div class="field-row" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="field" style="flex:1;min-width:160px;">
+            <label for="new-source-type">Type</label>
+            <select id="new-source-type" class="input">
+              <option value="table">Table / salle</option>
+              <option value="takeaway">À emporter</option>
+              <option value="counter">Comptoir</option>
+              <option value="door">Porte / retrait</option>
+              <option value="delivery">Livraison</option>
+            </select>
+          </div>
+          <div class="field" style="flex:2;min-width:200px;">
+            <label for="new-source-name">Nom (dans l’URL et à l’affichage) *</label>
+            <input type="text" id="new-source-name" class="input" placeholder="Ex: table-1, takeaway, bar, terrasse">
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-add-source">Ajouter</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h3>Mes sources <span id="sources-count" style="color:var(--ink3);font-weight:400;font-size:.85rem"></span></h3>
+      </div>
+      <div id="sources-container" class="sources-list"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
+import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import { getRestaurant, hideLoader, toast, applyStaffShellBranding } from '../js/shared.js';
+import {
+  listOrderSources,
+  insertOrderSource,
+  deleteOrderSource,
+} from '../supabase/order-sources.js';
+
+let restaurant = null;
+
+const TYPE_LABELS = {
+  table: 'Table',
+  takeaway: 'À emporter',
+  counter: 'Comptoir',
+  delivery: 'Livraison',
+  door: 'Porte',
+};
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
+
+function menuUrlWithSource(slug, sourceName) {
+  const q = new URLSearchParams({ slug: String(slug || '').trim(), source: String(sourceName) });
+  return new URL(`menu.html?${q}`, window.location.href).href;
+}
+
+function typeBadgeClass(t) {
+  const x = String(t || 'table');
+  return `source-type-badge source-type-badge--${x}`;
+}
+
+async function loadSources() {
+  const { data, error } = await listOrderSources(restaurant.id);
+  if (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  const list = data || [];
+  document.getElementById('sources-count').textContent = list.length ? `(${list.length})` : '';
+  const container = document.getElementById('sources-container');
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon" style="font-size:2rem">📍</div>
+        <h3>Aucune source</h3>
+        <p>Ajoutez au moins une source pour des liens <code style="font-size:.8rem;">?source=…</code>.</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = list
+    .map((row) => {
+      const url = menuUrlWithSource(restaurant.slug, row.name);
+      const id = esc(row.id);
+      const name = esc(row.name);
+      const typ = esc(row.type || 'table');
+      const tlab = esc(TYPE_LABELS[row.type] || row.type);
+      return `
+    <div class="source-row-card" id="src-${id}">
+      <div>
+        <div class="source-row-head">
+          <span class="source-row-name">${name}</span>
+          <span class="${typeBadgeClass(row.type)}">${tlab}</span>
+        </div>
+        <div class="source-row-url">${esc(url)}</div>
+      </div>
+      <div class="source-row-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-copy-name="${name}">Copier le lien</button>
+        <button type="button" class="btn btn-danger btn-sm" data-del="${id}" data-name="${name}">Supprimer</button>
+      </div>
+    </div>`;
+    })
+    .join('');
+}
+
+document.getElementById('sources-container')?.addEventListener('click', async (e) => {
+  const copyBtn = e.target.closest('[data-copy-name]');
+  if (copyBtn) {
+    const name = copyBtn.getAttribute('data-copy-name');
+    if (!name || !restaurant) return;
+    const u = menuUrlWithSource(restaurant.slug, name);
+    try {
+      await navigator.clipboard.writeText(u);
+      toast('Lien copié', 'success');
+    } catch {
+      toast('Copie impossible', 'error');
+    }
+    return;
+  }
+  const del = e.target.closest('[data-del]');
+  if (del) {
+    const id = del.getAttribute('data-del');
+    const name = del.getAttribute('data-name') || '';
+    if (!id || !confirm(`Supprimer la source « ${name} » ?`)) return;
+    const { error } = await deleteOrderSource(restaurant.id, id);
+    if (error) {
+      toast(error.message, 'error');
+      return;
+    }
+    toast('Source supprimée', 'success');
+    await loadSources();
+  }
+});
+
+document.getElementById('btn-add-source')?.addEventListener('click', async () => {
+  const input = document.getElementById('new-source-name');
+  const typeEl = document.getElementById('new-source-type');
+  const name = input?.value?.trim() ?? '';
+  const type = typeEl?.value ?? 'table';
+  if (!name) {
+    toast('Indiquez un nom de source', 'error');
+    return;
+  }
+  const btn = document.getElementById('btn-add-source');
+  btn.disabled = true;
+  const { error } = await insertOrderSource(restaurant.id, name, type);
+  btn.disabled = false;
+  if (error) {
+    toast(error.message || 'Impossible d’ajouter la source', 'error');
+    return;
+  }
+  toast('Source ajoutée', 'success');
+  input.value = '';
+  await loadSources();
+});
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  let { data: rest } = await getRestaurant(session.user.id);
+  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
+    await syncAuthContext(session.user.id);
+    ({ data: rest } = await getRestaurant(session.user.id));
+  }
+  if (!rest) {
+    window.location.href = 'create-restaurant.html';
+    return;
+  }
+  restaurant = rest;
+  applyStaffShellBranding(rest);
+  document.getElementById('sb-rest-name').textContent = rest.name;
+  await loadSources();
+  hideLoader();
+})();
+
+window.handleSignOut = async () => { await signOut(); };
+</script>
+</body>
+</html>

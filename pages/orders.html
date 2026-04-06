@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <script src="supabase-env.js"></script>
@@ -295,41 +295,57 @@
 <div class="app-shell">
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-name">OneTap</div>
-      <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden data-i18n-aria="nav.overview">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Principal</div>
+      <div class="sidebar-section-label" data-i18n="nav.sectionMain">Principal</div>
       <a href="dashboard.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Aperçu
+        <span data-i18n="nav.overview">Aperçu</span>
       </a>
       <a href="orders.html" class="nav-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-        Commandes
+        <span data-i18n="nav.orders">Commandes</span>
       </a>
       <a href="kitchen.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v0"/><path d="M19 22v-3"/></svg>
-        Cuisine
+        <span data-i18n="nav.kitchen">Cuisine</span>
       </a>
-      <div class="sidebar-section-label">Menu</div>
+      <div class="sidebar-section-label" data-i18n="nav.sectionMenu">Menu</div>
       <a href="add-categories.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Catégories
+        <span data-i18n="nav.categories">Catégories</span>
       </a>
       <a href="add-products.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Produits
+        <span data-i18n="nav.products">Produits</span>
       </a>
       <a href="order-sources.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        Sources
+        <span data-i18n="nav.sources">Sources</span>
+      </a>
+      <a href="source-qr.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h6v2h-6z"/></svg>
+        <span data-i18n="nav.qrSources">QR sources</span>
+      </a>
+      <div class="sidebar-section-label" data-i18n="nav.sectionSettings">Paramètres</div>
+      <a href="settings.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span data-i18n="nav.settings">Paramètres</span>
       </a>
     </nav>
     <div class="sidebar-footer">
-      <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+      <button type="button" class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Déconnexion
+        <span data-i18n="nav.signOut">Déconnexion</span>
       </button>
     </div>
   </aside>
@@ -339,12 +355,12 @@
       <div class="topbar-left">
         <h1 class="topbar-title">
           <span class="live-dot"></span>
-          Commandes
+          <span data-i18n="ord.title">Commandes</span>
         </h1>
       </div>
       <div class="topbar-right">
         <span id="orders-count-tag" style="font-size:.83rem;color:var(--ink3);"></span>
-        <button class="btn btn-secondary btn-sm" onclick="loadOrders()">↻ Actualiser</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadOrders()" data-i18n="ord.refresh">↻ Actualiser</button>
       </div>
     </header>
 
@@ -352,32 +368,32 @@
 
       <!-- STATS ROW -->
       <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px;" id="stats-row">
-        <div class="stat-card"><div class="stat-card-label">Nouvelles</div><div class="stat-card-value" id="s-new" style="color:var(--blue)">—</div></div>
-        <div class="stat-card"><div class="stat-card-label">En préparation</div><div class="stat-card-value" id="s-preparing" style="color:var(--amber)">—</div></div>
-        <div class="stat-card"><div class="stat-card-label">Prêtes</div><div class="stat-card-value" id="s-ready" style="color:var(--green)">—</div></div>
-        <div class="stat-card"><div class="stat-card-label">Terminées (30j)</div><div class="stat-card-value" id="s-done">—</div></div>
-        <div class="stat-card"><div class="stat-card-label">CA (30j)</div><div class="stat-card-value" id="s-revenue" style="color:var(--accent)">—</div></div>
+        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statNew">Nouvelles</div><div class="stat-card-value" id="s-new" style="color:var(--blue)">—</div></div>
+        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statPreparing">En préparation</div><div class="stat-card-value" id="s-preparing" style="color:var(--amber)">—</div></div>
+        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statReady">Prêtes</div><div class="stat-card-value" id="s-ready" style="color:var(--green)">—</div></div>
+        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statDone30">Terminées (30j)</div><div class="stat-card-value" id="s-done">—</div></div>
+        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statRevenue">CA (30j)</div><div class="stat-card-value" id="s-revenue" style="color:var(--accent)">—</div></div>
       </div>
 
       <!-- FILTERS + SEARCH -->
       <div class="orders-toolbar">
         <div class="status-filters" id="status-filters">
-          <button type="button" class="sf-btn active" onclick="filterStatus('all', this)">Toutes</button>
-          <button type="button" class="sf-btn" onclick="filterStatus('new', this)">🔵 Nouvelles</button>
-          <button type="button" class="sf-btn" onclick="filterStatus('preparing', this)">🟡 En préparation</button>
-          <button type="button" class="sf-btn" onclick="filterStatus('ready', this)">🟢 Prêtes</button>
-          <button type="button" class="sf-btn" onclick="filterStatus('completed', this)">✅ Terminées</button>
-          <button type="button" class="sf-btn" onclick="filterStatus('cancelled', this)">❌ Annulées</button>
+          <button type="button" class="sf-btn active" onclick="filterStatus('all', this)" data-i18n="ord.filterAll">Toutes</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('new', this)" data-i18n="ord.filterNew">🔵 Nouvelles</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('preparing', this)" data-i18n="ord.filterPreparing">🟡 En préparation</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('ready', this)" data-i18n="ord.filterReady">🟢 Prêtes</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('completed', this)" data-i18n="ord.filterDone">✅ Terminées</button>
+          <button type="button" class="sf-btn" onclick="filterStatus('cancelled', this)" data-i18n="ord.filterCancelled">❌ Annulées</button>
         </div>
         <div class="orders-search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="search-input" placeholder="Nom, téléphone, n°, source…" oninput="handleSearch(this.value)">
+          <input type="text" id="search-input" data-i18n-placeholder="ord.searchPlaceholder" oninput="handleSearch(this.value)">
         </div>
       </div>
 
       <!-- ORDERS LIST -->
       <div id="orders-container">
-        <div class="empty-state"><div class="empty-state-icon" style="font-size:2rem">📋</div><h3>Chargement...</h3></div>
+        <div class="empty-state"><div class="empty-state-icon" style="font-size:2rem">📋</div><h3 data-i18n="ord.loading">Chargement...</h3></div>
       </div>
 
     </div>
@@ -387,7 +403,20 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
-import { getRestaurant, hideLoader, fmtCurrency, fmtDate, getStatusBadge, toast } from '../js/shared.js';
+import {
+  getRestaurant,
+  hideLoader,
+  fmtCurrency,
+  fmtDate,
+  getStatusBadge,
+  toast,
+  formatOrderSourceForDisplay,
+  getRestaurantCurrency,
+  getRestaurantLocale,
+  applyStaffShellBranding,
+  t,
+  hydrateI18n,
+} from '../js/shared.js';
 import { listOrdersWithItems, updateOrderStatus } from '../supabase/orders.js';
 
 let restaurant = null;
@@ -413,6 +442,8 @@ function esc(s) {
   }
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
+  applyStaffShellBranding(rest);
+  hydrateI18n(document);
   document.getElementById('sb-rest-name').textContent = rest.name;
   await loadOrders();
   hideLoader();
@@ -439,7 +470,11 @@ function updateStats() {
   const doneLike = (s) => ['completed', 'done', 'delivered'].includes(s);
   document.getElementById('s-done').textContent = recent.filter(o => doneLike(o.status)).length;
   const revenue = recent.filter(o => doneLike(o.status)).reduce((s, o) => s + (o.total_amount || 0), 0);
-  document.getElementById('s-revenue').textContent = fmtCurrency(revenue);
+  document.getElementById('s-revenue').textContent = fmtCurrency(
+    revenue,
+    getRestaurantCurrency(restaurant),
+    getRestaurantLocale(restaurant),
+  );
 }
 
 function getFiltered() {
@@ -459,6 +494,7 @@ function getFiltered() {
       o.customer_phone?.includes(q) ||
       o.order_number?.toLowerCase().includes(q) ||
       o.source_name?.toLowerCase().includes(q) ||
+      o.source_type?.toLowerCase().includes(q) ||
       o.table_name?.toLowerCase().includes(q) ||
       String(o.table_number || '').toLowerCase().includes(q)
     );
@@ -483,44 +519,45 @@ function effectiveWorkflowStep(status) {
 function buildStatusActionButtons(o) {
   const s = o.status;
   if (s === 'cancelled') {
-    return '<span class="order-flow-muted">Annulée</span>';
+    return `<span class="order-flow-muted">${esc(t('ord.flowCancelled'))}</span>`;
   }
   const step = effectiveWorkflowStep(s);
   if (step === 'completed') {
-    return '<span class="order-flow-muted">Terminée</span>';
+    return `<span class="order-flow-muted">${esc(t('ord.flowDone'))}</span>`;
   }
   const id = o.id;
   const parts = [];
   if (step === 'new') {
     parts.push(
-      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'preparing')">En préparation</button>`,
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'preparing')">${esc(t('ord.btnToPreparing'))}</button>`,
     );
   } else if (step === 'preparing') {
     parts.push(
-      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'ready')">Prête</button>`,
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'ready')">${esc(t('ord.btnToReady'))}</button>`,
     );
   } else if (step === 'ready') {
     parts.push(
-      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'completed')">Terminée</button>`,
+      `<button type="button" class="order-flow-btn order-flow-btn--primary" onclick="event.stopPropagation(); updateStatus('${id}', 'completed')">${esc(t('ord.btnToCompleted'))}</button>`,
     );
   }
   parts.push(
-    `<button type="button" class="order-flow-btn order-flow-btn--danger" onclick="event.stopPropagation(); updateStatus('${id}', 'cancelled')">Annuler</button>`,
+    `<button type="button" class="order-flow-btn order-flow-btn--danger" onclick="event.stopPropagation(); updateStatus('${id}', 'cancelled')">${esc(t('ord.btnCancel'))}</button>`,
   );
   return `<div class="order-flow-actions">${parts.join('')}</div>`;
 }
 
 function renderOrders() {
   const filtered = getFiltered();
-  document.getElementById('orders-count-tag').textContent = `${filtered.length} commande${filtered.length !== 1 ? 's' : ''}`;
+  document.getElementById('orders-count-tag').textContent =
+    filtered.length === 1 ? t('ord.orderCount', { n: filtered.length }) : t('ord.orderCountPlural', { n: filtered.length });
 
   const container = document.getElementById('orders-container');
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon" style="font-size:2rem">📋</div>
-        <h3>Aucune commande</h3>
-        <p>${currentStatus === 'all' ? 'Partagez votre menu pour recevoir vos premières commandes.' : 'Aucune commande avec ce statut.'}</p>
+        <h3>${esc(t('ord.emptyTitle'))}</h3>
+        <p>${esc(currentStatus === 'all' ? t('ord.emptyAll') : t('ord.emptyFilter'))}</p>
       </div>`;
     return;
   }
@@ -528,97 +565,108 @@ function renderOrders() {
   container.innerHTML = filtered.map(o => buildOrderCard(o)).join('');
 }
 
+const ORDER_CARD_STATUS_OPTIONS = ['new','preparing','ready','completed','cancelled','confirmed','done','delivered'];
+
+function orderTypeLabel(type) {
+  const m = {
+    delivery: 'ord.orderTypeDelivery',
+    pickup: 'ord.orderTypePickup',
+    dine_in: 'ord.orderTypeDineIn',
+    qr_table: 'ord.orderTypeQrTable',
+  };
+  const key = m[type];
+  return key ? t(key) : type;
+}
+
 function buildOrderCard(o) {
   const items = o.order_items || [];
-  const typeLabels = { delivery: '🛵 Livraison', pickup: '🏪 À emporter', dine_in: '🍽️ Sur place', qr_table: '📱 QR Table' };
-  const sourceDisp = o.source_name || o.table_name || o.table_number;
-  const sourcePill = sourceDisp
-    ? `<div class="order-source-pill" title="Source">📍 ${esc(String(sourceDisp))}</div>`
+  const loc = getRestaurantLocale(restaurant);
+  const sourceDisplayLine = formatOrderSourceForDisplay(o);
+  const sourcePill = sourceDisplayLine
+    ? `<div class="order-source-pill" title="${esc(t('ord.sourcePillTitle'))}">${esc(sourceDisplayLine)}</div>`
     : '';
 
   const waMsg = encodeURIComponent(
-    `✅ Votre commande ${o.order_number} est confirmée!\nMerci ${o.customer_name} 🙏`
+    t('ord.waConfirmMsg', { num: o.order_number, name: o.customer_name || '' }),
   );
   const waLink = `https://wa.me/${o.customer_phone?.replace(/\D/g,'')}?text=${waMsg}`;
 
   const stClass = orderCardStatusClass(o.status);
+  const typeLine = orderTypeLabel(o.order_type);
   return `
   <div class="order-card-full order-card--st-${stClass}" id="order-${o.id}">
     <div class="order-card-header" onclick="toggleOrder('${o.id}')">
       <div>
         <div class="order-num-tag">${o.order_number}</div>
         ${sourcePill}
-        <div class="order-date">${fmtDate(o.created_at)}</div>
+        <div class="order-date">${fmtDate(o.created_at, loc)}</div>
       </div>
       <div>
-        <div class="order-customer-name">${o.customer_name}</div>
-        <div class="order-customer-phone">${o.customer_phone || '—'}</div>
+        <div class="order-customer-name">${esc(o.customer_name)}</div>
+        <div class="order-customer-phone">${esc(o.customer_phone || '—')}</div>
       </div>
       <div>
-        <div class="order-total">${fmtCurrency(o.total_amount)}</div>
-        <div class="order-type-tag">${typeLabels[o.order_type] || o.order_type}</div>
+        <div class="order-total">${fmtCurrency(o.total_amount, getRestaurantCurrency(restaurant), loc)}</div>
+        <div class="order-type-tag">${esc(typeLine)}</div>
       </div>
       <div>${getStatusBadge(o.status)}</div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         ${buildStatusActionButtons(o)}
-        <select class="order-status-select" title="Changer le statut (toutes les valeurs)" onchange="updateStatus('${o.id}', this.value)" onclick="event.stopPropagation()">
-          ${['new','preparing','ready','completed','cancelled','confirmed','done','delivered'].map(s =>
-            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${{
-              new:'Nouvelle', preparing:'En préparation', ready:'Prête', completed:'Terminée',
-              cancelled:'Annulée', confirmed:'Confirmée (anc.)', done:'Terminée (anc.)', delivered:'Livrée (anc.)',
-            }[s]}</option>`
+        <select class="order-status-select" title="${esc(t('ord.statusSelectTitle'))}" onchange="updateStatus('${o.id}', this.value)" onclick="event.stopPropagation()">
+          ${ORDER_CARD_STATUS_OPTIONS.map(s =>
+            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${esc(t('status.' + s))}</option>`
           ).join('')}
         </select>
-        <button type="button" class="order-expand-btn" aria-label="Détails">▾</button>
+        <button type="button" class="order-expand-btn" aria-label="${esc(t('ord.detailsAria'))}">▾</button>
       </div>
     </div>
 
     <div class="order-detail-panel" id="detail-${o.id}">
       <div class="order-info-grid">
         <div class="order-info-box">
-          <div class="order-info-label">Client</div>
-          <div class="order-info-value">${o.customer_name}</div>
-          <div style="font-size:.8rem;color:var(--ink3)">${o.customer_phone || '—'}</div>
-          ${o.customer_email ? `<div style="font-size:.8rem;color:var(--ink3)">${o.customer_email}</div>` : ''}
+          <div class="order-info-label">${esc(t('ord.customerBlockTitle'))}</div>
+          <div class="order-info-value">${esc(o.customer_name)}</div>
+          <div style="font-size:.8rem;color:var(--ink3)">${esc(o.customer_phone || '—')}</div>
+          ${o.customer_email ? `<div style="font-size:.8rem;color:var(--ink3)">${esc(o.customer_email)}</div>` : ''}
         </div>
         <div class="order-info-box">
-          <div class="order-info-label">Livraison / Retrait</div>
-          <div class="order-info-value">${typeLabels[o.order_type] || '—'}</div>
-          ${o.customer_address ? `<div style="font-size:.8rem;color:var(--ink3);margin-top:4px;">${o.customer_address}</div>` : ''}
-          ${(o.source_name || o.table_name || o.table_number) ? `<div style="font-size:.8rem;color:var(--ink3)">Source : ${esc(String(o.source_name || o.table_name || o.table_number))}</div>` : ''}
+          <div class="order-info-label">${esc(t('ord.deliveryBlockTitle'))}</div>
+          <div class="order-info-value">${esc(typeLine || '—')}</div>
+          ${o.customer_address ? `<div style="font-size:.8rem;color:var(--ink3);margin-top:4px;">${esc(o.customer_address)}</div>` : ''}
+          ${sourceDisplayLine ? `<div style="font-size:.8rem;color:var(--ink3)">${esc(t('ord.sourceLabel'))} : ${esc(sourceDisplayLine)}</div>` : ''}
         </div>
         <div class="order-info-box">
-          <div class="order-info-label">Notes</div>
+          <div class="order-info-label">${esc(t('ord.notes'))}</div>
           <div class="order-info-value" style="font-size:.85rem;color:var(--ink2)">
-            ${o.customer_notes || '<span style="color:var(--ink3)">Aucune note</span>'}
+            ${o.customer_notes ? esc(o.customer_notes) : `<span style="color:var(--ink3)">${esc(t('ord.noNotes'))}</span>`}
           </div>
         </div>
       </div>
 
       <div class="order-items-table">
         <div class="oi-row header">
-          <div>Produit</div><div style="text-align:center">Qté</div>
-          <div style="text-align:right">Prix unit.</div>
-          <div style="text-align:right">Sous-total</div>
+          <div>${esc(t('ord.thProduct'))}</div><div style="text-align:center">${esc(t('ord.thQty'))}</div>
+          <div style="text-align:right">${esc(t('ord.thUnitPrice'))}</div>
+          <div style="text-align:right">${esc(t('ord.thLineSubtotal'))}</div>
         </div>
         ${items.map(i => `
         <div class="oi-row">
-          <div>${i.product_name}</div>
+          <div>${esc(i.product_name)}</div>
           <div style="text-align:center">${i.quantity}</div>
-          <div style="text-align:right">${fmtCurrency(i.unit_price)}</div>
-          <div class="oi-total">${fmtCurrency(i.subtotal)}</div>
+          <div style="text-align:right">${fmtCurrency(i.unit_price, getRestaurantCurrency(restaurant), loc)}</div>
+          <div class="oi-total">${fmtCurrency(i.subtotal, getRestaurantCurrency(restaurant), loc)}</div>
         </div>`).join('')}
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <a href="${waLink}" target="_blank" class="order-wa-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Contacter via WhatsApp
+          ${esc(t('ord.waContact'))}
         </a>
         <div class="order-total-summary">
-          ${o.delivery_fee ? `<span>Livraison: ${fmtCurrency(o.delivery_fee)}</span>` : ''}
-          ${o.discount_amount ? `<span style="color:var(--green)">Remise: -${fmtCurrency(o.discount_amount)}</span>` : ''}
-          <span>Total : <strong>${fmtCurrency(o.total_amount)}</strong></span>
+          ${o.delivery_fee ? `<span>${esc(t('ord.delivery'))}: ${fmtCurrency(o.delivery_fee, getRestaurantCurrency(restaurant), loc)}</span>` : ''}
+          ${o.discount_amount ? `<span style="color:var(--green)">${esc(t('ord.discount'))}: -${fmtCurrency(o.discount_amount, getRestaurantCurrency(restaurant), loc)}</span>` : ''}
+          <span>${esc(t('ord.total'))} : <strong>${fmtCurrency(o.total_amount, getRestaurantCurrency(restaurant), loc)}</strong></span>
         </div>
       </div>
     </div>
@@ -643,13 +691,13 @@ window.handleSearch = function(q) {
 };
 
 window.updateStatus = async function(id, status) {
-  if (status === 'cancelled' && !confirm('Annuler cette commande ?')) return;
+  if (status === 'cancelled' && !confirm(t('ord.confirmCancelOrder'))) return;
   const { error } = await updateOrderStatus(id, status);
   if (error) {
-    toast('Erreur : ' + error.message, 'error');
+    toast(t('ord.updateErr') + ': ' + error.message, 'error');
     return;
   }
-  toast('Statut mis à jour', 'success');
+  toast(t('ord.updateOk'), 'success');
   await loadOrders();
 };
 

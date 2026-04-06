@@ -31,6 +31,18 @@ export async function countOrdersSince(restaurantId, isoDate) {
     .gte('created_at', isoDate);
 }
 
+/** Orders created since the first day of the current month (UTC-aligned). */
+export async function countOrdersThisMonth(restaurantId) {
+  const d = new Date();
+  d.setUTCDate(1);
+  d.setUTCHours(0, 0, 0, 0);
+  return supabase
+    .from('orders')
+    .select('id', { count: 'exact', head: true })
+    .eq('restaurant_id', restaurantId)
+    .gte('created_at', d.toISOString());
+}
+
 export async function countOrdersByStatus(restaurantId, status) {
   return supabase
     .from('orders')

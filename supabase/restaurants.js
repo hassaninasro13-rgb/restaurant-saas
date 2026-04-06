@@ -1,5 +1,6 @@
 import { supabase } from './client.js';
 import { uploadLogoToStorage, uploadCoverToStorage } from './storage.js';
+import { mergeRestaurantSettings, mergeRestaurantSubscription } from './restaurant-settings.js';
 
 const LS_PENDING_RESTAURANT = 'onetap_pending_restaurant_name';
 
@@ -67,7 +68,15 @@ export async function tryCreateRestaurantFromPending(userId) {
 
 /** Full row for the authenticated owner's restaurant */
 export async function getRestaurantForUser(userId) {
-  return supabase.from('restaurants').select('*').eq('user_id', userId).maybeSingle();
+  const res = await supabase
+    .from('restaurants')
+    .select('*, restaurant_settings(*), subscriptions(*, plans(*))')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (res.data) {
+    res.data = mergeRestaurantSubscription(mergeRestaurantSettings(res.data));
+  }
+  return res;
 }
 
 /** Lightweight check after login (id only) */
@@ -77,12 +86,14 @@ export async function getRestaurantIdForUser(userId) {
 
 /** Public menu: active restaurant by slug */
 export async function getActiveRestaurantBySlug(slug) {
-  return supabase
+  const res = await supabase
     .from('restaurants')
-    .select('*')
+    .select('*, restaurant_settings(*)')
     .eq('slug', slug)
     .eq('is_active', true)
     .maybeSingle();
+  if (res.data) res.data = mergeRestaurantSettings(res.data);
+  return res;
 }
 
 export async function getOpeningHoursForDay(restaurantId, dayOfWeek) {

@@ -19,6 +19,8 @@
   --accent:    #e85c2c;
   --accent-dk: #c24820;
   --accent-lt: #fdf0eb;
+  /* Space-separated for rgba(var(--accent-rgb), alpha) — updated by applyRestaurantTheme */
+  --accent-rgb: 232, 92, 44;
   --green:     #1a7a4a;
   --green-lt:  #e8f5ee;
   --amber:     #b86e00;
@@ -56,6 +58,15 @@ body {
 }
 
 a { color: inherit; text-decoration: none; }
+
+/* Inline / body-text links that should follow restaurant accent */
+a.link-accent {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a.link-accent:hover { color: var(--accent-dk); }
 button, input, select, textarea { font-family: inherit; font-size: inherit; }
 img { display: block; max-width: 100%; }
 
@@ -88,7 +99,7 @@ h4 { font-size: 1rem; font-weight: 600; }
 }
 .input:focus, .select:focus, .textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(232,92,44,.12);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .14);
 }
 .input::placeholder, .textarea::placeholder { color: var(--ink3); }
 .textarea { resize: vertical; min-height: 90px; }
@@ -125,7 +136,7 @@ h4 { font-size: 1rem; font-weight: 600; }
   background: var(--accent);
   color: #fff;
 }
-.btn-primary:hover { background: var(--accent-dk); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,92,44,.3); }
+.btn-primary:hover { background: var(--accent-dk); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--accent-rgb), .32); }
 
 .btn-secondary {
   background: var(--cream2);

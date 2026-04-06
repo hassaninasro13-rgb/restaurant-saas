@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <script src="supabase-env.js"></script>
@@ -25,7 +25,7 @@
     content: '';
     position: absolute;
     width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(232,92,44,.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--accent-rgb), .28) 0%, transparent 70%);
     right: -60px; top: -80px;
     pointer-events: none;
   }
@@ -300,43 +300,54 @@
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-name">OneTap</div>
-      <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden data-i18n-aria="nav.overview">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Principal</div>
+      <div class="sidebar-section-label" data-i18n="nav.sectionMain">Principal</div>
       <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Aperçu
+        <span data-i18n="nav.overview">Aperçu</span>
       </a>
       <a href="orders.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-        Commandes
+        <span data-i18n="nav.orders">Commandes</span>
         <span class="badge" id="new-orders-badge" style="display:none">0</span>
       </a>
       <a href="kitchen.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v0"/><path d="M19 22v-3"/></svg>
-        Cuisine
+        <span data-i18n="nav.kitchen">Cuisine</span>
       </a>
 
-      <div class="sidebar-section-label">Menu</div>
+      <div class="sidebar-section-label" data-i18n="nav.sectionMenu">Menu</div>
       <a href="add-categories.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Catégories
+        <span data-i18n="nav.categories">Catégories</span>
       </a>
       <a href="add-products.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Produits
+        <span data-i18n="nav.products">Produits</span>
       </a>
       <a href="order-sources.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        Sources
+        <span data-i18n="nav.sources">Sources</span>
+      </a>
+      <a href="source-qr.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h6v2h-6z"/></svg>
+        <span data-i18n="nav.qrSources">QR sources</span>
       </a>
 
-      <div class="sidebar-section-label">Paramètres</div>
+      <div class="sidebar-section-label" data-i18n="nav.sectionSettings">Paramètres</div>
       <a href="settings.html" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        Paramètres
+        <span data-i18n="nav.settings">Paramètres</span>
       </a>
     </nav>
     <div class="sidebar-footer">
@@ -347,9 +358,9 @@
           <div class="sidebar-rest-type" id="sb-rest-type">—</div>
         </div>
       </div>
-      <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+      <button type="button" class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Déconnexion
+        <span data-i18n="nav.signOut">Déconnexion</span>
       </button>
     </div>
   </aside>
@@ -358,24 +369,24 @@
   <div class="main-content">
     <header class="topbar">
       <div class="topbar-left">
-        <h1 class="topbar-title">Tableau de bord</h1>
+        <h1 class="topbar-title" data-i18n="dash.title">Tableau de bord</h1>
       </div>
       <div class="topbar-right">
         <a id="topbar-menu-link" href="#" target="_blank" class="topbar-menu-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-          Voir mon menu
+          <span data-i18n="dash.viewMenu">Voir mon menu</span>
         </a>
         <a href="add-products.html" class="btn btn-primary btn-sm">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Ajouter un produit
+          <span data-i18n="dash.addProduct">Ajouter un produit</span>
         </a>
       </div>
     </header>
 
     <div class="page-content">
       <div id="sub-expired-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(220,80,80,.45);background:rgba(220,80,80,.08);">
-        <strong style="color:var(--red);">Menu public désactivé</strong>
-        <p style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;">Votre abonnement est expiré : les clients ne voient plus le menu. Renouvelez ou contactez le support.</p>
+        <strong style="color:var(--red);" data-i18n="dash.subExpiredTitle">Menu public désactivé</strong>
+        <p style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;" data-i18n="dash.subExpiredBody">Votre abonnement est expiré : les clients ne voient plus le menu. Renouvelez ou contactez le support.</p>
       </div>
 
       <!-- WELCOME BANNER -->
@@ -383,25 +394,25 @@
         <div class="welcome-banner-main">
           <div class="welcome-text">
             <h2 id="welcome-title">Bienvenue 👋</h2>
-            <p id="welcome-sub">Gérez votre restaurant depuis votre tableau de bord</p>
+            <p id="welcome-sub" data-i18n="dash.welcomeSub">Gérez votre restaurant depuis votre tableau de bord</p>
           </div>
           <div class="welcome-actions">
-            <a href="add-categories.html" class="btn btn-white btn-sm">+ Catégorie</a>
-            <a href="add-products.html" class="btn btn-primary btn-sm">+ Produit</a>
+            <a href="add-categories.html" class="btn btn-white btn-sm" data-i18n="dash.addCategory">+ Catégorie</a>
+            <a href="add-products.html" class="btn btn-primary btn-sm" data-i18n="dash.addProductBtn">+ Produit</a>
           </div>
         </div>
         <div class="welcome-branding">
-          <div class="wb-hint">Logo & bannière (aperçu menu public)</div>
+          <div class="wb-hint" data-i18n="dash.logoBannerHint">Logo & bannière (aperçu menu public)</div>
           <div class="wb-cover-wrap" id="dash-cover-wrap">
-            <div class="wb-cover-placeholder">Bannière menu</div>
+            <div class="wb-cover-placeholder" data-i18n="dash.bannerPlaceholder">Bannière menu</div>
           </div>
           <div class="wb-logo-row">
             <div class="wb-logo-preview" id="dash-logo-preview">?</div>
             <div class="wb-upload-btns">
               <input type="file" id="dash-logo-input" accept="image/*" style="display:none">
               <input type="file" id="dash-cover-input" accept="image/*" style="display:none">
-              <button type="button" id="btn-dash-upload-logo">Changer le logo</button>
-              <button type="button" id="btn-dash-upload-cover">Changer la bannière</button>
+              <button type="button" id="btn-dash-upload-logo" data-i18n="dash.changeLogo">Changer le logo</button>
+              <button type="button" id="btn-dash-upload-cover" data-i18n="dash.changeBanner">Changer la bannière</button>
             </div>
           </div>
         </div>
@@ -409,72 +420,77 @@
 
       <div class="card" id="subscription-status-card" style="margin-bottom:24px;">
         <div class="section-header" style="margin-bottom:14px;">
-          <h3>Abonnement</h3>
-          <a href="admin.html" id="dash-admin-sub-link" class="btn btn-secondary btn-sm" style="display:none;">Panneau admin</a>
+          <h3 data-i18n="dash.subscription">Abonnement</h3>
+          <a href="admin.html" id="dash-admin-sub-link" class="btn btn-secondary btn-sm" style="display:none;" data-i18n="dash.adminPanel">Panneau admin</a>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;">
           <div>
-            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;">Plan</div>
+            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;" data-i18n="dash.plan">Plan</div>
             <div id="sub-plan-val" style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;margin-top:4px;">—</div>
           </div>
           <div>
-            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;">Expiration</div>
+            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;" data-i18n="dash.expiry">Expiration</div>
             <div id="sub-exp-val" style="font-weight:600;margin-top:4px;font-size:.95rem;">—</div>
           </div>
           <div>
-            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;">Menu public</div>
+            <div style="font-size:.72rem;color:var(--ink3);text-transform:uppercase;font-weight:700;" data-i18n="dash.publicMenu">Menu public</div>
             <div id="sub-menu-val" style="margin-top:4px;font-size:.95rem;">—</div>
           </div>
         </div>
+        <div id="plan-limits-detail" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:.82rem;color:var(--ink2);line-height:1.55;"></div>
+      </div>
+
+      <div id="plan-limits-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(200,140,40,.45);background:rgba(255,200,80,.09);">
+        <strong style="color:var(--amber);" data-i18n="dash.planLimitsWarnTitle">Limites du plan dépassées</strong>
+        <p id="plan-limits-warn-body" style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;"></p>
       </div>
 
       <!-- STATS -->
       <div class="stats-grid" id="stats-grid">
         <div class="stat-card">
           <div class="stat-card-icon" style="background:var(--accent-lt);color:var(--accent)">📋</div>
-          <div class="stat-card-label">Commandes aujourd'hui</div>
+          <div class="stat-card-label" data-i18n="dash.statOrdersToday">Commandes aujourd'hui</div>
           <div class="stat-card-value" id="stat-orders-today">—</div>
-          <div class="stat-card-sub" id="stat-orders-sub">Chargement...</div>
+          <div class="stat-card-sub" id="stat-orders-sub" data-i18n="dash.statLoading">Chargement...</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon" style="background:var(--green-lt);color:var(--green)">💰</div>
-          <div class="stat-card-label">Chiffre d'affaires (30j)</div>
+          <div class="stat-card-label" data-i18n="dash.statRevenue">Chiffre d'affaires (30j)</div>
           <div class="stat-card-value" id="stat-revenue">—</div>
-          <div class="stat-card-sub">Commandes terminées</div>
+          <div class="stat-card-sub" data-i18n="dash.statRevenueSub">Commandes terminées</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon" style="background:var(--blue-lt);color:var(--blue)">🍽️</div>
-          <div class="stat-card-label">Produits actifs</div>
+          <div class="stat-card-label" data-i18n="dash.statProducts">Produits actifs</div>
           <div class="stat-card-value" id="stat-products">—</div>
           <div class="stat-card-sub" id="stat-categories-sub">Dans — catégories</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon" style="background:var(--amber-lt);color:var(--amber)">⏳</div>
-          <div class="stat-card-label">En attente</div>
+          <div class="stat-card-label" data-i18n="dash.statPending">En attente</div>
           <div class="stat-card-value" id="stat-pending">—</div>
-          <div class="stat-card-sub">Nouvelles commandes</div>
+          <div class="stat-card-sub" data-i18n="dash.statPendingSub">Nouvelles commandes</div>
         </div>
       </div>
 
       <!-- PUBLIC MENU URL + QR -->
       <div class="card menu-share-card">
         <div class="section-header">
-          <h3>Lien &amp; QR code du menu</h3>
+          <h3 data-i18n="dash.linkQrTitle">Lien &amp; QR code du menu</h3>
         </div>
         <div class="menu-share-grid">
           <div class="menu-share-qr">
-            <img id="menu-qr-img" alt="QR code — menu public" width="240" height="240" style="display:none;max-width:100%;height:auto;border-radius:12px;border:1.5px solid var(--border);background:#fff">
-            <div class="menu-qr-placeholder" id="menu-qr-placeholder">Génération du QR…</div>
-            <a id="menu-qr-download" href="#" download="menu-qr.png" class="btn btn-secondary btn-sm" style="margin-top:12px;display:none">Télécharger le QR (PNG)</a>
+            <img id="menu-qr-img" data-i18n-aria="dash.qrAlt" alt="" width="240" height="240" style="display:none;max-width:100%;height:auto;border-radius:12px;border:1.5px solid var(--border);background:#fff">
+            <div class="menu-qr-placeholder" id="menu-qr-placeholder" data-i18n="dash.qrGenerating">Génération du QR…</div>
+            <a id="menu-qr-download" href="#" download="menu-qr.png" class="btn btn-secondary btn-sm" style="margin-top:12px;display:none" data-i18n="dash.qrDownload">Télécharger le QR (PNG)</a>
           </div>
           <div class="menu-share-info">
-            <p class="menu-share-desc">
-              Le QR ouvre <code>menu.html?slug=votre-restaurant</code>. Pour un canal (table, à emporter, etc.), ajoutez
-              <code>&amp;source=nom</code> (voir <a href="order-sources.html" style="color:var(--accent);font-weight:600;">Sources</a>).
+            <p class="menu-share-desc" data-i18n="dash.menuUrlHelp">
+              Le QR ouvre menu.html?slug=votre-restaurant. Pour un canal (table, à emporter, etc.), ajoutez &source=nom (voir Sources).
             </p>
             <div class="menu-url-row">
-              <input type="text" readonly class="input menu-url-input" id="menu-public-url" aria-label="URL du menu public">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-menu-url">Copier le lien</button>
+              <input type="text" readonly class="input menu-url-input" id="menu-public-url" data-i18n-aria="dash.urlPublicLabel">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-menu-url" data-i18n="dash.copyLink">Copier le lien</button>
             </div>
           </div>
         </div>
@@ -484,43 +500,48 @@
       <div class="quick-actions">
         <a href="add-categories.html" class="quick-action-card">
           <div class="quick-action-icon" style="background:var(--blue-lt)">📂</div>
-          <h4>Catégories</h4>
-          <p>Gérer les sections de votre menu</p>
+          <h4 data-i18n="dash.qaCategoriesTitle">Catégories</h4>
+          <p data-i18n="dash.qaCategoriesDesc">Gérer les sections de votre menu</p>
         </a>
         <a href="add-products.html" class="quick-action-card">
           <div class="quick-action-icon" style="background:var(--green-lt)">🍽️</div>
-          <h4>Produits</h4>
-          <p>Ajouter ou modifier vos plats</p>
+          <h4 data-i18n="dash.qaProductsTitle">Produits</h4>
+          <p data-i18n="dash.qaProductsDesc">Ajouter ou modifier vos plats</p>
         </a>
         <a href="order-sources.html" class="quick-action-card">
           <div class="quick-action-icon" style="background:var(--amber-lt)">📍</div>
-          <h4>Sources</h4>
-          <p>Tables, emporter, comptoir, livraison…</p>
+          <h4 data-i18n="dash.qaSourcesTitle">Sources</h4>
+          <p data-i18n="dash.qaSourcesDesc">Tables, emporter, comptoir, livraison…</p>
+        </a>
+        <a href="source-qr.html" class="quick-action-card">
+          <div class="quick-action-icon" style="background:var(--cream2)">▦</div>
+          <h4 data-i18n="dash.qaQrTitle">QR sources</h4>
+          <p data-i18n="dash.qaQrDesc">Imprimer les codes par table / canal</p>
         </a>
         <a href="orders.html" class="quick-action-card">
           <div class="quick-action-icon" style="background:var(--accent-lt)">📋</div>
-          <h4>Commandes</h4>
-          <p>Voir et gérer toutes les commandes</p>
+          <h4 data-i18n="dash.qaOrdersTitle">Commandes</h4>
+          <p data-i18n="dash.qaOrdersDesc">Voir et gérer toutes les commandes</p>
         </a>
         <a id="qa-menu-link" href="#" target="_blank" class="quick-action-card">
           <div class="quick-action-icon" style="background:var(--purple-lt)">📱</div>
-          <h4>Mon menu</h4>
-          <p>Voir votre menu public</p>
+          <h4 data-i18n="dash.qaMyMenuTitle">Mon menu</h4>
+          <p data-i18n="dash.qaMyMenuDesc">Voir votre menu public</p>
         </a>
       </div>
 
       <!-- CATEGORIES (Supabase CRUD overview) -->
       <div class="card">
         <div class="section-header">
-          <h3>Catégories du menu</h3>
+          <h3 data-i18n="dash.catListTitle">Catégories du menu</h3>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <a href="add-categories.html" class="btn btn-secondary btn-sm">Gérer tout</a>
-            <a href="add-categories.html" class="btn btn-primary btn-sm">+ Ajouter</a>
+            <a href="add-categories.html" class="btn btn-secondary btn-sm" data-i18n="dash.manageAll">Gérer tout</a>
+            <a href="add-categories.html" class="btn btn-primary btn-sm" data-i18n="dash.add">+ Ajouter</a>
           </div>
         </div>
         <div id="dash-categories-container">
           <div class="empty-state" style="padding:28px">
-            <p style="color:var(--ink3);font-size:.9rem;">Chargement des catégories…</p>
+            <p style="color:var(--ink3);font-size:.9rem;" data-i18n="dash.loadingCats">Chargement des catégories…</p>
           </div>
         </div>
       </div>
@@ -528,15 +549,15 @@
       <!-- PRODUCTS -->
       <div class="card">
         <div class="section-header">
-          <h3>Produits du menu</h3>
+          <h3 data-i18n="dash.prodListTitle">Produits du menu</h3>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <a href="add-products.html" class="btn btn-secondary btn-sm">Gérer tout</a>
-            <a href="add-products.html" class="btn btn-primary btn-sm">+ Ajouter</a>
+            <a href="add-products.html" class="btn btn-secondary btn-sm" data-i18n="dash.manageAll">Gérer tout</a>
+            <a href="add-products.html" class="btn btn-primary btn-sm" data-i18n="dash.add">+ Ajouter</a>
           </div>
         </div>
         <div id="dash-products-container">
           <div class="empty-state" style="padding:28px">
-            <p style="color:var(--ink3);font-size:.9rem;">Chargement des produits…</p>
+            <p style="color:var(--ink3);font-size:.9rem;" data-i18n="dash.loadingProds">Chargement des produits…</p>
           </div>
         </div>
       </div>
@@ -544,13 +565,13 @@
       <!-- RECENT ORDERS -->
       <div class="card">
         <div class="section-header">
-          <h3>Commandes récentes</h3>
-          <a href="orders.html">Voir tout →</a>
+          <h3 data-i18n="dash.recentOrders">Commandes récentes</h3>
+          <a href="orders.html" data-i18n="dash.viewAllOrders">Voir tout →</a>
         </div>
         <div id="orders-container">
           <div class="empty-state">
             <div class="empty-state-icon">📋</div>
-            <h3>Chargement...</h3>
+            <h3 data-i18n="dash.statLoading">Chargement...</h3>
           </div>
         </div>
       </div>
@@ -567,7 +588,20 @@ import {
   uploadRestaurantCover,
   updateRestaurantForOwner,
 } from '../supabase/restaurants.js';
-import { getRestaurant, fmtCurrency, fmtDate, getStatusBadge, hideLoader, toast } from '../js/shared.js';
+import {
+  getRestaurant,
+  fmtCurrency,
+  fmtDate,
+  getStatusBadge,
+  hideLoader,
+  toast,
+  formatOrderSourceForDisplay,
+  getRestaurantCurrency,
+  getRestaurantLocale,
+  applyStaffShellBranding,
+  t,
+  hydrateI18n,
+} from '../js/shared.js';
 import {
   countOrdersSince,
   countOrdersByStatus,
@@ -580,7 +614,12 @@ import {
   listCategoriesWithProductCounts,
   deleteCategoryForRestaurant,
 } from '../supabase/categories.js';
-import { countAvailableProducts, listProductsWithCategory, deleteProductForRestaurant } from '../supabase/products.js';
+import {
+  countAvailableProducts,
+  countProductsForRestaurant,
+  listProductsWithCategory,
+  deleteProductForRestaurant,
+} from '../supabase/products.js';
 import {
   isSubscriptionActive,
   subscriptionLabel,
@@ -609,7 +648,7 @@ async function renderMenuQr(menuUrl, slugForFilename) {
   const ph = document.getElementById('menu-qr-placeholder');
   const dl = document.getElementById('menu-qr-download');
   if (!img || !ph) return;
-  ph.textContent = 'Génération du QR…';
+  ph.textContent = t('dash.qrGenerating');
   ph.style.display = '';
   img.style.display = 'none';
   if (dl) dl.style.display = 'none';
@@ -623,6 +662,7 @@ async function renderMenuQr(menuUrl, slugForFilename) {
     const displayUrl = await QRCode.toDataURL(menuUrl, { ...baseOpts, width: 240 });
     const downloadUrl = await QRCode.toDataURL(menuUrl, { ...baseOpts, width: 720 });
     img.src = displayUrl;
+    img.alt = t('dash.qrAlt');
     img.style.display = 'block';
     ph.style.display = 'none';
     if (dl) {
@@ -633,7 +673,7 @@ async function renderMenuQr(menuUrl, slugForFilename) {
     }
   } catch (e) {
     console.warn('QR generation failed', e);
-    ph.textContent = 'QR indisponible (connexion requise pour générer le code). Utilisez le lien ci-contre.';
+    ph.textContent = t('dash.qrUnavailable');
     ph.style.display = '';
   }
 }
@@ -649,21 +689,71 @@ function renderSubscriptionUI(rest) {
   const planEl = document.getElementById('sub-plan-val');
   const expEl = document.getElementById('sub-exp-val');
   const menuEl = document.getElementById('sub-menu-val');
-  if (planEl) planEl.textContent = subscriptionLabel(rest.subscription_plan);
-  if (expEl) expEl.textContent = formatSubscriptionExpiry(rest.subscription_expires_at);
+  if (planEl) planEl.textContent = subscriptionLabel(rest);
+  if (expEl) {
+    expEl.textContent = formatSubscriptionExpiry(rest.subscription?.end_date ?? rest.subscription_expires_at);
+  }
   if (menuEl) {
     if (menuOk) {
-      menuEl.innerHTML = '<span style="color:var(--green);font-weight:700;">Visible</span>';
+      menuEl.innerHTML = `<span style="color:var(--green);font-weight:700;">${escHtml(t('dash.subVisible'))}</span>`;
     } else if (rest.is_active === false) {
-      menuEl.innerHTML = '<span style="color:var(--red);font-weight:700;">Masqué (compte désactivé)</span>';
+      menuEl.innerHTML = `<span style="color:var(--red);font-weight:700;">${escHtml(t('dash.subHiddenInactive'))}</span>`;
     } else {
-      menuEl.innerHTML = '<span style="color:var(--red);font-weight:700;">Masqué (abonnement expiré)</span>';
+      menuEl.innerHTML = `<span style="color:var(--red);font-weight:700;">${escHtml(t('dash.subHiddenExpired'))}</span>`;
     }
   }
   checkIsPlatformAdmin().then((ok) => {
     const link = document.getElementById('dash-admin-sub-link');
     if (link) link.style.display = ok ? 'inline-flex' : 'none';
   });
+}
+
+function fmtPlanCap(n) {
+  const v = Number(n);
+  if (Number.isNaN(v) || v >= 999999) return t('dash.planUnlimited');
+  return String(v);
+}
+
+async function renderPlanLimits(rest) {
+  const plan = rest.subscription?.plan;
+  const detail = document.getElementById('plan-limits-detail');
+  const banner = document.getElementById('plan-limits-banner');
+  const body = document.getElementById('plan-limits-warn-body');
+  if (!detail || !plan) {
+    if (detail) detail.style.display = 'none';
+    if (banner) banner.style.display = 'none';
+    return;
+  }
+  const [{ count: prodCount, error: e1 }, { count: ordCount, error: e2 }] = await Promise.all([
+    countProductsForRestaurant(rest.id),
+    countOrdersThisMonth(rest.id),
+  ]);
+  if (e1 || e2) {
+    detail.style.display = 'none';
+    if (banner) banner.style.display = 'none';
+    return;
+  }
+  const pN = prodCount ?? 0;
+  const oN = ordCount ?? 0;
+  const uN = 1;
+  const maxP = plan.max_products >= 999999 ? Infinity : Number(plan.max_products);
+  const maxO = plan.max_orders_per_month >= 999999 ? Infinity : Number(plan.max_orders_per_month);
+  const maxU = plan.max_users >= 999999 ? Infinity : Number(plan.max_users);
+  detail.style.display = 'block';
+  detail.innerHTML = [
+    `<div><strong>${escHtml(t('dash.planLimitProducts'))}</strong> ${pN} / ${fmtPlanCap(plan.max_products)}</div>`,
+    `<div><strong>${escHtml(t('dash.planLimitOrders'))}</strong> ${oN} / ${fmtPlanCap(plan.max_orders_per_month)}</div>`,
+    `<div><strong>${escHtml(t('dash.planLimitUsers'))}</strong> ${uN} / ${fmtPlanCap(plan.max_users)}</div>`,
+  ].join('');
+  const overP = pN > maxP;
+  const overO = oN > maxO;
+  const overU = uN > maxU;
+  if (overP || overO || overU) {
+    banner.style.display = 'block';
+    if (body) body.textContent = t('dash.planLimitsWarnBody');
+  } else {
+    banner.style.display = 'none';
+  }
 }
 
 function renderDashboardBranding() {
@@ -678,7 +768,7 @@ function renderDashboardBranding() {
   if (restaurant.cover_url) {
     wrap.innerHTML = `<img src="${restaurant.cover_url}" alt="" loading="lazy" decoding="async" width="220" height="88">`;
   } else {
-    wrap.innerHTML = `<div class="wb-cover-placeholder">Bannière menu</div>`;
+    wrap.innerHTML = `<div class="wb-cover-placeholder">${escHtml(t('dash.bannerPlaceholder'))}</div>`;
   }
 
   const av = document.getElementById('sb-avatar');
@@ -702,13 +792,15 @@ async function init() {
   }
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
+  applyStaffShellBranding(rest);
+  hydrateI18n(document);
 
   // Update UI with restaurant info
   const name = rest.name;
   document.getElementById('sb-rest-name').textContent = name;
   document.getElementById('sb-rest-name2').textContent = name;
   document.getElementById('sb-rest-type').textContent = rest.business_type;
-  document.getElementById('welcome-title').textContent = `Bonjour, ${name} 👋`;
+  document.getElementById('welcome-title').textContent = t('dash.welcome', { name });
   renderDashboardBranding();
   renderSubscriptionUI(rest);
 
@@ -720,9 +812,9 @@ async function init() {
   document.getElementById('btn-copy-menu-url').onclick = async () => {
     try {
       await navigator.clipboard.writeText(menuUrl);
-      toast('Lien copié', 'success');
+      toast(t('dash.copyMenuOk'), 'success');
     } catch {
-      toast('Copie impossible', 'error');
+      toast(t('dash.copyMenuFail'), 'error');
     }
   };
 
@@ -737,33 +829,34 @@ async function init() {
     loadDashboardCategories(),
     loadDashboardProducts(),
     renderMenuQr(menuUrl, rest.slug),
+    renderPlanLimits(rest),
   ]);
   hideLoader();
 }
 
 async function handleDashLogoUpload(file) {
   if (!file || !file.type.startsWith('image/')) return;
-  if (file.size > 2 * 1024 * 1024) { toast('Logo trop lourd (max 2 Mo)', 'error'); return; }
+  if (file.size > 2 * 1024 * 1024) { toast(t('dash.logoHeavy'), 'error'); return; }
   const { publicUrl, error: upErr } = await uploadRestaurantLogo(currentSession.user.id, file);
-  if (upErr || !publicUrl) { toast(upErr?.message || 'Échec envoi logo', 'error'); return; }
+  if (upErr || !publicUrl) { toast(upErr?.message || t('dash.uploadLogoFail'), 'error'); return; }
   const { data, error } = await updateRestaurantForOwner(restaurant.id, currentSession.user.id, { logo_url: publicUrl });
   if (error) { toast(error.message, 'error'); return; }
   restaurant = { ...restaurant, ...data };
   renderDashboardBranding();
-  toast('Logo mis à jour', 'success');
+  toast(t('dash.logoOk'), 'success');
   document.getElementById('dash-logo-input').value = '';
 }
 
 async function handleDashCoverUpload(file) {
   if (!file || !file.type.startsWith('image/')) return;
-  if (file.size > 5 * 1024 * 1024) { toast('Bannière trop lourde (max 5 Mo)', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { toast(t('dash.bannerHeavy'), 'error'); return; }
   const { publicUrl, error: upErr } = await uploadRestaurantCover(currentSession.user.id, file);
-  if (upErr || !publicUrl) { toast(upErr?.message || 'Échec envoi bannière', 'error'); return; }
+  if (upErr || !publicUrl) { toast(upErr?.message || t('dash.uploadBannerFail'), 'error'); return; }
   const { data, error } = await updateRestaurantForOwner(restaurant.id, currentSession.user.id, { cover_url: publicUrl });
   if (error) { toast(error.message, 'error'); return; }
   restaurant = { ...restaurant, ...data };
   renderDashboardBranding();
-  toast('Bannière mise à jour', 'success');
+  toast(t('dash.bannerOk'), 'success');
   document.getElementById('dash-cover-input').value = '';
 }
 
@@ -781,33 +874,37 @@ async function loadStats() {
 
   document.getElementById('stat-orders-today').textContent = ordersRes.count ?? 0;
   document.getElementById('stat-products').textContent = productsRes.count ?? 0;
-  document.getElementById('stat-categories-sub').textContent = `Dans ${catsRes.count ?? 0} catégories`;
+  document.getElementById('stat-categories-sub').textContent = t('dash.statInCategories', { n: catsRes.count ?? 0 });
   document.getElementById('stat-pending').textContent = pendingRes.count ?? 0;
 
   const revenue = (revenueRes.data || []).reduce((s, o) => s + (o.total_amount || 0), 0);
-  document.getElementById('stat-revenue').textContent = fmtCurrency(revenue);
+  document.getElementById('stat-revenue').textContent = fmtCurrency(
+    revenue,
+    getRestaurantCurrency(restaurant),
+    getRestaurantLocale(restaurant),
+  );
 
   const newCount = pendingRes.count ?? 0;
   const badge = document.getElementById('new-orders-badge');
   if (newCount > 0) { badge.style.display = ''; badge.textContent = newCount; }
 
-  document.getElementById('stat-orders-sub').textContent = `Total : ${ordersRes.count ?? 0}`;
+  document.getElementById('stat-orders-sub').textContent = t('dash.statTotalOrders', { n: ordersRes.count ?? 0 });
 }
 
 async function loadDashboardCategories() {
   const { data: cats, error } = await listCategoriesWithProductCounts(restaurant.id);
   const el = document.getElementById('dash-categories-container');
   if (error) {
-    el.innerHTML = `<div class="empty-state" style="padding:24px"><p style="color:var(--red);">Impossible de charger les catégories.</p></div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:24px"><p style="color:var(--red);">${escHtml(t('dash.catLoadErr'))}</p></div>`;
     return;
   }
   if (!cats || cats.length === 0) {
     el.innerHTML = `
       <div class="empty-state" style="padding:28px">
         <div class="empty-state-icon" style="font-size:2rem">📂</div>
-        <h3>Aucune catégorie</h3>
-        <p style="max-width:320px;margin:0 auto 16px">Créez des catégories pour structurer votre menu — elles sont liées à votre restaurant.</p>
-        <a href="add-categories.html" class="btn btn-primary btn-sm">Créer une catégorie</a>
+        <h3>${escHtml(t('dash.emptyCategoriesTitle'))}</h3>
+        <p style="max-width:320px;margin:0 auto 16px">${escHtml(t('dash.emptyCategoriesBody'))}</p>
+        <a href="add-categories.html" class="btn btn-primary btn-sm">${escHtml(t('dash.emptyCategoriesBtn'))}</a>
       </div>`;
     return;
   }
@@ -815,27 +912,27 @@ async function loadDashboardCategories() {
   el.innerHTML = `
     <table class="dash-cat-table">
       <thead><tr>
-        <th>Catégorie</th>
-        <th style="width:100px">Produits</th>
-        <th style="width:110px">Visibilité</th>
-        <th style="width:200px;text-align:right">Actions</th>
+        <th>${escHtml(t('dash.thCategory'))}</th>
+        <th style="width:100px">${escHtml(t('dash.thProductsCount'))}</th>
+        <th style="width:110px">${escHtml(t('dash.thVisibility'))}</th>
+        <th style="width:200px;text-align:right">${escHtml(t('dash.thActions'))}</th>
       </tr></thead>
       <tbody>
         ${cats.map((c) => {
           const n = (c.products?.[0]?.count ?? 0);
           const vis = c.is_visible
-            ? '<span class="badge badge-green">Visible</span>'
-            : '<span class="badge badge-gray">Masquée</span>';
+            ? `<span class="badge badge-green">${escHtml(t('dash.badgeVisibleMenu'))}</span>`
+            : `<span class="badge badge-gray">${escHtml(t('dash.badgeHiddenCat'))}</span>`;
           return `<tr>
             <td>
               <div class="dash-cat-name"></div>
-              <div class="dash-cat-meta">Position ${c.position}</div>
+              <div class="dash-cat-meta">${escHtml(t('dash.position', { n: c.position }))}</div>
             </td>
             <td>${n}</td>
             <td>${vis}</td>
             <td><div class="dash-cat-actions">
-              <a href="add-categories.html?edit=${c.id}" class="btn btn-secondary btn-sm">Modifier</a>
-              <button type="button" class="btn btn-danger btn-sm" data-cat-del="${c.id}">Supprimer</button>
+              <a href="add-categories.html?edit=${c.id}" class="btn btn-secondary btn-sm">${escHtml(t('dash.edit'))}</a>
+              <button type="button" class="btn btn-danger btn-sm" data-cat-del="${c.id}">${escHtml(t('dash.delete'))}</button>
             </div></td>
           </tr>`;
         }).join('')}
@@ -858,16 +955,16 @@ async function loadDashboardProducts() {
   const { data: prods, error } = await listProductsWithCategory(restaurant.id);
   const el = document.getElementById('dash-products-container');
   if (error) {
-    el.innerHTML = `<div class="empty-state" style="padding:24px"><p style="color:var(--red);">Impossible de charger les produits.</p></div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:24px"><p style="color:var(--red);">${escHtml(t('dash.prodLoadErr'))}</p></div>`;
     return;
   }
   if (!prods || prods.length === 0) {
     el.innerHTML = `
       <div class="empty-state" style="padding:28px">
         <div class="empty-state-icon" style="font-size:2rem">🍽️</div>
-        <h3>Aucun produit</h3>
-        <p style="max-width:340px;margin:0 auto 16px">Ajoutez des plats avec photo (stockage Supabase), prix et catégorie — tout est lié à votre restaurant.</p>
-        <a href="add-products.html" class="btn btn-primary btn-sm">Créer un produit</a>
+        <h3>${escHtml(t('dash.emptyProductsTitle'))}</h3>
+        <p style="max-width:340px;margin:0 auto 16px">${escHtml(t('dash.emptyProductsBody'))}</p>
+        <a href="add-products.html" class="btn btn-primary btn-sm">${escHtml(t('dash.emptyProductsBtn'))}</a>
       </div>`;
     return;
   }
@@ -879,11 +976,11 @@ async function loadDashboardProducts() {
     <table class="dash-cat-table">
       <thead><tr>
         <th style="width:56px"></th>
-        <th>Produit</th>
-        <th style="width:120px">Catégorie</th>
-        <th style="width:100px">Prix</th>
-        <th style="width:110px">Stock</th>
-        <th style="width:200px;text-align:right">Actions</th>
+        <th>${escHtml(t('dash.thProduct'))}</th>
+        <th style="width:120px">${escHtml(t('dash.thCategoryCol'))}</th>
+        <th style="width:100px">${escHtml(t('dash.thPrice'))}</th>
+        <th style="width:110px">${escHtml(t('dash.thStock'))}</th>
+        <th style="width:200px;text-align:right">${escHtml(t('dash.thActions'))}</th>
       </tr></thead>
       <tbody>
         ${preview.map((p) => `
@@ -894,13 +991,13 @@ async function loadDashboardProducts() {
             <td class="prod-price"></td>
             <td class="prod-stock"></td>
             <td><div class="dash-cat-actions">
-              <a href="add-products.html?edit=${p.id}" class="btn btn-secondary btn-sm">Modifier</a>
-              <button type="button" class="btn btn-danger btn-sm" data-prod-del="${p.id}">Supprimer</button>
+              <a href="add-products.html?edit=${p.id}" class="btn btn-secondary btn-sm">${escHtml(t('dash.edit'))}</a>
+              <button type="button" class="btn btn-danger btn-sm" data-prod-del="${p.id}">${escHtml(t('dash.delete'))}</button>
             </div></td>
           </tr>`).join('')}
       </tbody>
     </table>
-    ${more > 0 ? `<p style="text-align:center;padding:12px;font-size:.85rem;color:var(--ink3)">+ ${more} autre(s) — <a href="add-products.html">voir tout</a></p>` : ''}`;
+    ${more > 0 ? `<p style="text-align:center;padding:12px;font-size:.85rem;color:var(--ink3)">${escHtml(t('dash.moreProducts', { n: more }))}</p>` : ''}`;
 
   preview.forEach((p) => {
     const row = el.querySelector(`[data-dash-prod="${p.id}"]`);
@@ -910,39 +1007,43 @@ async function loadDashboardProducts() {
       const img = document.createElement('img');
       img.className = 'dash-prod-thumb';
       img.src = p.image_url;
-      img.alt = p.name || 'Produit';
+      img.alt = p.name || t('dash.thProduct');
       thumbCell.appendChild(img);
     } else {
       thumbCell.innerHTML = '<span class="dash-prod-thumb-placeholder">🍽️</span>';
     }
     row.querySelector('.prod-title').textContent = p.name;
     row.querySelector('.prod-cat').textContent = p.categories?.name || '—';
-    row.querySelector('.prod-price').textContent = fmtCurrency(p.price);
+    row.querySelector('.prod-price').textContent = fmtCurrency(
+      p.price,
+      getRestaurantCurrency(restaurant),
+      getRestaurantLocale(restaurant),
+    );
     const vis = p.is_visible !== false;
     const avail = p.is_available !== false;
     row.querySelector('.prod-stock').innerHTML = !vis
-      ? '<span class="badge badge-gray">Hors menu</span>'
+      ? `<span class="badge badge-gray">${escHtml(t('dash.stockOffMenu'))}</span>`
       : !avail
-        ? '<span class="badge badge-amber">Rupture</span>'
-        : '<span class="badge badge-green">En vente</span>';
+        ? `<span class="badge badge-amber">${escHtml(t('dash.stockOut'))}</span>`
+        : `<span class="badge badge-green">${escHtml(t('dash.stockOnSale'))}</span>`;
     row.querySelector(`[data-prod-del="${p.id}"]`).addEventListener('click', () => dashboardDeleteProduct(p.id));
   });
 }
 
 window.dashboardDeleteProduct = async function(id) {
-  if (!confirm('Supprimer ce produit ?')) return;
+  if (!confirm(t('dash.deleteProductConfirm'))) return;
   const { error } = await deleteProductForRestaurant(id, restaurant.id);
   if (error) { toast(error.message, 'error'); return; }
-  toast('Produit supprimé', 'success');
+  toast(t('dash.productDeleted'), 'success');
   await Promise.all([loadDashboardProducts(), loadStats()]);
 };
 
 window.dashboardDeleteCategory = async function(id, name) {
-  const label = name ? `"${name}"` : 'cette catégorie';
-  if (!confirm(`Supprimer ${label} ? Les produits de cette catégorie seront aussi supprimés.`)) return;
+  const label = name ? `"${name}"` : t('dash.deleteCategoryThis');
+  if (!confirm(t('dash.deleteCategoryConfirm', { label }))) return;
   const { error } = await deleteCategoryForRestaurant(id, restaurant.id);
   if (error) { toast(error.message, 'error'); return; }
-  toast('Catégorie supprimée', 'success');
+  toast(t('dash.categoryDeleted'), 'success');
   await Promise.all([loadDashboardCategories(), loadDashboardProducts(), loadStats()]);
 };
 
@@ -954,28 +1055,29 @@ async function loadRecentOrders() {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon" style="font-size:2rem">📋</div>
-        <h3>Aucune commande pour l'instant</h3>
-        <p>Partagez votre menu pour recevoir vos premières commandes.</p>
+        <h3>${escHtml(t('dash.recentEmptyTitle'))}</h3>
+        <p>${escHtml(t('dash.recentEmptySub'))}</p>
       </div>`;
     return;
   }
 
+  const statusOpts = ['new','preparing','ready','completed','cancelled','confirmed','done','delivered'];
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:8px;">
       ${orders.map(o => `
         <div class="order-row">
           <div class="order-row-num">${o.order_number}</div>
           <div class="order-row-customer">
-            <strong>${o.customer_name}</strong>
-            <span>${o.customer_phone}</span>
-            ${(o.source_name || o.table_name || o.table_number) ? `<span style="display:block;font-size:.76rem;color:var(--ink3);margin-top:2px;">📍 ${escHtml(o.source_name || o.table_name || o.table_number)}</span>` : ''}
+            <strong>${escHtml(o.customer_name)}</strong>
+            <span>${escHtml(o.customer_phone)}</span>
+            ${formatOrderSourceForDisplay(o) ? `<span style="display:block;font-size:.76rem;color:var(--ink3);margin-top:2px;">📍 ${escHtml(formatOrderSourceForDisplay(o))}</span>` : ''}
           </div>
-          <div>${fmtCurrency(o.total_amount)}</div>
+          <div>${fmtCurrency(o.total_amount, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
           <div>${getStatusBadge(o.status)}</div>
           <div>
             <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
-              ${['new','preparing','ready','completed','cancelled','confirmed','done','delivered'].map(s =>
-                `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
+              ${statusOpts.map(s =>
+                `<option value="${s}" ${o.status === s ? 'selected' : ''}>${escHtml(t('status.' + s))}</option>`
               ).join('')}
             </select>
           </div>
@@ -984,10 +1086,10 @@ async function loadRecentOrders() {
 }
 
 window.updateStatus = async function(orderId, status) {
-  if (status === 'cancelled' && !confirm('Annuler cette commande ?')) return;
+  if (status === 'cancelled' && !confirm(t('dash.cancelOrderConfirm'))) return;
   const { error } = await updateOrderStatus(orderId, status);
-  if (error) toast('Erreur lors de la mise à jour', 'error');
-  else toast('Statut mis à jour', 'success');
+  if (error) toast(t('ord.updateErr'), 'error');
+  else toast(t('ord.updateOk'), 'success');
   await loadStats();
   await loadRecentOrders();
 };

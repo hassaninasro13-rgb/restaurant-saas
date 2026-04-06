@@ -28,7 +28,7 @@
     content: '';
     position: absolute;
     width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(232,92,44,.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--accent-rgb), .32) 0%, transparent 70%);
     top: -100px; left: -100px;
     pointer-events: none;
   }
@@ -36,7 +36,7 @@
     content: '';
     position: absolute;
     width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(232,92,44,.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--accent-rgb), .16) 0%, transparent 70%);
     bottom: 60px; right: -60px;
     pointer-events: none;
   }
@@ -145,7 +145,7 @@
   .auth-tab.active {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(232,92,44,.3);
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb), .3);
   }
   .auth-footer-link {
     text-align: center;

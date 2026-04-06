@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="supabase-env.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap — Paramètres établissement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<style>
+  .settings-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 22px;
+  }
+  .settings-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    margin: 0 0 16px;
+  }
+  .settings-intro {
+    font-size: .88rem;
+    color: var(--ink2);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .logo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .logo-preview {
+    width: 72px; height: 72px; border-radius: 12px;
+    background: var(--cream2); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; font-weight: 800; color: var(--ink3);
+    overflow: hidden;
+  }
+  .logo-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .hours-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  .hours-table th, .hours-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .hours-table th { color: var(--ink2); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+  .hours-table input[type="time"] { max-width: 120px; }
+  .theme-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .theme-row input[type="color"] { width: 48px; height: 40px; padding: 2px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">OneTap</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-row">
+        <a href="dashboard.html" class="sidebar-brand-logo-link" id="staff-sidebar-logo" hidden aria-label="Accueil">
+          <img id="staff-sidebar-logo-img" alt="" width="44" height="44" decoding="async">
+        </a>
+        <div class="sidebar-brand-texts">
+          <div class="sidebar-brand-name">OneTap</div>
+          <div class="sidebar-brand-sub" id="sb-rest-name">Chargement...</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Aperçu
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Commandes
+      </a>
+      <a href="kitchen.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v0"/><path d="M19 22v-3"/></svg>
+        Cuisine
+      </a>
+      <div class="sidebar-section-label">Menu</div>
+      <a href="add-categories.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Catégories
+      </a>
+      <a href="add-products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Produits
+      </a>
+      <a href="order-sources.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Sources
+      </a>
+      <a href="source-qr.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h6v2h-6z"/></svg>
+        QR sources
+      </a>
+      <div class="sidebar-section-label">Paramètres</div>
+      <a href="settings.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Paramètres
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="handleSignOut()" style="color:rgba(255,255,255,.4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title">Paramètres de l’établissement</h1>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <p class="settings-intro">
+        Ces informations apparaissent sur le menu public, les pages de commande et le tableau de bord.
+        La <strong>langue</strong> est enregistrée pour une future traduction du menu.
+      </p>
+
+      <div class="settings-card">
+        <h3>Nom &amp; logo</h3>
+        <div class="field">
+          <label for="field-name">Nom du restaurant</label>
+          <input type="text" id="field-name" class="input" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label>Logo</label>
+          <div class="logo-row">
+            <div class="logo-preview" id="logo-preview">?</div>
+            <div>
+              <input type="file" id="logo-input" accept="image/*" hidden>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-pick-logo">Choisir une image</button>
+              <p style="font-size:.72rem;color:var(--ink3);margin-top:8px;">PNG ou JPG, max 2&nbsp;Mo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Contact</h3>
+        <div class="field">
+          <label for="field-address">Adresse</label>
+          <textarea id="field-address" class="textarea" rows="2" placeholder="Rue, ville…"></textarea>
+        </div>
+        <div class="field-row" style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div class="field" style="flex:1;min-width:200px;">
+            <label for="field-phone">Téléphone</label>
+            <input type="tel" id="field-phone" class="input" autocomplete="tel">
+          </div>
+          <div class="field" style="flex:1;min-width:200px;">
+            <label for="field-whatsapp">WhatsApp (optionnel)</label>
+            <input type="tel" id="field-whatsapp" class="input" autocomplete="tel">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Affichage public</h3>
+        <div class="field-row" style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div class="field" style="flex:1;min-width:160px;">
+            <label for="field-currency">Devise (prix)</label>
+            <select id="field-currency" class="input">
+              <option value="DZD">DZD — Dinar algérien</option>
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+              <option value="MAD">MAD</option>
+              <option value="TND">TND</option>
+            </select>
+          </div>
+          <div class="field" style="flex:1;min-width:160px;">
+            <label for="field-language">Langue (futur)</label>
+            <select id="field-language" class="input">
+              <option value="fr">Français</option>
+              <option value="ar">العربية</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Couleur du thème</label>
+          <div class="theme-row">
+            <input type="color" id="field-theme" value="#e85c2c" aria-label="Couleur">
+            <input type="text" id="field-theme-text" class="input" placeholder="#e85c2c" style="max-width:140px;font-family:monospace;font-size:.85rem;">
+          </div>
+          <p style="font-size:.72rem;color:var(--ink3);margin-top:8px;">Boutons et accents sur le menu et le dashboard.</p>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Horaires (par jour)</h3>
+        <p style="font-size:.8rem;color:var(--ink2);margin:-8px 0 12px;">Utilisés pour le badge « ouvert / fermé » sur le menu public.</p>
+        <div style="overflow-x:auto;">
+          <table class="hours-table">
+            <thead>
+              <tr>
+                <th>Jour</th>
+                <th></th>
+                <th>Ouverture</th>
+                <th>Fermeture</th>
+              </tr>
+            </thead>
+            <tbody id="hours-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
+import {
+  tryCreateRestaurantFromPending,
+  updateRestaurantForOwner,
+  uploadRestaurantLogo,
+} from '../supabase/restaurants.js';
+import {
+  getRestaurant,
+  hideLoader,
+  toast,
+  applyStaffShellBranding,
+} from '../js/shared.js';
+import {
+  upsertRestaurantSettings,
+  listOpeningHours,
+  ensureOpeningHoursTemplate,
+  upsertOpeningHour,
+} from '../supabase/restaurant-settings.js';
+
+const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+let session = null;
+let restaurant = null;
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
+
+function normalizeTime(v) {
+  const t = String(v || '').trim();
+  if (/^\d{1,2}:\d{2}$/.test(t)) {
+    const [h, m] = t.split(':');
+    return `${h.padStart(2, '0')}:${m}:00`.slice(0, 8);
+  }
+  return t.slice(0, 8) || '12:00:00';
+}
+
+function renderLogoPreview() {
+  const el = document.getElementById('logo-preview');
+  if (!el || !restaurant) return;
+  if (restaurant.logo_url) {
+    el.innerHTML = `<img src="${esc(restaurant.logo_url)}" alt="" width="72" height="72" loading="lazy">`;
+  } else {
+    el.innerHTML = esc((restaurant.name || '?').charAt(0).toUpperCase());
+  }
+}
+
+function bindHourClosedToggles(tbody) {
+  tbody.querySelectorAll('.hour-closed').forEach((cb) => {
+    cb.addEventListener('change', () => {
+      const tr = cb.closest('tr');
+      const dis = cb.checked;
+      tr.querySelector('.hour-open').disabled = dis;
+      tr.querySelector('.hour-close').disabled = dis;
+    });
+  });
+}
+
+function renderHours(rows) {
+  const byDay = {};
+  for (let d = 0; d <= 6; d++) byDay[d] = null;
+  (rows || []).forEach((r) => {
+    const d = Number(r.day_of_week);
+    if (d >= 0 && d <= 6) byDay[d] = r;
+  });
+  const tbody = document.getElementById('hours-body');
+  tbody.innerHTML = [0, 1, 2, 3, 4, 5, 6]
+    .map((d) => {
+      const r = byDay[d] || {
+        day_of_week: d,
+        is_closed: d === 0,
+        open_time: '11:30:00',
+        close_time: '22:30:00',
+      };
+      const closed = !!r.is_closed;
+      const ot = String(r.open_time || '11:30:00').slice(0, 5);
+      const ct = String(r.close_time || '22:30:00').slice(0, 5);
+      return `<tr data-day="${d}">
+        <td>${DAY_NAMES[d]}</td>
+        <td><label style="font-weight:500;cursor:pointer"><input type="checkbox" class="hour-closed" data-day="${d}" ${closed ? 'checked' : ''}> Fermé</label></td>
+        <td><input type="time" class="input hour-open" data-day="${d}" value="${closed ? '12:00' : ot}" ${closed ? 'disabled' : ''}></td>
+        <td><input type="time" class="input hour-close" data-day="${d}" value="${closed ? '12:00' : ct}" ${closed ? 'disabled' : ''}></td>
+      </tr>`;
+    })
+    .join('');
+  bindHourClosedToggles(tbody);
+}
+
+function syncThemeInputs(fromColorPicker) {
+  const cp = document.getElementById('field-theme');
+  const tx = document.getElementById('field-theme-text');
+  if (fromColorPicker) {
+    tx.value = cp.value.toUpperCase();
+  } else {
+    const raw = String(tx.value || '').trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(raw)) cp.value = raw;
+  }
+}
+
+async function reloadRestaurant() {
+  const { data: rest, error } = await getRestaurant(session.user.id);
+  if (error || !rest) return;
+  restaurant = rest;
+  applyStaffShellBranding(rest);
+}
+
+document.getElementById('field-theme')?.addEventListener('input', () => syncThemeInputs(true));
+document.getElementById('field-theme-text')?.addEventListener('change', () => syncThemeInputs(false));
+
+document.getElementById('btn-pick-logo')?.addEventListener('click', () => {
+  document.getElementById('logo-input').click();
+});
+
+document.getElementById('logo-input')?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  if (file.size > 2 * 1024 * 1024) {
+    toast('Logo trop lourd (max 2 Mo)', 'error');
+    return;
+  }
+  const { publicUrl, error: upErr } = await uploadRestaurantLogo(session.user.id, file);
+  if (upErr || !publicUrl) {
+    toast(upErr?.message || 'Échec envoi logo', 'error');
+    return;
+  }
+  const { data, error } = await updateRestaurantForOwner(restaurant.id, session.user.id, { logo_url: publicUrl });
+  if (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  restaurant = { ...restaurant, ...data };
+  renderLogoPreview();
+  toast('Logo mis à jour', 'success');
+  e.target.value = '';
+});
+
+document.getElementById('btn-save')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  const name = document.getElementById('field-name').value.trim();
+  if (!name) {
+    toast('Le nom est requis', 'error');
+    btn.disabled = false;
+    return;
+  }
+  syncThemeInputs(false);
+  const themeHex = document.getElementById('field-theme-text').value.trim();
+  const patchRest = {
+    name,
+    address: document.getElementById('field-address').value.trim() || null,
+    phone: document.getElementById('field-phone').value.trim() || null,
+    whatsapp: document.getElementById('field-whatsapp').value.trim() || null,
+  };
+  const { data: updatedRest, error: e1 } = await updateRestaurantForOwner(
+    restaurant.id,
+    session.user.id,
+    patchRest,
+  );
+  if (e1) {
+    toast(e1.message, 'error');
+    btn.disabled = false;
+    return;
+  }
+  restaurant = { ...restaurant, ...updatedRest };
+
+  const { error: e2 } = await upsertRestaurantSettings(restaurant.id, {
+    currency: document.getElementById('field-currency').value,
+    language: document.getElementById('field-language').value,
+    theme_color: /^#[0-9A-Fa-f]{6}$/.test(themeHex) ? themeHex : null,
+  });
+  if (e2) {
+    toast(e2.message || 'Erreur préférences', 'error');
+    btn.disabled = false;
+    return;
+  }
+
+  const tbody = document.getElementById('hours-body');
+  const rows = tbody.querySelectorAll('tr[data-day]');
+  for (const tr of rows) {
+    const d = Number(tr.getAttribute('data-day'));
+    const closed = tr.querySelector('.hour-closed').checked;
+    const openEl = tr.querySelector('.hour-open');
+    const closeEl = tr.querySelector('.hour-close');
+    const { error: he } = await upsertOpeningHour(restaurant.id, {
+      day_of_week: d,
+      is_closed: closed,
+      open_time: normalizeTime(openEl.value),
+      close_time: normalizeTime(closeEl.value),
+    });
+    if (he) {
+      toast(he.message || 'Erreur horaires', 'error');
+      btn.disabled = false;
+      return;
+    }
+  }
+
+  await reloadRestaurant();
+  renderLogoPreview();
+  const { data: hrs } = await listOpeningHours(restaurant.id);
+  renderHours(hrs || []);
+
+  toast('Paramètres enregistrés', 'success');
+  btn.disabled = false;
+});
+
+(async () => {
+  session = await requireAuth();
+  if (!session) return;
+  let { data: rest } = await getRestaurant(session.user.id);
+  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
+    await syncAuthContext(session.user.id);
+    ({ data: rest } = await getRestaurant(session.user.id));
+  }
+  if (!rest) {
+    window.location.href = 'create-restaurant.html';
+    return;
+  }
+  restaurant = rest;
+  applyStaffShellBranding(rest);
+  document.getElementById('sb-rest-name').textContent = rest.name;
+
+  document.getElementById('field-name').value = rest.name || '';
+  document.getElementById('field-address').value = rest.address || '';
+  document.getElementById('field-phone').value = rest.phone || '';
+  document.getElementById('field-whatsapp').value = rest.whatsapp || '';
+  document.getElementById('field-currency').value = rest.settings?.currency || 'DZD';
+  document.getElementById('field-language').value = rest.settings?.language || 'fr';
+  const tc = rest.settings?.theme_color || '#e85c2c';
+  document.getElementById('field-theme').value = /^#[0-9A-Fa-f]{6}$/.test(tc) ? tc : '#e85c2c';
+  document.getElementById('field-theme-text').value = document.getElementById('field-theme').value.toUpperCase();
+
+  renderLogoPreview();
+
+  await ensureOpeningHoursTemplate(rest.id);
+  const { data: hrs, error: hErr } = await listOpeningHours(rest.id);
+  if (hErr) {
+    toast('Horaires : lecture impossible (vérifiez la table opening_hours).', 'warning');
+    renderHours([]);
+  } else {
+    renderHours(hrs || []);
+  }
+
+  hideLoader();
+})();
+
+window.handleSignOut = async () => {
+  await signOut();
+};
+</script>
+</body>
+</html>

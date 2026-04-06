@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <script src="supabase-env.js"></script>
@@ -16,6 +16,8 @@
     min-height: 100vh;
     position: relative;
   }
+  [dir="rtl"] .cart-page-back { transform: scaleX(-1); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
   /* HEADER */
   .menu-header {
@@ -29,6 +31,18 @@
     position: relative;
     background: var(--ink);
     overflow: hidden;
+  }
+  .menu-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse 90% 70% at 75% 15%, rgba(var(--accent-rgb), .28) 0%, transparent 55%);
+  }
+  .menu-hero > * {
+    position: relative;
+    z-index: 1;
   }
   .menu-cover {
     width: 100%;
@@ -46,7 +60,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 30% 50%, rgba(232,92,44,.3) 0%, transparent 60%);
+    background: radial-gradient(circle at 30% 50%, rgba(var(--accent-rgb), .35) 0%, transparent 60%);
   }
 
   .menu-hero-info {
@@ -692,6 +706,7 @@
 <div id="page-loader">
   <div class="loader-logo">OneTap</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <span class="visually-hidden" data-i18n="pub.loading">Chargement…</span>
 </div>
 
 <!-- MENU HEADER (sticky) -->
@@ -701,7 +716,7 @@
   </div>
   <div class="menu-hero-info">
     <div id="menu-logo-area"></div>
-    <div class="menu-rest-name" id="rest-name">Chargement...</div>
+    <div class="menu-rest-name" id="rest-name" data-i18n="pub.loading">Chargement…</div>
     <div class="menu-rest-meta">
       <span id="rest-address"></span>
       <span id="rest-hours-badge"></span>
@@ -719,62 +734,62 @@
 <!-- MENU BROWSE -->
 <div id="browse-zone">
   <div class="menu-body" id="menu-body">
-    <div class="no-cat-msg">Chargement du menu...</div>
+    <div class="no-cat-msg" data-i18n="pub.loadingMenu">Chargement du menu...</div>
   </div>
 </div>
 
 <!-- CART PAGE (index.html?slug=…&cart=1) -->
 <div class="cart-page-view" id="cart-page-view" hidden>
   <header class="cart-page-header">
-    <a href="#" class="cart-page-back" id="cart-page-back">← Menu</a>
-    <h2 class="cart-page-title">Panier</h2>
+    <a href="#" class="cart-page-back" id="cart-page-back" data-i18n="pub.cartBack">← Menu</a>
+    <h2 class="cart-page-title" data-i18n="pub.cartTitle">Panier</h2>
     <p class="cart-source-pill" id="cart-source-pill" hidden></p>
   </header>
 
   <div class="cart-page-main-block" id="cart-page-main-block">
     <div class="cart-page-list" id="cart-page-list"></div>
-    <p class="cart-page-empty" id="cart-page-empty" hidden>Votre panier est vide.</p>
+    <p class="cart-page-empty" id="cart-page-empty" hidden data-i18n="pub.cartEmpty">Votre panier est vide.</p>
     <footer class="cart-page-footer" id="cart-page-footer" hidden>
       <div class="cart-page-form-section">
-        <h3>Type de commande</h3>
+        <h3 data-i18n="pub.orderType">Type de commande</h3>
         <div class="order-type-btns" id="cart-order-type-btns"></div>
       </div>
       <div class="cart-page-form-section">
-        <h3>Vos coordonnées</h3>
+        <h3 data-i18n="pub.yourDetails">Vos coordonnées</h3>
         <div class="field">
-          <label for="cart-order-name">Nom complet *</label>
-          <input type="text" id="cart-order-name" class="input" placeholder="Votre nom" autocomplete="name">
+          <label for="cart-order-name" data-i18n="pub.fullName">Nom complet *</label>
+          <input type="text" id="cart-order-name" class="input" data-i18n-placeholder="pub.placeholderName" placeholder="Votre nom" autocomplete="name">
         </div>
         <div class="field">
-          <label for="cart-order-phone">Téléphone *</label>
-          <input type="tel" id="cart-order-phone" class="input" placeholder="0551 23 45 67" autocomplete="tel">
+          <label for="cart-order-phone" data-i18n="pub.phone">Téléphone *</label>
+          <input type="tel" id="cart-order-phone" class="input" data-i18n-placeholder="pub.placeholderPhone" placeholder="0551 23 45 67" autocomplete="tel">
         </div>
         <div class="field" id="cart-address-field">
-          <label for="cart-order-address">Adresse de livraison *</label>
-          <textarea id="cart-order-address" class="textarea" placeholder="Adresse complète, quartier…"></textarea>
+          <label for="cart-order-address" data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
+          <textarea id="cart-order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier…"></textarea>
         </div>
         <div class="field">
-          <label for="cart-order-notes">Notes <span style="color:var(--ink3);font-weight:400">(facultatif)</span></label>
-          <input type="text" id="cart-order-notes" class="input" placeholder="Allergies, instructions…">
+          <label for="cart-order-notes"><span data-i18n="pub.notes">Notes</span> <span style="color:var(--ink3);font-weight:400" data-i18n="pub.optional">(facultatif)</span></label>
+          <input type="text" id="cart-order-notes" class="input" data-i18n-placeholder="pub.placeholderNotes" placeholder="Allergies, instructions…">
         </div>
       </div>
       <div class="cart-page-total-row cart-page-subtotal-row" id="cart-page-subtotal-row" style="display:none;">
-        <span>Sous-total</span>
+        <span data-i18n="pub.subtotal">Sous-total</span>
         <span id="cart-page-subtotal">—</span>
       </div>
       <div class="cart-page-total-row cart-page-subtotal-row" id="cart-page-delivery-row" style="display:none;">
-        <span>Frais de livraison</span>
+        <span data-i18n="pub.deliveryFee">Frais de livraison</span>
         <span id="cart-page-delivery-fee">—</span>
       </div>
       <div class="cart-page-total-row">
-        <span>Total</span>
+        <span data-i18n="pub.total">Total</span>
         <span id="cart-page-total">—</span>
       </div>
       <button type="button" class="cart-page-checkout-btn" id="cart-page-send-order-btn"
-        aria-label="Send order — Envoyer la commande">
+        data-i18n="pub.placeOrder" data-i18n-aria="pub.placeOrderAria">
         Commander
       </button>
-      <p style="font-size:.76rem;color:var(--ink3);margin:10px 0 0;text-align:center;line-height:1.4;">
+      <p style="font-size:.76rem;color:var(--ink3);margin:10px 0 0;text-align:center;line-height:1.4;" data-i18n="pub.checkoutDisclaimer">
         En validant, votre commande est enregistrée pour le restaurant (aucun paiement en ligne pour l’instant).
       </p>
     </footer>
@@ -782,13 +797,13 @@
 
   <div class="cart-page-order-success" id="cart-page-order-success" hidden>
     <div class="order-success-icon">✓</div>
-    <h3>Commande enregistrée</h3>
+    <h3 data-i18n="pub.orderSaved">Commande enregistrée</h3>
     <p class="cart-order-success-lead" id="cart-order-success-lead"></p>
-    <textarea id="cart-wa-order-msg-preview" readonly rows="7" aria-label="Message pour le restaurant"></textarea>
+    <textarea id="cart-wa-order-msg-preview" readonly rows="7" data-i18n-aria="pub.msgForRestaurant"></textarea>
     <div class="cart-success-actions">
-      <a class="btn-whatsapp-send" id="cart-btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Ouvrir WhatsApp</a>
-      <button type="button" class="btn-copy-msg" id="cart-btn-wa-copy">Copier le message</button>
-      <button type="button" class="cart-page-checkout-btn" id="cart-order-success-done">Retour au menu</button>
+      <a class="btn-whatsapp-send" id="cart-btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;" data-i18n="pub.openWhatsapp">Ouvrir WhatsApp</a>
+      <button type="button" class="btn-copy-msg" id="cart-btn-wa-copy" data-i18n="pub.copyMessage">Copier le message</button>
+      <button type="button" class="cart-page-checkout-btn" id="cart-order-success-done" data-i18n="pub.backToMenu">Retour au menu</button>
     </div>
   </div>
 </div>
@@ -796,90 +811,90 @@
 <!-- CART FAB -->
 <button type="button" class="cart-fab hidden" id="cart-fab" onclick="goToCartPage()">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-  <span id="cart-fab-text">Mon panier</span>
+  <span id="cart-fab-text" data-i18n="pub.cartFab">Mon panier</span>
   <span class="cart-count" id="cart-count">0</span>
 </button>
 
 <!-- ORDER MODAL -->
 <div class="order-modal" id="order-modal" style="display:none;">
   <div class="order-modal-header">
-    <h2 style="font-size:1.1rem;">🛒 Ma commande</h2>
-    <button onclick="closeOrderModal()" style="background:var(--cream2);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:.95rem;">✕</button>
+    <h2 style="font-size:1.1rem;" data-i18n="pub.modalTitle">🛒 Ma commande</h2>
+    <button type="button" onclick="closeOrderModal()" data-i18n-aria="pub.modalClose" style="background:var(--cream2);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:.95rem;">✕</button>
   </div>
   <div class="order-modal-body">
     <div id="order-checkout-panel">
       <div id="cart-items-list"></div>
 
       <div class="cart-total-row">
-        <span>Sous-total</span>
+        <span data-i18n="pub.subtotal">Sous-total</span>
         <span id="modal-subtotal">—</span>
       </div>
       <div class="cart-total-row" id="delivery-fee-row" style="display:none;">
-        <span>Frais de livraison</span>
+        <span data-i18n="pub.deliveryFee">Frais de livraison</span>
         <span id="modal-delivery-fee">—</span>
       </div>
       <div class="cart-total-row total">
-        <span>Total</span>
+        <span data-i18n="pub.total">Total</span>
         <span class="total-val" id="modal-total">—</span>
       </div>
 
       <div class="order-form-section">
-        <h3>Type de commande</h3>
+        <h3 data-i18n="pub.orderType">Type de commande</h3>
         <div class="order-type-btns" id="order-type-btns">
           <button class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery', this)">
             <div class="otype-btn-icon">🛵</div>
-            Livraison
+            <span data-i18n="pub.delivery">Livraison</span>
           </button>
           <button class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup', this)">
             <div class="otype-btn-icon">🏪</div>
-            À emporter
+            <span data-i18n="pub.pickup">À emporter</span>
           </button>
         </div>
 
         <div class="field">
-          <label>Nom complet *</label>
-          <input type="text" id="order-name" class="input" placeholder="Votre nom">
+          <label data-i18n="pub.fullName">Nom complet *</label>
+          <input type="text" id="order-name" class="input" data-i18n-placeholder="pub.placeholderName" placeholder="Votre nom">
         </div>
         <div class="field">
-          <label>Téléphone *</label>
-          <input type="tel" id="order-phone" class="input" placeholder="0551 23 45 67">
+          <label data-i18n="pub.phone">Téléphone *</label>
+          <input type="tel" id="order-phone" class="input" data-i18n-placeholder="pub.placeholderPhone" placeholder="0551 23 45 67">
         </div>
         <div id="address-field" class="field">
-          <label>Adresse de livraison *</label>
-          <textarea id="order-address" class="textarea" placeholder="Adresse complète, quartier, indicatifs..."></textarea>
+          <label data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
+          <textarea id="order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier, indicatifs..."></textarea>
         </div>
         <div class="field">
-          <label>Notes <span style="color:var(--ink3);font-weight:400">(facultatif)</span></label>
-          <input type="text" id="order-notes" class="input" placeholder="Instructions spéciales, allergies...">
+          <label><span data-i18n="pub.notes">Notes</span> <span style="color:var(--ink3);font-weight:400" data-i18n="pub.optional">(facultatif)</span></label>
+          <input type="text" id="order-notes" class="input" data-i18n-placeholder="pub.placeholderNotes" placeholder="Instructions spéciales, allergies...">
         </div>
       </div>
     </div>
 
     <div class="order-success-panel" id="order-success-panel">
       <div class="order-success-icon">✓</div>
-      <h3>Commande enregistrée</h3>
-      <p class="order-success-lead" id="order-success-lead">
+      <h3 data-i18n="pub.orderSaved">Commande enregistrée</h3>
+      <p class="order-success-lead" id="order-success-lead" data-i18n="pub.successLeadDefault">
         Si WhatsApp ne s’est pas ouvert automatiquement, utilisez le bouton vert. Vous pouvez aussi copier le texte ci-dessous.
       </p>
-      <div class="wa-msg-label">Texte du message</div>
-      <textarea id="wa-order-msg-preview" class="textarea" readonly rows="8" aria-label="Message WhatsApp"></textarea>
+      <div class="wa-msg-label" data-i18n="pub.waMsgLabel">Texte du message</div>
+      <textarea id="wa-order-msg-preview" class="textarea" readonly rows="8" data-i18n-aria="pub.msgForRestaurant"></textarea>
       <div class="order-success-actions">
         <a class="btn-whatsapp-send" id="btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Ouvrir WhatsApp
+          <span data-i18n="pub.openWhatsapp">Ouvrir WhatsApp</span>
         </a>
-        <button type="button" class="btn-copy-msg" id="btn-wa-copy">Copier le message</button>
-        <button type="button" class="wa-order-btn" id="btn-order-done" style="margin-top:4px;">Terminer</button>
+        <button type="button" class="btn-copy-msg" id="btn-wa-copy" data-i18n="pub.copyMessage">Copier le message</button>
+        <button type="button" class="wa-order-btn" id="btn-order-done" style="margin-top:4px;" data-i18n="pub.done">Terminer</button>
       </div>
     </div>
   </div>
   <div class="order-modal-footer" id="order-modal-footer">
-    <p id="checkout-hint" style="font-size:.78rem;color:var(--ink3);margin:0 0 10px;text-align:center;">
+    <p id="checkout-hint" style="font-size:.78rem;color:var(--ink3);margin:0 0 10px;text-align:center;" data-i18n="pub.checkoutHint">
       La commande est enregistrée, puis WhatsApp s’ouvre avec le message prêt à envoyer (si un numéro est configuré).
     </p>
     <button type="button" class="wa-order-btn" id="checkout-submit-btn" onclick="placeOrder()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Confirmer la commande
+      <span data-i18n="pub.confirmOrder">Confirmer la commande</span>
     </button>
   </div>
 </div>
@@ -890,7 +905,17 @@
  * Exemple d’URL : index.html?slug=mon-restaurant-abc123
  * (à la racine du site : / redirige vers pages/index.html?slug=… si présent)
  */
-import { hideLoader, fmtCurrency, toast } from '../js/shared.js';
+import {
+  hideLoader,
+  fmtCurrency,
+  toast,
+  orderSourceTypeLabel,
+  getRestaurantCurrency,
+  getRestaurantLocale,
+  applyRestaurantClientPrefs,
+  t,
+  hydrateI18n,
+} from '../js/shared.js';
 import { loadPublicMenuBySlug, getOpeningHoursForDay } from '../supabase/public-menu.js';
 import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orders.js';
 import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
@@ -900,6 +925,11 @@ let restaurant = null;
 let categories = [];
 let products = [];
 let cart = {}; // { productId: { product, qty } }
+let orderCurrency = 'DZD';
+let orderLocale = 'fr-DZ';
+function cur(amount) {
+  return fmtCurrency(amount, orderCurrency, orderLocale);
+}
 let orderType = 'delivery';
 let orderCounter = 1;
 /** Set after menu load when URL contains ?source=… or legacy ?table=… */
@@ -916,77 +946,133 @@ const urlParams = new URLSearchParams(window.location.search);
 const slug = urlParams.get('slug');
 const publicSourceParam = urlParams.get('source') || urlParams.get('table');
 
+const ORDER_SOURCE_SESSION_KEY = 'onetap_order_source_v1';
+
+function saveResolvedSourceSession() {
+  if (!restaurant || !slug || !resolvedSource) return;
+  try {
+    sessionStorage.setItem(
+      ORDER_SOURCE_SESSION_KEY,
+      JSON.stringify({
+        slug: String(slug).trim(),
+        restaurantId: restaurant.id,
+        id: resolvedSource.id,
+        name: resolvedSource.name,
+        type: resolvedSource.type,
+      }),
+    );
+  } catch (_) {}
+}
+
+function clearResolvedSourceSession() {
+  try {
+    sessionStorage.removeItem(ORDER_SOURCE_SESSION_KEY);
+  } catch (_) {}
+}
+
+function applyResolvedSourceBanner() {
+  if (!resolvedSource) return;
+  const st = resolvedSource.type || 'table';
+  const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵', door: '🚪' };
+  const pk = `source.prefix.${st}`;
+  const prefix = t(pk) === pk ? t('pub.sourceFallback') : t(pk);
+  const b = document.getElementById('source-order-banner');
+  const lab = document.getElementById('source-order-label');
+  const ic = document.getElementById('source-order-banner-icon');
+  const pre = document.getElementById('source-order-banner-prefix');
+  const cp = document.getElementById('cart-source-pill');
+  if (ic) ic.textContent = icons[st] || '📍';
+  if (pre) pre.textContent = prefix;
+  if (lab) lab.textContent = resolvedSource.name;
+  if (b) b.hidden = false;
+  if (cp) {
+    cp.textContent = `${prefix} · ${resolvedSource.name}`;
+    cp.hidden = false;
+  }
+}
+
+async function resolveSourceFromUrlParam(rest) {
+  if (!publicSourceParam || !String(publicSourceParam).trim()) return;
+  const { data: srcRow, error: sErr } = await resolveOrderSourceForPublicOrder(
+    rest.id,
+    String(publicSourceParam).trim(),
+  );
+  if (sErr) {
+    toast(t('pub.sourceVerifyErr'), 'error');
+    return;
+  }
+  if (srcRow) {
+    resolvedSource = srcRow;
+    applyResolvedSourceBanner();
+    saveResolvedSourceSession();
+  } else {
+    toast(t('pub.sourceNotFound'), 'warning');
+  }
+}
+
+async function tryRestoreResolvedSourceSession(rest) {
+  if (publicSourceParam && String(publicSourceParam).trim()) return;
+  try {
+    const raw = sessionStorage.getItem(ORDER_SOURCE_SESSION_KEY);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o.slug !== String(slug).trim() || o.restaurantId !== rest.id) return;
+    const { data: srcRow, error } = await resolveOrderSourceForPublicOrder(rest.id, o.id);
+    if (error || !srcRow) return;
+    resolvedSource = srcRow;
+    applyResolvedSourceBanner();
+  } catch (_) {}
+}
+
 (async () => {
   if (!slug || !slug.trim()) {
-    document.getElementById('rest-name').textContent = 'Menu';
+    document.getElementById('rest-name').textContent = t('pub.menu');
     document.getElementById('menu-body').innerHTML = `
       <div class="no-cat-msg" style="text-align:left;max-width:320px;margin:0 auto;">
-        <p><strong>Lien du menu</strong></p>
-        <p style="font-size:.88rem;color:var(--ink2);">Ajoutez le nom du restaurant dans l’adresse, par exemple :</p>
+        <p><strong>${esc(t('pub.slugHelpTitle'))}</strong></p>
+        <p style="font-size:.88rem;color:var(--ink2);">${esc(t('pub.slugHelpBody'))}</p>
         <p style="font-family:monospace;font-size:.8rem;background:var(--cream2);padding:10px;border-radius:8px;word-break:break-all;">
           index.html?slug=<em>votre-slug</em>&amp;source=<em>takeaway</em>
         </p>
-        <p style="font-size:.82rem;color:var(--ink2);margin-top:8px;"><code style="font-size:.78rem;">source</code> ou <code style="font-size:.78rem;">table</code> (ancien).</p>
+        <p style="font-size:.82rem;color:var(--ink2);margin-top:8px;">${esc(t('pub.slugHelpSource'))}</p>
       </div>`;
     hideLoader();
     return;
   }
 
-  document.title = 'Menu — Chargement…';
+  document.title = `${t('pub.menu')} — ${t('pub.loading')}`;
 
   const { restaurant: rest, categories: cats, products: prods, error, menuBlockedReason } = await loadPublicMenuBySlug(slug);
 
   if (!rest && menuBlockedReason === 'subscription_expired') {
-    document.getElementById('rest-name').textContent = 'Menu indisponible';
-    document.getElementById('menu-body').innerHTML =
-      '<div class="no-cat-msg">Ce menu est temporairement indisponible (abonnement expiré). Merci de contacter l’établissement.</div>';
+    document.getElementById('rest-name').textContent = t('pub.menuUnavailable');
+    document.getElementById('menu-body').innerHTML = `<div class="no-cat-msg">${esc(t('pub.menuUnavailableSub'))}</div>`;
     hideLoader();
     return;
   }
 
   if (!rest) {
-    document.getElementById('rest-name').textContent = 'Menu introuvable';
-    document.getElementById('menu-body').innerHTML = '<div class="no-cat-msg">Ce menu n’est pas disponible ou le lien est incorrect.</div>';
+    document.getElementById('rest-name').textContent = t('pub.menuNotFound');
+    document.getElementById('menu-body').innerHTML = `<div class="no-cat-msg">${esc(t('pub.menuNotFoundSub'))}</div>`;
     hideLoader();
     return;
   }
 
   if (error) {
-    toast('Impossible de charger tout le menu.', 'error');
+    toast(t('pub.loadMenuErr'), 'error');
   }
 
   restaurant = rest;
   categories = cats;
   products = prods;
+  orderCurrency = getRestaurantCurrency(rest);
+  orderLocale = getRestaurantLocale(rest);
+  applyRestaurantClientPrefs(rest);
+  hydrateI18n(document);
   cart = hydrateCart(slug, products);
 
-  if (publicSourceParam && String(publicSourceParam).trim()) {
-    const { data: srcRow, error: sErr } = await resolveOrderSourceForPublicOrder(
-      rest.id,
-      String(publicSourceParam).trim(),
-    );
-    if (sErr) toast('Impossible de vérifier la source.', 'error');
-    else if (srcRow) {
-      resolvedSource = srcRow;
-      const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵' };
-      const prefix = { table: 'Table', takeaway: 'À emporter', counter: 'Comptoir', delivery: 'Livraison' }[srcRow.type] || 'Source';
-      const b = document.getElementById('source-order-banner');
-      const lab = document.getElementById('source-order-label');
-      const ic = document.getElementById('source-order-banner-icon');
-      const pre = document.getElementById('source-order-banner-prefix');
-      const cp = document.getElementById('cart-source-pill');
-      if (ic) ic.textContent = icons[srcRow.type] || '📍';
-      if (pre) pre.textContent = prefix;
-      if (lab) lab.textContent = srcRow.name;
-      if (b) b.hidden = false;
-      if (cp) {
-        cp.textContent = `${prefix} · ${srcRow.name}`;
-        cp.hidden = false;
-      }
-    } else {
-      toast('Source introuvable. Vous pouvez commander sans canal dédié.', 'warning');
-    }
-  }
+  await resolveSourceFromUrlParam(rest);
+  if (!resolvedSource) await tryRestoreResolvedSourceSession(rest);
 
   document.title = `${rest.name} — Menu`;
 
@@ -1027,10 +1113,17 @@ const publicSourceParam = urlParams.get('source') || urlParams.get('table');
     isOpen = nowMin >= oh * 60 + om && nowMin <= ch * 60 + cm;
   }
 
+  const ot = hours ? String(hours.open_time || '').slice(0, 5) : '';
+  const ct = hours ? String(hours.close_time || '').slice(0, 5) : '';
+  const hoursLabel = isOpen
+    ? hours && ot && ct
+      ? t('pub.openHours', { open: ot, close: ct })
+      : t('pub.open')
+    : t('pub.closed');
   document.getElementById('rest-hours-badge').innerHTML =
     `<div class="open-badge ${isOpen ? 'open' : 'closed'}">
       <span class="open-dot"></span>
-      ${isOpen ? (hours ? `Ouvert · ${hours.open_time}–${hours.close_time}` : 'Ouvert') : 'Fermé'}
+      ${esc(hoursLabel)}
     </div>`;
 
   applyRestaurantOrderTypeUi(rest);
@@ -1072,15 +1165,21 @@ function applyRestaurantOrderTypeUi(rest) {
   };
   if (resolvedSource) {
     const st = resolvedSource.type || 'table';
-    const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵' };
-    const labels = { table: 'Sur table', takeaway: 'À emporter', counter: 'Comptoir', delivery: 'Livraison' };
+    const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵', door: '🚪' };
+    const labels = {
+      table: t('pub.onTable'),
+      takeaway: t('pub.pickup'),
+      counter: t('pub.atCounter'),
+      delivery: t('pub.delivery'),
+      door: t('pub.doorPickup'),
+    };
     const icon = icons[st] || '📍';
-    const lab = labels[st] || 'Commande';
-    const lockedHtml = `<div class="otype-source-locked" role="status"><span aria-hidden="true">${icon}</span><span>${lab} — <strong>${esc(resolvedSource.name)}</strong></span></div>`;
+    const lab = labels[st] || t('pub.orderLocked');
+    const lockedHtml = `<div class="otype-source-locked" role="status"><span aria-hidden="true">${icon}</span><span>${esc(lab)} — <strong>${esc(resolvedSource.name)}</strong></span></div>`;
     if (st === 'delivery') {
       orderType = 'delivery';
       setBoth(lockedHtml, true);
-    } else if (st === 'takeaway' || st === 'counter') {
+    } else if (st === 'takeaway' || st === 'counter' || st === 'door') {
       orderType = 'pickup';
       setBoth(lockedHtml, false);
     } else {
@@ -1093,20 +1192,20 @@ function applyRestaurantOrderTypeUi(rest) {
     if (!rest.delivery_enabled && rest.pickup_enabled) {
       orderType = 'pickup';
       setBoth(
-        `<button type="button" class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>À emporter</button>`,
+        `<button type="button" class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>`,
         false,
       );
     } else if (rest.delivery_enabled && !rest.pickup_enabled) {
       orderType = 'delivery';
       setBoth(
-        `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>Livraison</button>`,
+        `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>${esc(t('pub.delivery'))}</button>`,
         true,
       );
     }
   } else {
     orderType = 'delivery';
-    const bothHtml = `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>Livraison</button>
-          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>À emporter</button>`;
+    const bothHtml = `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>${esc(t('pub.delivery'))}</button>
+          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>`;
     setBoth(bothHtml, true);
   }
 }
@@ -1130,14 +1229,14 @@ function updateCartPageTotals() {
   const feeRow = document.getElementById('cart-page-delivery-row');
   const subEl = document.getElementById('cart-page-subtotal');
   const totalEl = document.getElementById('cart-page-total');
-  if (subEl) subEl.textContent = fmtCurrency(subtotal);
-  if (totalEl) totalEl.textContent = fmtCurrency(total);
+  if (subEl) subEl.textContent = cur(subtotal);
+  if (totalEl) totalEl.textContent = cur(total);
   if (subRow) subRow.style.display = items.length > 0 ? 'flex' : 'none';
   if (feeRow) {
     if (deliveryFee > 0 && items.length > 0) {
       feeRow.style.display = 'flex';
       const feeEl = document.getElementById('cart-page-delivery-fee');
-      if (feeEl) feeEl.textContent = fmtCurrency(deliveryFee);
+      if (feeEl) feeEl.textContent = cur(deliveryFee);
     } else feeRow.style.display = 'none';
   }
 }
@@ -1201,7 +1300,7 @@ function renderCartPage() {
       <div class="cart-page-img">${img || '🍽️'}</div>
       <div class="cart-page-main">
         <div class="cart-page-name">${esc(p.name)}</div>
-        <div class="cart-page-unit">${fmtCurrency(p.price)} l’unité</div>
+        <div class="cart-page-unit">${cur(p.price)} ${esc(t('pub.perUnit'))}</div>
         <div class="qty-controls">
           <button type="button" class="qty-btn" onclick="removeFromCart('${pid}')">−</button>
           <span class="qty-num">${i.qty}</span>
@@ -1209,8 +1308,8 @@ function renderCartPage() {
         </div>
       </div>
       <div class="cart-page-side">
-        <div class="cart-page-line-total">${fmtCurrency(p.price * i.qty)}</div>
-        <button type="button" class="btn-cart-remove" onclick="cartRemoveLine('${pid}')">Retirer</button>
+        <div class="cart-page-line-total">${cur(p.price * i.qty)}</div>
+        <button type="button" class="btn-cart-remove" onclick="cartRemoveLine('${pid}')">${esc(t('pub.removeLine'))}</button>
       </div>
     </div>`;
     })
@@ -1238,13 +1337,13 @@ document.getElementById('cart-page-back')?.addEventListener('click', (e) => {
 document.getElementById('cart-page-send-order-btn')?.addEventListener('click', () => placeOrder());
 
 document.getElementById('cart-btn-wa-copy')?.addEventListener('click', async () => {
-  const t = document.getElementById('cart-wa-order-msg-preview')?.value;
-  if (!t) return;
+  const clip = document.getElementById('cart-wa-order-msg-preview')?.value;
+  if (!clip) return;
   try {
-    await navigator.clipboard.writeText(t);
-    toast('Message copié', 'success');
+    await navigator.clipboard.writeText(clip);
+    toast(t('pub.copyOk'), 'success');
   } catch {
-    toast('Copie impossible sur cet appareil', 'error');
+    toast(t('pub.copyFail'), 'error');
   }
 });
 
@@ -1265,7 +1364,7 @@ function buildMenu() {
   // Menu body
   const body = document.getElementById('menu-body');
   if (categories.length === 0) {
-    body.innerHTML = '<div class="no-cat-msg">🍽️ Le menu sera disponible bientôt.</div>';
+    body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
     return;
   }
 
@@ -1304,13 +1403,13 @@ function buildProductRow(p) {
       <div class="product-row-name">${esc(p.name)}</div>
       ${p.description ? `<div class="product-row-desc">${esc(p.description)}</div>` : ''}
       <div class="product-row-price">
-        ${fmtCurrency(p.price)}
-        ${p.compare_price ? `<s>${fmtCurrency(p.compare_price)}</s>` : ''}
+        ${cur(p.price)}
+        ${p.compare_price ? `<s>${cur(p.compare_price)}</s>` : ''}
       </div>
     </div>
     <div class="qty-controls" id="qty-${p.id}">
       ${qty === 0
-        ? `<button type="button" class="btn-add-cart" onclick="addToCart('${p.id}')">Ajouter au panier</button>`
+        ? `<button type="button" class="btn-add-cart" onclick="addToCart('${p.id}')">${esc(t('pub.addToCart'))}</button>`
         : `<button type="button" class="qty-btn" onclick="removeFromCart('${p.id}')">−</button>
            <span class="qty-num">${qty}</span>
            <button type="button" class="qty-btn add" onclick="addToCart('${p.id}')">+</button>`}
@@ -1353,7 +1452,7 @@ function updateCartFAB() {
   const total = items.reduce((s, i) => s + i.qty * i.product.price, 0);
   const fab = document.getElementById('cart-fab');
   document.getElementById('cart-count').textContent = count;
-  document.getElementById('cart-fab-text').textContent = `Mon panier · ${fmtCurrency(total)}`;
+  document.getElementById('cart-fab-text').textContent = `${t('pub.cartFab')} · ${cur(total)}`;
   fab.classList.toggle('hidden', count === 0);
 }
 
@@ -1384,12 +1483,12 @@ function updateCartTotals() {
   const deliveryFee = (orderType === 'delivery' && restaurant.delivery_fee) ? restaurant.delivery_fee : 0;
   const total = subtotal + deliveryFee;
 
-  document.getElementById('modal-subtotal').textContent = fmtCurrency(subtotal);
-  document.getElementById('modal-total').textContent = fmtCurrency(total);
+  document.getElementById('modal-subtotal').textContent = cur(subtotal);
+  document.getElementById('modal-total').textContent = cur(total);
   const feeRow = document.getElementById('delivery-fee-row');
   if (deliveryFee > 0) {
     feeRow.style.display = '';
-    document.getElementById('modal-delivery-fee').textContent = fmtCurrency(deliveryFee);
+    document.getElementById('modal-delivery-fee').textContent = cur(deliveryFee);
   } else {
     feeRow.style.display = 'none';
   }
@@ -1419,14 +1518,14 @@ window.openOrderModal = function() {
     <div class="cart-item-row">
       <div class="cart-item-info">
         <div class="cart-item-name">${esc(i.product.name)}</div>
-        <div class="cart-item-price">${fmtCurrency(i.product.price)} × ${i.qty}</div>
+        <div class="cart-item-price">${cur(i.product.price)} × ${i.qty}</div>
       </div>
       <div class="qty-controls">
         <button type="button" class="qty-btn" onclick="removeFromCart('${i.product.id}');openOrderModal()">−</button>
         <span class="qty-num">${i.qty}</span>
         <button type="button" class="qty-btn add" onclick="addToCart('${i.product.id}');openOrderModal()">+</button>
       </div>
-      <div class="cart-item-subtotal">${fmtCurrency(i.product.price * i.qty)}</div>
+      <div class="cart-item-subtotal">${cur(i.product.price * i.qty)}</div>
     </div>`).join('');
 
   updateCartTotals();
@@ -1440,15 +1539,15 @@ window.closeOrderModal = function() {
 window.placeOrder = async function() {
   const { name, phone, address, notes } = readCheckoutFields();
 
-  if (!name) { toast('Veuillez saisir votre nom', 'error'); return; }
-  if (!phone) { toast('Veuillez saisir votre téléphone', 'error'); return; }
+  if (!name) { toast(t('pub.errName'), 'error'); return; }
+  if (!phone) { toast(t('pub.errPhone'), 'error'); return; }
   if (orderType === 'delivery' && !address) {
-    toast('Veuillez saisir votre adresse', 'error');
+    toast(t('pub.errAddress'), 'error');
     return;
   }
 
   const items = Object.values(cart);
-  if (items.length === 0) { toast('Votre panier est vide', 'error'); return; }
+  if (items.length === 0) { toast(t('pub.errEmptyCart'), 'error'); return; }
 
   /** Ouvre un onglet vide tout de suite (même geste utilisateur) pour éviter le blocage des pop-ups après l’await. Sans `noopener` pour obtenir une référence (ex. Firefox). */
   let waPrep = null;
@@ -1477,6 +1576,7 @@ window.placeOrder = async function() {
     total_amount: total,
     source_id: resolvedSource?.id ?? null,
     source_name: resolvedSource?.name ?? null,
+    source_type: resolvedSource?.type ?? null,
   };
   const itemRows = items.map(i => ({
     product_id: i.product.id,
@@ -1491,11 +1591,11 @@ window.placeOrder = async function() {
   const prevCartLabel = btnCart?.textContent;
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = 'Enregistrement…';
+    btn.textContent = t('pub.saving');
   }
   if (btnCart) {
     btnCart.disabled = true;
-    btnCart.textContent = 'Enregistrement…';
+    btnCart.textContent = t('pub.saving');
   }
 
   const { data: savedOrder, error: orderErr } = await createOrderWithItems(orderRow, itemRows);
@@ -1506,7 +1606,7 @@ window.placeOrder = async function() {
   }
   if (btnCart) {
     btnCart.disabled = false;
-    btnCart.textContent = prevCartLabel || 'Commander';
+    btnCart.textContent = prevCartLabel || t('pub.placeOrder');
   }
 
   if (orderErr || !savedOrder) {
@@ -1515,7 +1615,7 @@ window.placeOrder = async function() {
         waPrep.close();
       } catch (_) {}
     }
-    toast(orderErr?.message || 'Impossible d’enregistrer la commande. Vérifiez la connexion ou réessayez.', 'error');
+    toast(orderErr?.message || t('pub.orderSaveErr'), 'error');
     return;
   }
 
@@ -1573,11 +1673,9 @@ window.placeOrder = async function() {
     }
 
     if (encoded.length > WA_URL_SAFE_LEN) {
-      leadText =
-        'Le message est long : WhatsApp s’ouvre sans le texte prérempli. Copiez le message ci-dessous puis collez-le dans la conversation.';
+      leadText = t('pub.leadWaLong');
     } else {
-      leadText =
-        'WhatsApp devrait s’ouvrir avec le message. Sinon, utilisez le bouton « Ouvrir WhatsApp » ou copiez le texte.';
+      leadText = t('pub.leadWaOk');
     }
   } else {
     if (waPrep && !waPrep.closed) {
@@ -1589,8 +1687,7 @@ window.placeOrder = async function() {
       waBtn.removeAttribute('href');
       waBtn.style.display = 'none';
     }
-    leadText =
-      'Le restaurant n’a pas encore renseigné de numéro WhatsApp. Copiez le texte ci-dessous si besoin — la commande est déjà enregistrée.';
+    leadText = t('pub.leadNoWa');
   }
 
   const cartWaBtn = document.getElementById('cart-btn-wa-open');
@@ -1632,14 +1729,15 @@ window.placeOrder = async function() {
   toast(
     waNumber
       ? encoded.length > WA_URL_SAFE_LEN
-        ? 'Commande enregistrée. Collez le message dans WhatsApp.'
-        : 'Commande enregistrée. WhatsApp ouvert avec votre commande.'
-      : 'Commande enregistrée.',
+        ? t('pub.toastOrderOkPaste')
+        : t('pub.toastOrderOkWa')
+      : t('pub.toastOrderOk'),
     'success',
   );
 
   cart = {};
   clearCartStorage();
+  clearResolvedSourceSession();
   orderCounter++;
   updateCartFAB();
   buildMenu();
@@ -1661,27 +1759,27 @@ function buildWhatsappOrderMessage({
   sourceType,
 }) {
   const typeLabels = {
-    delivery: '🛵 Livraison',
-    pickup: '🏪 À emporter',
-    dine_in: '🍽️ Sur place',
-    qr_table: '🪑 Sur table (QR / source)',
+    delivery: t('wa.orderType.delivery'),
+    pickup: t('wa.orderType.pickup'),
+    dine_in: t('wa.orderType.dine_in'),
+    qr_table: t('wa.orderType.qr_table'),
   };
-  let msg = `🍽️ *Restaurant : ${restaurantName}*\n`;
-  msg += `📌 *Commande ${orderNumber}*\n`;
-  msg += `_Enregistrée dans le système._\n\n`;
-  msg += `*Articles*\n`;
+  let msg = `🍽️ *${t('wa.restaurant')} : ${restaurantName}*\n`;
+  msg += `📌 *${t('wa.order')} ${orderNumber}*\n`;
+  msg += `_${t('wa.saved')}_\n\n`;
+  msg += `*${t('wa.items')}*\n`;
   items.forEach((i) => {
     const line = i.product.price * i.qty;
-    msg += `• ${i.product.name}\n   Qté : ${i.qty} × ${fmtCurrency(i.product.price)} → ${fmtCurrency(line)}\n`;
+    msg += `• ${i.product.name}\n   ${t('wa.qtyLine', { qty: i.qty, unit: cur(i.product.price), line: cur(line) })}\n`;
   });
-  msg += `\n💰 *Sous-total : ${fmtCurrency(subtotal)}*`;
-  if (deliveryFee > 0) msg += `\n🚚 *Livraison : ${fmtCurrency(deliveryFee)}*`;
-  msg += `\n🧾 *TOTAL À PAYER : ${fmtCurrency(total)}*\n`;
+  msg += `\n💰 *${t('wa.subtotal')} : ${cur(subtotal)}*`;
+  if (deliveryFee > 0) msg += `\n🚚 *${t('wa.delivery')} : ${cur(deliveryFee)}*`;
+  msg += `\n🧾 *${t('wa.grandTotal')} : ${cur(total)}*\n`;
   msg += `\n📦 *${typeLabels[orderType] || orderType}*\n`;
   if (sourceLabel) {
     const st = sourceType || 'table';
-    const srcTag = { table: '🪑 Table', takeaway: '🥡 À emporter', counter: '🧾 Comptoir', delivery: '🛵 Livraison' }[st] || '📍 Source';
-    msg += `${srcTag} : *${sourceLabel}*\n`;
+    const emoji = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵', door: '🚪' }[st] || '📍';
+    msg += `${emoji} *${orderSourceTypeLabel(st)} · ${sourceLabel}*\n`;
   }
   msg += `👤 *${customerName}* — 📞 ${customerPhone}`;
   if (customerAddress) msg += `\n📍 ${customerAddress}`;
@@ -1690,12 +1788,12 @@ function buildWhatsappOrderMessage({
 }
 
 document.getElementById('btn-wa-copy').addEventListener('click', async () => {
-  const t = document.getElementById('wa-order-msg-preview').value;
+  const clip = document.getElementById('wa-order-msg-preview').value;
   try {
-    await navigator.clipboard.writeText(t);
-    toast('Message copié', 'success');
+    await navigator.clipboard.writeText(clip);
+    toast(t('pub.copyOk'), 'success');
   } catch {
-    toast('Copie impossible sur cet appareil', 'error');
+    toast(t('pub.copyFail'), 'error');
   }
 });
 

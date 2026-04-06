@@ -1,8 +1,24 @@
 import { supabase } from './client.js';
 
+const PLAN_SLUG_LABELS = {
+  free: 'Free',
+  basic: 'Basic',
+  pro: 'Pro',
+  enterprise: 'Enterprise',
+};
+
 /** Menu is served when there is no end date, or the end date is in the future. */
 export function isSubscriptionActive(restaurant) {
   if (!restaurant) return false;
+  const sub = restaurant.subscription;
+  if (sub) {
+    if (sub.status === 'cancelled' || sub.status === 'expired') return false;
+    const end = sub.end_date;
+    if (end == null || end === '') return true;
+    const t = new Date(end).getTime();
+    if (Number.isNaN(t)) return true;
+    return t > Date.now();
+  }
   const exp = restaurant.subscription_expires_at;
   if (exp == null || exp === '') return true;
   const t = new Date(exp).getTime();
@@ -10,10 +26,16 @@ export function isSubscriptionActive(restaurant) {
   return t > Date.now();
 }
 
-export function subscriptionLabel(plan) {
-  const p = String(plan || 'free').toLowerCase();
-  if (p === 'pro') return 'Pro';
-  return 'Free';
+/** @param {string|object} restaurantOrSlug — restaurant row (with optional `subscription.plan`) or plan slug */
+export function subscriptionLabel(restaurantOrSlug) {
+  if (restaurantOrSlug && typeof restaurantOrSlug === 'object') {
+    const name = restaurantOrSlug.subscription?.plan?.name;
+    if (name) return name;
+    const slug = String(restaurantOrSlug.subscription_plan || 'free').toLowerCase();
+    return PLAN_SLUG_LABELS[slug] || 'Free';
+  }
+  const p = String(restaurantOrSlug || 'free').toLowerCase();
+  return PLAN_SLUG_LABELS[p] || 'Free';
 }
 
 export function formatSubscriptionExpiry(iso) {
@@ -50,7 +72,8 @@ export async function listRestaurantsForAdmin() {
  */
 export async function adminUpdateRestaurant(restaurantId, fields) {
   const patch = {};
-  if (fields.subscription_plan === 'free' || fields.subscription_plan === 'pro') {
+  const allowedPlans = new Set(['free', 'basic', 'pro', 'enterprise']);
+  if (fields.subscription_plan && allowedPlans.has(fields.subscription_plan)) {
     patch.subscription_plan = fields.subscription_plan;
   }
   if (fields.subscription_expires_at !== undefined) {

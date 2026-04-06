@@ -12,7 +12,10 @@ function normalizeRecipients(input: string | string[]) {
 
 export async function sendEmail(payload: EmailPayload) {
   const apiKey = Deno.env.get('RESEND_API_KEY') || '';
-  const from = Deno.env.get('EMAIL_FROM') || 'OneTap <noreply@onetap.local>';
+  const from = Deno.env.get('EMAIL_FROM');
+  if (!from?.trim()) {
+    throw new Error('EMAIL_FROM is missing. Set it in Supabase Edge Function secrets (e.g. OneTapMenu <noreply@onetapmenu.online>).');
+  }
   if (!apiKey) throw new Error('RESEND_API_KEY is missing.');
   const to = normalizeRecipients(payload.to);
   if (!to.length) throw new Error('No recipients.');
@@ -24,7 +27,7 @@ export async function sendEmail(payload: EmailPayload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from,
+      from: from.trim(),
       to,
       subject: payload.subject,
       html: payload.html,

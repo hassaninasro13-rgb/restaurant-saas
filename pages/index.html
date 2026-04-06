@@ -919,6 +919,7 @@ import {
 import { loadPublicMenuBySlug, getOpeningHoursForDay } from '../supabase/public-menu.js';
 import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orders.js';
 import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
+import { notifyNewOrderCreated } from '../supabase/email.js';
 import { hydrateCart, persistCart as persistCartLs, clearCartStorage as clearCartStorageLs } from '../js/onetap-cart.js';
 
 let restaurant = null;
@@ -1618,6 +1619,10 @@ window.placeOrder = async function() {
     toast(orderErr?.message || t('pub.orderSaveErr'), 'error');
     return;
   }
+
+  try {
+    await notifyNewOrderCreated(savedOrder.id);
+  } catch (_) {}
 
   const msg = buildWhatsappOrderMessage({
     restaurantName: restaurant.name,

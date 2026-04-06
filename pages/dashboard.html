@@ -384,6 +384,9 @@
     </header>
 
     <div class="page-content">
+      <div id="demo-created-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(46,140,87,.35);background:rgba(46,140,87,.08);">
+        <strong style="color:var(--green);">Demo data has been created. You can edit or delete it.</strong>
+      </div>
       <div id="sub-expired-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(220,80,80,.45);background:rgba(220,80,80,.08);">
         <strong style="color:var(--red);" data-i18n="dash.subExpiredTitle">Menu public désactivé</strong>
         <p style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;" data-i18n="dash.subExpiredBody">Votre abonnement est expiré : les clients ne voient plus le menu. Renouvelez ou contactez le support.</p>
@@ -583,13 +586,12 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import {
-  tryCreateRestaurantFromPending,
+  getRestaurantById,
   uploadRestaurantLogo,
   uploadRestaurantCover,
-  updateRestaurantForOwner,
+  updateRestaurantForManager,
 } from '../supabase/restaurants.js';
 import {
-  getRestaurant,
   fmtCurrency,
   fmtDate,
   getStatusBadge,
@@ -626,6 +628,11 @@ import {
   formatSubscriptionExpiry,
   checkIsPlatformAdmin,
 } from '../supabase/subscriptions.js';
+import {
+  getMyRestaurantAccess,
+  getRoleHomePath,
+  isRestaurantRoleAllowed,
+} from '../supabase/restaurant-users.js';
 
 let restaurant = null;
 let currentSession = null;
@@ -784,12 +791,14 @@ async function init() {
   const session = await requireAuth();
   if (!session) return;
   currentSession = session;
-
-  let { data: rest } = await getRestaurant(session.user.id);
-  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
-    await syncAuthContext(session.user.id);
-    ({ data: rest } = await getRestaurant(session.user.id));
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  if (!access?.restaurant_id) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isRestaurantRoleAllowed(access.role, ['owner', 'admin'])) {
+    window.location.href = getRoleHomePath(access.role);
+    return;
   }
+  await syncAuthContext(session.user.id);
+  const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
   applyStaffShellBranding(rest);
@@ -831,6 +840,11 @@ async function init() {
     renderMenuQr(menuUrl, rest.slug),
     renderPlanLimits(rest),
   ]);
+  const demo = new URLSearchParams(window.location.search).get('demo');
+  if (demo === '1') {
+    const b = document.getElementById('demo-created-banner');
+    if (b) b.style.display = '';
+  }
   hideLoader();
 }
 
@@ -839,7 +853,7 @@ async function handleDashLogoUpload(file) {
   if (file.size > 2 * 1024 * 1024) { toast(t('dash.logoHeavy'), 'error'); return; }
   const { publicUrl, error: upErr } = await uploadRestaurantLogo(currentSession.user.id, file);
   if (upErr || !publicUrl) { toast(upErr?.message || t('dash.uploadLogoFail'), 'error'); return; }
-  const { data, error } = await updateRestaurantForOwner(restaurant.id, currentSession.user.id, { logo_url: publicUrl });
+  const { data, error } = await updateRestaurantForManager(restaurant.id, { logo_url: publicUrl });
   if (error) { toast(error.message, 'error'); return; }
   restaurant = { ...restaurant, ...data };
   renderDashboardBranding();
@@ -852,7 +866,7 @@ async function handleDashCoverUpload(file) {
   if (file.size > 5 * 1024 * 1024) { toast(t('dash.bannerHeavy'), 'error'); return; }
   const { publicUrl, error: upErr } = await uploadRestaurantCover(currentSession.user.id, file);
   if (upErr || !publicUrl) { toast(upErr?.message || t('dash.uploadBannerFail'), 'error'); return; }
-  const { data, error } = await updateRestaurantForOwner(restaurant.id, currentSession.user.id, { cover_url: publicUrl });
+  const { data, error } = await updateRestaurantForManager(restaurant.id, { cover_url: publicUrl });
   if (error) { toast(error.message, 'error'); return; }
   restaurant = { ...restaurant, ...data };
   renderDashboardBranding();

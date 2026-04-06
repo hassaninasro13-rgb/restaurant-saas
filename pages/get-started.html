@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="supabase-env.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTap — Create Restaurant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body { min-height: 100vh; display: grid; place-items: center; background: var(--cream); padding: 22px; }
+  .gs-card {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px;
+  }
+  .gs-title { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 6px; }
+  .gs-sub { color: var(--ink2); font-size: .88rem; margin-bottom: 18px; line-height: 1.45; }
+  .gs-footer { margin-top: 14px; font-size: .82rem; color: var(--ink3); text-align: center; }
+</style>
+</head>
+<body>
+  <main class="gs-card">
+    <h1 class="gs-title">Creer votre restaurant</h1>
+    <p class="gs-sub">Commencez par creer votre compte, puis nous vous redirigerons vers la creation de votre restaurant.</p>
+    <div id="alert-area"></div>
+    <div class="field">
+      <label for="rest-name">Nom du restaurant *</label>
+      <input id="rest-name" class="input" type="text" placeholder="Ex: El Bahia" autocomplete="organization">
+    </div>
+    <div class="field">
+      <label for="email">Email *</label>
+      <input id="email" class="input" type="email" placeholder="vous@restaurant.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label for="password">Mot de passe *</label>
+      <input id="password" class="input" type="password" placeholder="Minimum 8 caracteres" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label for="password2">Confirmer mot de passe *</label>
+      <input id="password2" class="input" type="password" placeholder="Retaper le mot de passe" autocomplete="new-password">
+    </div>
+    <button type="button" class="btn btn-primary btn-full btn-lg" id="btn-create-account">Create Restaurant Account</button>
+    <p class="gs-footer">Vous avez deja un compte ? <a href="login.html">Se connecter</a></p>
+  </main>
+
+<script type="module">
+import { supabase } from '../supabase/client.js';
+import { setPendingRestaurantName } from '../supabase/restaurants.js';
+import { isSupabaseConfigured } from '../supabase/config.js';
+import { getMyRestaurantAccess, getRoleHomePath } from '../supabase/restaurant-users.js';
+
+function setAlert(message, type = 'error') {
+  const root = document.getElementById('alert-area');
+  root.innerHTML = message ? `<div class="alert alert-${type}">${message}</div>` : '';
+}
+
+async function bootstrapRedirectIfLogged() {
+  if (!isSupabaseConfigured()) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  window.location.href = access ? getRoleHomePath(access.role) : 'create-restaurant.html';
+}
+
+document.getElementById('btn-create-account')?.addEventListener('click', async () => {
+  if (!isSupabaseConfigured()) {
+    setAlert('Supabase non configure. Ajoutez vos variables et lancez le build.');
+    return;
+  }
+  const name = document.getElementById('rest-name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const password2 = document.getElementById('password2').value;
+
+  if (!name || !email || !password || !password2) {
+    setAlert('Veuillez remplir tous les champs.');
+    return;
+  }
+  if (password.length < 8) {
+    setAlert('Le mot de passe doit contenir au moins 8 caracteres.');
+    return;
+  }
+  if (password !== password2) {
+    setAlert('Les mots de passe ne correspondent pas.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-create-account');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  setPendingRestaurantName(name);
+
+  const emailRedirectTo = new URL('login.html', window.location.href).href;
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo },
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Create Restaurant Account';
+
+  if (error) {
+    setAlert(error.message || 'Inscription impossible.');
+    return;
+  }
+
+  if (data?.session?.user) {
+    window.location.href = 'create-restaurant.html';
+    return;
+  }
+  setAlert('Compte cree. Verifiez votre email puis connectez-vous pour finaliser votre restaurant.', 'success');
+});
+
+bootstrapRedirectIfLogged();
+</script>
+</body>
+</html>

@@ -358,9 +358,8 @@
 
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
-import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import { getRestaurantById } from '../supabase/restaurants.js';
 import {
-  getRestaurant,
   hideLoader,
   fmtCurrency,
   toast,
@@ -368,6 +367,11 @@ import {
   getRestaurantLocale,
   applyStaffShellBranding,
 } from '../js/shared.js';
+import {
+  getMyRestaurantAccess,
+  getRoleHomePath,
+  isRestaurantRoleAllowed,
+} from '../supabase/restaurant-users.js';
 import { listCategoriesForRestaurant } from '../supabase/categories.js';
 import {
   listProductsWithCategory,
@@ -409,11 +413,14 @@ function revokePreviewObjectUrl() {
 (async () => {
   const session = await requireAuth();
   if (!session) return;
-  let { data: rest } = await getRestaurant(session.user.id);
-  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
-    await syncAuthContext(session.user.id);
-    ({ data: rest } = await getRestaurant(session.user.id));
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  if (!access?.restaurant_id) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isRestaurantRoleAllowed(access.role, ['owner', 'admin'])) {
+    window.location.href = getRoleHomePath(access.role);
+    return;
   }
+  await syncAuthContext(session.user.id);
+  const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
   applyStaffShellBranding(rest);

@@ -350,6 +350,9 @@
     <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
     <h2 class="setup-card-title" style="text-align:center;">Félicitations !</h2>
     <p style="color:var(--ink2);margin-bottom:28px;">Votre restaurant a été créé avec succès. Vous pouvez maintenant ajouter vos catégories et produits.</p>
+    <p id="demo-note" style="display:none;background:var(--green-lt);color:var(--green);border:1px solid rgba(46,140,87,.25);padding:10px 12px;border-radius:10px;font-size:.82rem;margin:0 0 18px;">
+      Demo data has been created. You can edit or delete it.
+    </p>
 
     <div style="background:var(--cream2);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:28px;text-align:left;">
       <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:8px;">Votre lien de menu</div>
@@ -367,7 +370,14 @@
 <script type="module">
 import { requireAuth, syncAuthContext } from '../supabase/auth.js';
 import { slugify, toast } from '../js/shared.js';
-import { getRestaurantIdForUser, createRestaurant as insertRestaurantRow, uploadRestaurantLogo, uploadRestaurantCover } from '../supabase/restaurants.js';
+import {
+  getRestaurantIdForUser,
+  createRestaurant as insertRestaurantRow,
+  uploadRestaurantLogo,
+  uploadRestaurantCover,
+  ensureDemoSetupForRestaurant,
+} from '../supabase/restaurants.js';
+import { notifyNewRestaurantSignup } from '../supabase/email.js';
 
 let session = null;
 let logoFile = null;
@@ -493,6 +503,19 @@ window.createRestaurant = async function() {
     goStep(2);
     return;
   }
+
+  const { created: demoCreated, error: demoErr } = await ensureDemoSetupForRestaurant(data.id);
+  if (demoErr) {
+    toast('Restaurant créé, mais données demo non ajoutées.', 'warning');
+  }
+  if (demoCreated) {
+    document.getElementById('demo-note').style.display = '';
+    const dashLink = document.querySelector('a[href="dashboard.html"]');
+    if (dashLink) dashLink.href = 'dashboard.html?demo=1';
+  }
+  try {
+    await notifyNewRestaurantSignup(data.id);
+  } catch (_) {}
 
   await syncAuthContext(session.user.id);
   document.getElementById('success-link').textContent = `onetapmenu.dz/menu/${data.slug}`;

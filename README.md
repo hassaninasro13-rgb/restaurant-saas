@@ -93,6 +93,17 @@ Apply migration **`20260404210000_admin_is_active_orders_rls.sql`** so non-owner
 
 **Optional DB hardening:** if you already have a permissive `anon` SELECT policy on `restaurants`, add the **restrictive** policy from the bottom of the migration file so expired rows are invisible at the database layer.
 
+## Email notifications (basic)
+
+Simple modular email notifications are available through Supabase Edge Functions + Resend:
+
+- New restaurant signup -> platform admin email
+- New order created -> restaurant owner email
+- Restaurant user invited -> invited user email
+- Subscription expiring soon -> owner email reminder (via scheduled function)
+
+See `supabase/functions/README.md` for deploy commands and required secrets.
+
 ## Images (performance)
 
 - Menu product images use **`loading="lazy"`** and **`decoding="async"`** where applicable.

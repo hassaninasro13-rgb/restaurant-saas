@@ -171,9 +171,8 @@
 
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
-import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
+import { getRestaurantById } from '../supabase/restaurants.js';
 import {
-  getRestaurant,
   hideLoader,
   fmtCurrency,
   toast,
@@ -185,6 +184,11 @@ import {
   hydrateI18n,
 } from '../js/shared.js';
 import { listOrdersWithItems, updateOrderStatus } from '../supabase/orders.js';
+import {
+  getMyRestaurantAccess,
+  getRoleHomePath,
+  isRestaurantRoleAllowed,
+} from '../supabase/restaurant-users.js';
 
 let restaurant = null;
 let allOrders = [];
@@ -263,11 +267,14 @@ window.kitchenAdvance = async function(id, status) {
 (async () => {
   const session = await requireAuth();
   if (!session) return;
-  let { data: rest } = await getRestaurant(session.user.id);
-  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
-    await syncAuthContext(session.user.id);
-    ({ data: rest } = await getRestaurant(session.user.id));
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  if (!access?.restaurant_id) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isRestaurantRoleAllowed(access.role, ['kitchen'])) {
+    window.location.href = getRoleHomePath(access.role);
+    return;
   }
+  await syncAuthContext(session.user.id);
+  const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
   applyStaffShellBranding(rest);

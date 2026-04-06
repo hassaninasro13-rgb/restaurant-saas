@@ -34,6 +34,8 @@ export async function fetchAllOrdersForPlatformAdmin() {
  */
 export function computePlatformAnalytics(restaurants, orders) {
   const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const totalRestaurants = restaurants.length;
 
   let activeSubscriptions = 0;
@@ -46,6 +48,8 @@ export function computePlatformAnalytics(restaurants, orders) {
 
   const orderCountsByRestaurant = {};
   let totalOrders = 0;
+  let ordersToday = 0;
+  let ordersThisMonth = 0;
   let orderRevenue = 0;
   const monthlyOrderCount = {};
 
@@ -60,6 +64,8 @@ export function computePlatformAnalytics(restaurants, orders) {
     if (o.created_at) {
       const d = new Date(o.created_at);
       if (!Number.isNaN(d.getTime())) {
+        if (d >= startToday) ordersToday += 1;
+        if (d >= startMonth) ordersThisMonth += 1;
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         monthlyOrderCount[key] = (monthlyOrderCount[key] || 0) + 1;
       }
@@ -76,8 +82,13 @@ export function computePlatformAnalytics(restaurants, orders) {
   }
 
   let manualSubscriptionRevenueTotal = 0;
+  let subscriptionRevenueThisMonth = 0;
   for (const r of restaurants) {
-    manualSubscriptionRevenueTotal += Number(r.manual_subscription_revenue) || 0;
+    const v = Number(r.manual_subscription_revenue) || 0;
+    manualSubscriptionRevenueTotal += v;
+    if (r.is_active !== false && isSubscriptionActive(r)) {
+      subscriptionRevenueThisMonth += v;
+    }
   }
 
   const months6 = [];
@@ -118,16 +129,36 @@ export function computePlatformAnalytics(restaurants, orders) {
     }))
     .sort((a, b) => b.count - a.count);
 
+  const topRestaurantsByOrders = ordersPerRestaurant.slice(0, 5);
+  const recentRestaurants = restaurants
+    .filter((r) => !!r.created_at)
+    .slice()
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 8)
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      slug: r.slug,
+      created_at: r.created_at,
+      subscription_plan: r.subscription_plan || 'free',
+      is_active: r.is_active !== false,
+    }));
+
   return {
     totalRestaurants,
     activeSubscriptions,
     expiredSubscriptions,
     totalOrders,
+    ordersToday,
+    ordersThisMonth,
     orderRevenue,
+    subscriptionRevenueThisMonth,
     manualSubscriptionRevenueTotal,
     months6OrderGrowth: { months: months6, growthPct, currentMonth: cur, previousMonth: prev, maxBar: maxBarOrders },
     months12NewRestaurants: { months: months12New, maxBar: maxBarNew },
     ordersPerRestaurant,
+    topRestaurantsByOrders,
+    recentRestaurants,
     orderCountsByRestaurant,
   };
 }

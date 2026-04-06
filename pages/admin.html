@@ -157,24 +157,25 @@
         <h1 class="topbar-title">Analytics plateforme</h1>
       </div>
       <div class="topbar-right">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="sendExpiryReminders()">Rappel expirations</button>
         <button type="button" class="btn btn-secondary btn-sm" onclick="refreshPlatformData()">Tout actualiser</button>
       </div>
     </header>
 
     <div class="page-content">
       <p class="admin-hint">
-        Vue consolidée : restaurants, abonnements, commandes, revenus commandes (statuts terminée / livrée) et revenus abonnements saisis manuellement par établissement.
-        Les graphiques couvrent les mois calendaires récents (fuseau local).
+        Vue consolidée de la plateforme : restaurants, abonnements et commandes.
+        Section simple avec KPI + top restaurants + derniers restaurants créés.
       </p>
 
       <div id="platform-analytics" class="admin-anchor">
         <div class="admin-kpi-grid" id="kpi-grid">
           <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-restaurants">—</div><div class="admin-kpi-lab">Restaurants</div></div>
-          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-active-sub">—</div><div class="admin-kpi-lab">Abonnements actifs</div><div class="admin-kpi-sub">Compte actif + date OK</div></div>
+          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-active-sub">—</div><div class="admin-kpi-lab">Abonnements actifs</div><div class="admin-kpi-sub">Compte actif + date valide</div></div>
+          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-orders-today">—</div><div class="admin-kpi-lab">Commandes aujourd’hui</div></div>
+          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-orders-month">—</div><div class="admin-kpi-lab">Commandes ce mois</div></div>
+          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-rev-sub-month">—</div><div class="admin-kpi-lab">Revenu abonnements (mois)</div><div class="admin-kpi-sub">Basé sur revenu manuel actif</div></div>
           <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-expired-sub">—</div><div class="admin-kpi-lab">Abonnements expirés</div><div class="admin-kpi-sub">Compte actif, date passée</div></div>
-          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-orders">—</div><div class="admin-kpi-lab">Total commandes</div></div>
-          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-rev-orders">—</div><div class="admin-kpi-lab">CA commandes</div><div class="admin-kpi-sub">Done + livrée</div></div>
-          <div class="admin-kpi"><div class="admin-kpi-val" id="kpi-rev-manual">—</div><div class="admin-kpi-lab">Revenu abo. manuel</div><div class="admin-kpi-sub">Somme saisie</div></div>
         </div>
 
         <div class="admin-section">
@@ -191,10 +192,20 @@
         </div>
 
         <div class="admin-section">
-          <h2>Commandes par restaurant</h2>
+          <h2>Top restaurants par commandes</h2>
           <div style="overflow-x:auto">
             <table class="mini-table" id="table-orders-by-rest">
               <thead><tr><th>#</th><th>Restaurant</th><th>Slug</th><th style="text-align:right">Commandes</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <h2>Restaurants récents</h2>
+          <div style="overflow-x:auto">
+            <table class="mini-table" id="table-recent-restaurants">
+              <thead><tr><th>#</th><th>Restaurant</th><th>Slug</th><th>Créé le</th><th>Plan</th><th>Statut</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -263,6 +274,7 @@
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
 import { hideLoader, toast, fmtCurrency, slugify } from '../js/shared.js';
+import { sendSubscriptionExpiryReminders } from '../supabase/email.js';
 import {
   checkIsPlatformAdmin,
   listRestaurantsForAdmin,
@@ -325,10 +337,10 @@ function menuBadge(r) {
 function renderAnalyticsUi(a) {
   document.getElementById('kpi-restaurants').textContent = String(a.totalRestaurants);
   document.getElementById('kpi-active-sub').textContent = String(a.activeSubscriptions);
+  document.getElementById('kpi-orders-today').textContent = String(a.ordersToday);
+  document.getElementById('kpi-orders-month').textContent = String(a.ordersThisMonth);
+  document.getElementById('kpi-rev-sub-month').textContent = fmtCurrency(a.subscriptionRevenueThisMonth);
   document.getElementById('kpi-expired-sub').textContent = String(a.expiredSubscriptions);
-  document.getElementById('kpi-orders').textContent = String(a.totalOrders);
-  document.getElementById('kpi-rev-orders').textContent = fmtCurrency(a.orderRevenue);
-  document.getElementById('kpi-rev-manual').textContent = fmtCurrency(a.manualSubscriptionRevenueTotal);
 
   const maxO = a.months6OrderGrowth.maxBar;
   document.getElementById('chart-orders-growth').innerHTML = a.months6OrderGrowth.months.map((m) => `
@@ -353,8 +365,8 @@ function renderAnalyticsUi(a) {
     </div>`).join('');
 
   const tb = document.querySelector('#table-orders-by-rest tbody');
-  tb.innerHTML = a.ordersPerRestaurant.length
-    ? a.ordersPerRestaurant.map((row, i) => `
+  tb.innerHTML = a.topRestaurantsByOrders.length
+    ? a.topRestaurantsByOrders.map((row, i) => `
       <tr>
         <td>${i + 1}</td>
         <td><strong>${escapeHtml(row.name)}</strong></td>
@@ -362,6 +374,19 @@ function renderAnalyticsUi(a) {
         <td style="text-align:right;font-weight:700">${row.count}</td>
       </tr>`).join('')
     : '<tr><td colspan="4" style="color:var(--ink3)">Aucune donnée</td></tr>';
+
+  const trr = document.querySelector('#table-recent-restaurants tbody');
+  trr.innerHTML = a.recentRestaurants.length
+    ? a.recentRestaurants.map((row, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td><strong>${escapeHtml(row.name)}</strong></td>
+        <td><code style="font-size:.75rem">${escapeHtml(row.slug)}</code></td>
+        <td>${new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+        <td>${escapeHtml(String(row.subscription_plan || 'free'))}</td>
+        <td>${row.is_active ? '<span class="badge-ok">Actif</span>' : '<span class="badge-bad">Inactif</span>'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="6" style="color:var(--ink3)">Aucune donnée</td></tr>';
 }
 
 function rowHtml(r) {
@@ -570,6 +595,14 @@ async function handleCreateRestaurant() {
 }
 
 window.refreshPlatformData = refreshPlatformData;
+window.sendExpiryReminders = async function() {
+  const { data, error } = await sendSubscriptionExpiryReminders(3);
+  if (error) {
+    toast(error.message || 'Envoi des rappels impossible', 'error');
+    return;
+  }
+  toast(`Rappels envoyés: ${Number(data?.sent || 0)}`, 'success');
+};
 
 (async () => {
   const session = await requireAuth();

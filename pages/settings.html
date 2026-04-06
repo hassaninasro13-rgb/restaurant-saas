@@ -42,6 +42,16 @@
   .hours-table input[type="time"] { max-width: 120px; }
   .theme-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .theme-row input[type="color"] { width: 48px; height: 40px; padding: 2px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+  .users-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .users-grid .btn { align-self: stretch; }
+  .users-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .users-table th, .users-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .users-table th { font-size: .7rem; text-transform: uppercase; color: var(--ink3); }
 </style>
 </head>
 <body>
@@ -209,6 +219,30 @@
         </div>
       </div>
 
+      <div class="settings-card">
+        <h3>Utilisateurs & rôles</h3>
+        <p style="font-size:.8rem;color:var(--ink2);margin:-8px 0 12px;">Ajouter des comptes staff par email. Les utilisateurs se lient automatiquement à la première connexion.</p>
+        <div class="users-grid">
+          <input id="user-email" class="input" type="email" placeholder="email@restaurant.com">
+          <select id="user-role" class="input">
+            <option value="admin">Admin</option>
+            <option value="staff">Staff</option>
+            <option value="kitchen">Kitchen</option>
+          </select>
+          <button type="button" id="btn-add-user" class="btn btn-secondary">Ajouter</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="users-table">
+            <thead>
+              <tr><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="users-body">
+              <tr><td colspan="4" style="color:var(--ink3)">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <button type="button" class="btn btn-primary" id="btn-save">Enregistrer</button>
     </div>
   </div>
@@ -217,16 +251,25 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import {
-  tryCreateRestaurantFromPending,
-  updateRestaurantForOwner,
+  getRestaurantById,
+  updateRestaurantForManager,
   uploadRestaurantLogo,
 } from '../supabase/restaurants.js';
 import {
-  getRestaurant,
   hideLoader,
   toast,
   applyStaffShellBranding,
 } from '../js/shared.js';
+import {
+  getMyRestaurantAccess,
+  getRoleHomePath,
+  isRestaurantRoleAllowed,
+  listRestaurantUsers,
+  createRestaurantUser,
+  updateRestaurantUser,
+  deleteRestaurantUser,
+} from '../supabase/restaurant-users.js';
+import { notifyRestaurantUserInvited } from '../supabase/email.js';
 import {
   upsertRestaurantSettings,
   listOpeningHours,
@@ -238,6 +281,7 @@ const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'
 
 let session = null;
 let restaurant = null;
+let restaurantUsers = [];
 
 function esc(s) {
   return String(s ?? '')
@@ -318,10 +362,78 @@ function syncThemeInputs(fromColorPicker) {
 }
 
 async function reloadRestaurant() {
-  const { data: rest, error } = await getRestaurant(session.user.id);
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  if (!access?.restaurant_id) return;
+  const { data: rest, error } = await getRestaurantById(access.restaurant_id);
   if (error || !rest) return;
   restaurant = rest;
   applyStaffShellBranding(rest);
+}
+
+function renderRestaurantUsers() {
+  const tbody = document.getElementById('users-body');
+  if (!tbody) return;
+  if (!restaurantUsers.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink3)">Aucun utilisateur.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = restaurantUsers.map((u) => {
+    const roleSelect = u.role === 'owner'
+      ? '<span class="badge badge-gray">owner</span>'
+      : `<select data-role-id="${u.id}" class="input" style="max-width:120px;padding:5px 8px;font-size:.78rem;">
+          <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>admin</option>
+          <option value="staff" ${u.role === 'staff' ? 'selected' : ''}>staff</option>
+          <option value="kitchen" ${u.role === 'kitchen' ? 'selected' : ''}>kitchen</option>
+        </select>`;
+    const st = u.is_active ? '<span class="badge badge-green">actif</span>' : '<span class="badge badge-gray">inactif</span>';
+    const actions = u.role === 'owner'
+      ? '—'
+      : `<button type="button" class="btn btn-ghost btn-sm" data-toggle-id="${u.id}">${u.is_active ? 'Désactiver' : 'Activer'}</button>
+         <button type="button" class="btn btn-danger btn-sm" data-delete-id="${u.id}">Supprimer</button>`;
+    return `<tr>
+      <td>${esc(u.email)}</td>
+      <td>${roleSelect}</td>
+      <td>${st}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('[data-role-id]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      const { error } = await updateRestaurantUser(el.getAttribute('data-role-id'), { role: el.value });
+      if (error) toast(error.message, 'error');
+      await loadRestaurantUsers();
+    });
+  });
+  tbody.querySelectorAll('[data-toggle-id]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      const id = el.getAttribute('data-toggle-id');
+      const row = restaurantUsers.find((x) => x.id === id);
+      if (!row) return;
+      const { error } = await updateRestaurantUser(id, { is_active: !row.is_active });
+      if (error) toast(error.message, 'error');
+      await loadRestaurantUsers();
+    });
+  });
+  tbody.querySelectorAll('[data-delete-id]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      if (!confirm('Supprimer cet utilisateur ?')) return;
+      const { error } = await deleteRestaurantUser(el.getAttribute('data-delete-id'));
+      if (error) toast(error.message, 'error');
+      await loadRestaurantUsers();
+    });
+  });
+}
+
+async function loadRestaurantUsers() {
+  if (!restaurant?.id) return;
+  const { data, error } = await listRestaurantUsers(restaurant.id);
+  if (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  restaurantUsers = data || [];
+  renderRestaurantUsers();
 }
 
 document.getElementById('field-theme')?.addEventListener('input', () => syncThemeInputs(true));
@@ -343,7 +455,7 @@ document.getElementById('logo-input')?.addEventListener('change', async (e) => {
     toast(upErr?.message || 'Échec envoi logo', 'error');
     return;
   }
-  const { data, error } = await updateRestaurantForOwner(restaurant.id, session.user.id, { logo_url: publicUrl });
+  const { data, error } = await updateRestaurantForManager(restaurant.id, { logo_url: publicUrl });
   if (error) {
     toast(error.message, 'error');
     return;
@@ -371,11 +483,7 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
     phone: document.getElementById('field-phone').value.trim() || null,
     whatsapp: document.getElementById('field-whatsapp').value.trim() || null,
   };
-  const { data: updatedRest, error: e1 } = await updateRestaurantForOwner(
-    restaurant.id,
-    session.user.id,
-    patchRest,
-  );
+  const { data: updatedRest, error: e1 } = await updateRestaurantForManager(restaurant.id, patchRest);
   if (e1) {
     toast(e1.message, 'error');
     btn.disabled = false;
@@ -426,11 +534,14 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
 (async () => {
   session = await requireAuth();
   if (!session) return;
-  let { data: rest } = await getRestaurant(session.user.id);
-  if (!rest && (await tryCreateRestaurantFromPending(session.user.id))) {
-    await syncAuthContext(session.user.id);
-    ({ data: rest } = await getRestaurant(session.user.id));
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  if (!access?.restaurant_id) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isRestaurantRoleAllowed(access.role, ['owner', 'admin'])) {
+    window.location.href = getRoleHomePath(access.role);
+    return;
   }
+  await syncAuthContext(session.user.id);
+  const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) {
     window.location.href = 'create-restaurant.html';
     return;
@@ -459,7 +570,23 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   } else {
     renderHours(hrs || []);
   }
+  await loadRestaurantUsers();
 
+  document.getElementById('btn-add-user')?.addEventListener('click', async () => {
+    const email = document.getElementById('user-email').value.trim();
+    const role = document.getElementById('user-role').value;
+    const { error } = await createRestaurantUser(restaurant.id, { email, role });
+    if (error) {
+      toast(error.message, 'error');
+      return;
+    }
+    document.getElementById('user-email').value = '';
+    document.getElementById('user-role').value = 'admin';
+    const { error: inviteErr } = await notifyRestaurantUserInvited({ restaurantId: restaurant.id, email, role });
+    if (inviteErr) toast('Utilisateur ajouté, email invitation non envoyé.', 'warning');
+    toast('Utilisateur ajouté', 'success');
+    await loadRestaurantUsers();
+  });
   hideLoader();
 })();
 

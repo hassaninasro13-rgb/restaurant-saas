@@ -246,6 +246,7 @@
 import { supabase } from '../js/shared.js';
 import { checkIsPlatformAdmin } from '../supabase/subscriptions.js';
 import { isSupabaseConfigured } from '../supabase/config.js';
+import { getMyRestaurantAccess, getRoleHomePath } from '../supabase/restaurant-users.js';
 
 window.showTab = function(tab) {
   document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
@@ -308,10 +309,8 @@ window.handleLogin = async function() {
     return;
   }
 
-  const { data: rest } = await supabase
-    .from('restaurants').select('id').eq('user_id', data.user.id).single();
-
-  window.location.href = rest ? 'dashboard.html' : 'create-restaurant.html';
+  const { data: access } = await getMyRestaurantAccess(data.user);
+  window.location.href = access ? getRoleHomePath(access.role) : 'create-restaurant.html';
 };
 
 window.handleRegister = async function() {
@@ -364,9 +363,8 @@ gateSupabaseUi();
     window.location.href = 'admin.html';
     return;
   }
-  const { data: rest } = await supabase
-    .from('restaurants').select('id').eq('user_id', session.user.id).single();
-  window.location.href = rest ? 'dashboard.html' : 'create-restaurant.html';
+  const { data: access } = await getMyRestaurantAccess(session.user);
+  window.location.href = access ? getRoleHomePath(access.role) : 'create-restaurant.html';
 })();
 
 // Enter key support

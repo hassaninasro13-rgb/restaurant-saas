@@ -98,6 +98,41 @@ export async function adminUpdateRestaurant(restaurantId, fields) {
   return supabase.from('restaurants').update(patch).eq('id', restaurantId).select().single();
 }
 
+function normalizeSlug(raw) {
+  const out = String(raw || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return out || null;
+}
+
+/** Admin: create a new restaurant row. */
+export async function adminCreateRestaurant(payload) {
+  const name = String(payload?.name || '').trim();
+  if (!name) {
+    return { data: null, error: new Error('Le nom du restaurant est requis.') };
+  }
+  const slug = normalizeSlug(payload?.slug || name);
+  if (!slug) {
+    return { data: null, error: new Error('Slug invalide.') };
+  }
+  const allowedPlans = new Set(['free', 'basic', 'pro', 'enterprise']);
+  const plan = allowedPlans.has(payload?.subscription_plan) ? payload.subscription_plan : 'free';
+  const insert = {
+    name,
+    slug,
+    subscription_plan: plan,
+    subscription_expires_at: payload?.subscription_expires_at || null,
+    is_active: payload?.is_active === false ? false : true,
+  };
+  const ownerUserId = String(payload?.user_id || '').trim();
+  if (ownerUserId) insert.user_id = ownerUserId;
+  return supabase.from('restaurants').insert(insert).select().single();
+}
+
 /** @deprecated use adminUpdateRestaurant */
 export async function updateRestaurantSubscriptionAdmin(restaurantId, { subscription_plan, subscription_expires_at }) {
   return adminUpdateRestaurant(restaurantId, { subscription_plan, subscription_expires_at });

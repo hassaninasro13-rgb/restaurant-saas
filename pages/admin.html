@@ -92,6 +92,26 @@
   .admin-toggle { display: flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 600; }
   .admin-toggle input { width: 16px; height: 16px; cursor: pointer; }
   .admin-orders { font-family: var(--font-display); font-weight: 800; font-size: .9rem; color: var(--accent); text-align: right; }
+  .admin-create-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    margin: 14px 0 10px;
+  }
+  .admin-create-grid input, .admin-create-grid select {
+    width: 100%;
+    font-size: .78rem;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .admin-create-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 </style>
 </head>
 <body>
@@ -185,6 +205,29 @@
         <div class="admin-section" style="margin-bottom:0;">
           <h2>Gestion des établissements</h2>
           <p style="font-size:.8rem;color:var(--ink3);margin:-8px 0 14px;">Plan, expiration, activation, revenu manuel des abonnements (hors paiement en ligne).</p>
+          <div style="border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 14px 12px;margin-bottom:14px;background:var(--cream2);">
+            <div style="font-size:.8rem;font-weight:700;">Créer un restaurant</div>
+            <div class="admin-create-grid">
+              <input id="new-rest-name" type="text" placeholder="Nom du restaurant *" />
+              <input id="new-rest-slug" type="text" placeholder="slug-optionnel" />
+              <select id="new-rest-plan">
+                <option value="free">Free</option>
+                <option value="basic">Basic</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+              <input id="new-rest-exp" type="datetime-local" title="Expiration (vide = sans fin)" />
+              <input id="new-rest-user" type="text" placeholder="Owner user_id (optionnel)" />
+            </div>
+            <div class="admin-create-actions">
+              <label class="admin-toggle" style="margin:0;">
+                <input id="new-rest-active" type="checkbox" checked />
+                <span>Actif</span>
+              </label>
+              <button type="button" class="admin-save-btn" id="btn-create-rest">Créer</button>
+              <span style="font-size:.72rem;color:var(--ink3);">Si `owner user_id` est vide, la création dépend de vos règles RLS.</span>
+            </div>
+          </div>
           <div class="admin-toolbar">
             <span style="font-size:.8rem;color:var(--ink3);" id="est-count-label"></span>
           </div>
@@ -219,11 +262,12 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
-import { hideLoader, toast, fmtCurrency } from '../js/shared.js';
+import { hideLoader, toast, fmtCurrency, slugify } from '../js/shared.js';
 import {
   checkIsPlatformAdmin,
   listRestaurantsForAdmin,
   adminUpdateRestaurant,
+  adminCreateRestaurant,
   isSubscriptionActive,
 } from '../supabase/subscriptions.js';
 import { fetchAllOrdersForPlatformAdmin, computePlatformAnalytics } from '../supabase/platform-analytics.js';
@@ -484,6 +528,47 @@ async function refreshPlatformData() {
   wireRowActions();
 }
 
+async function handleCreateRestaurant() {
+  const nameEl = document.getElementById('new-rest-name');
+  const slugEl = document.getElementById('new-rest-slug');
+  const planEl = document.getElementById('new-rest-plan');
+  const expEl = document.getElementById('new-rest-exp');
+  const userEl = document.getElementById('new-rest-user');
+  const activeEl = document.getElementById('new-rest-active');
+  const btn = document.getElementById('btn-create-rest');
+  const name = nameEl.value.trim();
+  if (!name) {
+    toast('Nom du restaurant obligatoire', 'error');
+    nameEl.focus();
+    return;
+  }
+  const rawSlug = slugEl.value.trim();
+  const slug = rawSlug ? slugify(rawSlug) : slugify(name);
+  const payload = {
+    name,
+    slug,
+    subscription_plan: planEl.value,
+    subscription_expires_at: expEl.value ? datetimeLocalToIso(expEl.value) : null,
+    is_active: !!activeEl.checked,
+    user_id: userEl.value.trim() || null,
+  };
+  btn.disabled = true;
+  const { error } = await adminCreateRestaurant(payload);
+  btn.disabled = false;
+  if (error) {
+    toast(error.message || 'Impossible de créer le restaurant', 'error');
+    return;
+  }
+  nameEl.value = '';
+  slugEl.value = '';
+  expEl.value = '';
+  userEl.value = '';
+  planEl.value = 'free';
+  activeEl.checked = true;
+  toast('Restaurant créé', 'success');
+  await refreshPlatformData();
+}
+
 window.refreshPlatformData = refreshPlatformData;
 
 (async () => {
@@ -501,6 +586,13 @@ window.refreshPlatformData = refreshPlatformData;
     window.location.hash = '#platform-analytics';
   }
   setNavActive(window.location.hash);
+  document.getElementById('new-rest-name')?.addEventListener('input', (e) => {
+    const typed = String(e.target.value || '').trim();
+    const slugEl = document.getElementById('new-rest-slug');
+    if (!slugEl) return;
+    if (!slugEl.value.trim()) slugEl.placeholder = typed ? slugify(typed) : 'slug-optionnel';
+  });
+  document.getElementById('btn-create-rest')?.addEventListener('click', handleCreateRestaurant);
   await refreshPlatformData();
   hideLoader();
 })();

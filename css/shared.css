@@ -4,7 +4,7 @@
    Font: Syne (display) + DM Sans (body)
 ═══════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
 
 /* ── VARIABLES ── */
 :root {
@@ -458,4 +458,41 @@ tbody td { padding: 12px 16px; vertical-align: middle; }
 @media (max-width: 768px) {
   .field-row, .field-row-3 { grid-template-columns: 1fr; }
   .modal { padding: 24px; }
+}
+
+/* ── LANDING PREMIUM (Linear/Stripe-inspired) ── */
+body.landing-premium {
+  font-family: 'Inter', var(--font-body), sans-serif;
+  background:
+    radial-gradient(1000px 500px at -10% -10%, #eaf0ff 0%, rgba(234, 240, 255, 0) 55%),
+    radial-gradient(900px 460px at 110% 0%, #fff3dc 0%, rgba(255, 243, 220, 0) 56%),
+    #f7f9ff;
+}
+
+body.landing-premium .btn {
+  border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform .24s ease, box-shadow .24s ease, background-color .24s ease, border-color .24s ease;
+}
+
+body.landing-premium .btn-primary {
+  background: linear-gradient(135deg, #6c4cf6 0%, #4f8fff 100%);
+  border: 1px solid rgba(82, 66, 223, .3);
+  box-shadow: 0 12px 28px rgba(91, 56, 245, .3);
+}
+
+body.landing-premium .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(91, 56, 245, .36);
+}
+
+body.landing-premium .btn-secondary {
+  background: #fff;
+  border: 1px solid #dbe4ff;
+}
+
+body.landing-premium .btn-secondary:hover {
+  background: #f7f9ff;
+  border-color: #c9d6ff;
 }

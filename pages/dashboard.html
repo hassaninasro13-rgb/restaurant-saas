@@ -318,6 +318,9 @@
   <div class="loader-logo">OneTap</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
+<div id="debug-lang" style="position:fixed;top:0;left:0;background:red;color:white;z-index:9999;">
+  LANG ACTIVE
+</div>
 
 <div class="app-shell">
   <!-- SIDEBAR -->
@@ -399,15 +402,15 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
           <span data-i18n="dash.viewMenu">Voir mon menu</span>
         </a>
-        <a href="add-products.html" class="btn btn-primary btn-sm">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span data-i18n="dash.addProduct">Ajouter un produit</span>
-        </a>
-        <select id="lang-switcher" class="select" style="margin-left:10px;display:inline-block;">
+        <select id="lang-switcher" style="display:inline-block !important; opacity:1 !important; visibility:visible !important; z-index:9999;">
           <option value="fr">FR</option>
           <option value="en">EN</option>
           <option value="ar">AR</option>
         </select>
+        <a href="add-products.html" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="dash.addProduct">Ajouter un produit</span>
+        </a>
       </div>
     </header>
 
@@ -943,13 +946,14 @@ async function init() {
   document.getElementById('dash-cover-input').onchange = (e) => handleDashCoverUpload(e.target.files[0]);
   document.getElementById('btn-upgrade-plan').onclick = openUpgradeModal;
   document.getElementById('btn-close-upgrade-modal').onclick = closeUpgradeModal;
-  const select = document.getElementById('lang-switcher');
-  if (select) {
-    select.value = getLang();
-    select.addEventListener('change', (e) => {
+  const langEl = document.getElementById('lang-switcher');
+  if (langEl) {
+    langEl.value = getLang();
+    langEl.addEventListener('change', (e) => {
       setLang(e.target.value);
       location.reload();
     });
+    console.log('LANG SWITCHER INSERTED');
   }
   document.getElementById('upgrade-plan-modal').onclick = (e) => {
     if (e.target?.id === 'upgrade-plan-modal') closeUpgradeModal();

@@ -15,16 +15,13 @@
   margin: 0;
   font-family: Inter, sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(980px 560px at -14% -16%, rgba(70, 104, 214, 0.22) 0%, transparent 64%),
-    radial-gradient(820px 460px at 112% -8%, rgba(84, 94, 210, 0.16) 0%, transparent 62%),
-    radial-gradient(760px 460px at 50% 118%, rgba(46, 88, 164, 0.14) 0%, transparent 66%),
-    radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 5, 11, 0.5) 100%),
-    var(--bg);
+  background: radial-gradient(800px 400px at 20% 10%, rgba(65,105,255,0.15), transparent),
+              radial-gradient(600px 300px at 80% 20%, rgba(138,43,226,0.12), transparent),
+              #0b0f1a !important;
 }
 
 html, body {
-  background: #0b0f1a;
+  background: #0b0f1a !important;
 }
 
 .landing-page * { box-sizing: border-box; }
@@ -126,12 +123,7 @@ html, body {
   position: relative;
   overflow: hidden;
   padding: 20px;
-  background:
-    radial-gradient(560px 300px at 18% 12%, rgba(98, 118, 230, 0.22) 0%, transparent 62%),
-    radial-gradient(circle at 100% 0%, rgba(72, 122, 226, 0.26) 0%, transparent 54%),
-    radial-gradient(circle at 10% 100%, rgba(78, 100, 218, 0.2) 0%, transparent 48%),
-    radial-gradient(circle at 50% 46%, rgba(85, 108, 205, 0.16) 0%, transparent 60%),
-    linear-gradient(165deg, #0d1324, #090f1d);
+  background: linear-gradient(165deg, #0d1324, #090f1d);
 }
 .lp-mockup::before {
   content: '';

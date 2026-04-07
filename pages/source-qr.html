@@ -275,6 +275,7 @@ import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
 import { getRestaurant, hideLoader, toast, applyStaffShellBranding } from '../js/shared.js';
 import { listOrderSources } from '../supabase/order-sources.js';
+import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
 
 let restaurant = null;
 
@@ -413,6 +414,15 @@ document.getElementById('btn-regenerate-qr')?.addEventListener('click', () => bu
   if (!rest) {
     window.location.href = 'create-restaurant.html';
     return;
+  }
+  if (!isSubscriptionAccessAllowed(rest, 'app')) {
+    toast('Your subscription has expired', 'error');
+    window.location.href = 'dashboard.html?sub=expired';
+    return;
+  }
+  const subStatus = getSubscriptionStatus(rest);
+  if (subStatus === 'pending' || subStatus === 'canceled') {
+    toast(`Subscription warning: ${subStatus}`, 'warning');
   }
   restaurant = rest;
   applyStaffShellBranding(rest);

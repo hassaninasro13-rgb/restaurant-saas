@@ -391,6 +391,10 @@
         <strong style="color:var(--red);" data-i18n="dash.subExpiredTitle">Menu public désactivé</strong>
         <p style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;" data-i18n="dash.subExpiredBody">Votre abonnement est expiré : les clients ne voient plus le menu. Renouvelez ou contactez le support.</p>
       </div>
+      <div id="sub-status-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(200,140,40,.45);background:rgba(255,200,80,.09);">
+        <strong id="sub-status-banner-title">Subscription warning</strong>
+        <p id="sub-status-banner-body" style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;"></p>
+      </div>
 
       <!-- WELCOME BANNER -->
       <div class="welcome-banner">
@@ -627,6 +631,8 @@ import {
   subscriptionLabel,
   formatSubscriptionExpiry,
   checkIsPlatformAdmin,
+  getSubscriptionStatus,
+  isSubscriptionAccessAllowed,
 } from '../supabase/subscriptions.js';
 import {
   getMyRestaurantAccess,
@@ -812,6 +818,35 @@ async function init() {
   document.getElementById('welcome-title').textContent = t('dash.welcome', { name });
   renderDashboardBranding();
   renderSubscriptionUI(rest);
+  const subStatus = getSubscriptionStatus(rest);
+  const appAccessOk = isSubscriptionAccessAllowed(rest, 'app');
+  if (!appAccessOk) {
+    const expired = document.getElementById('sub-expired-banner');
+    if (expired) {
+      expired.style.display = '';
+      const title = expired.querySelector('strong');
+      const body = expired.querySelector('p');
+      if (title) title.textContent = 'Subscription expired';
+      if (body) body.textContent = 'Your subscription has expired';
+    }
+    document.getElementById('stats-grid')?.style.setProperty('display', 'none');
+    document.querySelector('.quick-actions')?.style.setProperty('display', 'none');
+    document.getElementById('dash-categories-container')?.style.setProperty('display', 'none');
+    document.getElementById('dash-products-container')?.style.setProperty('display', 'none');
+    document.getElementById('orders-container')?.style.setProperty('display', 'none');
+    hideLoader();
+    return;
+  }
+  if (subStatus === 'pending' || subStatus === 'canceled') {
+    const banner = document.getElementById('sub-status-banner');
+    const title = document.getElementById('sub-status-banner-title');
+    const body = document.getElementById('sub-status-banner-body');
+    if (banner && title && body) {
+      banner.style.display = '';
+      title.textContent = 'Subscription warning';
+      body.textContent = `Status: ${subStatus}. Limited access may apply until activation.`;
+    }
+  }
 
   const menuUrl = getMenuPublicUrl(rest.slug);
   document.getElementById('topbar-menu-link').href = menuUrl;

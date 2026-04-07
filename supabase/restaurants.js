@@ -1,7 +1,6 @@
 import { supabase } from './client.js';
 import { uploadLogoToStorage, uploadCoverToStorage } from './storage.js';
 import { mergeRestaurantSettings, mergeRestaurantSubscription } from './restaurant-settings.js';
-import { notifyNewRestaurantSignup } from './email.js';
 
 const LS_PENDING_RESTAURANT = 'onetap_pending_restaurant_name';
 
@@ -55,13 +54,14 @@ export async function createRestaurantForNewUser(userId, displayName) {
     subscription_plan: 'free',
     subscription_expires_at: null,
   });
+  let demoCreated = false;
+  let demoError = null;
   if (created.data?.id) {
-    await ensureDemoSetupForRestaurant(created.data.id);
-    try {
-      await notifyNewRestaurantSignup(created.data.id);
-    } catch (_) {}
+    const demoRes = await ensureDemoSetupForRestaurant(created.data.id);
+    demoCreated = !!demoRes?.created;
+    demoError = demoRes?.error || null;
   }
-  return created;
+  return { ...created, demoCreated, demoError };
 }
 
 /** If a name was saved at signup (email confirmation), create the restaurant once. */

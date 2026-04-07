@@ -1,5 +1,7 @@
 import { supabase } from './client.js';
 
+export const SUBSCRIPTION_STATUSES = ['trial', 'active', 'expired', 'canceled', 'pending'];
+
 const PLAN_SLUG_LABELS = {
   free: 'Free',
   basic: 'Basic',
@@ -7,23 +9,80 @@ const PLAN_SLUG_LABELS = {
   enterprise: 'Enterprise',
 };
 
-/** Menu is served when there is no end date, or the end date is in the future. */
+function normalizeStatus(raw) {
+  const v = String(raw || '').trim().toLowerCase();
+  if (!v) return null;
+  if (v === 'trialing') return 'trial';
+  if (v === 'cancelled') return 'canceled';
+  if (v === 'past_due') return 'pending';
+  if (SUBSCRIPTION_STATUSES.includes(v)) return v;
+  return null;
+}
+
+function parseDateMs(iso) {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  return Number.isNaN(t) ? null : t;
+}
+
+export function getCurrentPlanSlug(restaurant) {
+  return String(
+    restaurant?.subscription?.plan?.slug
+      || restaurant?.subscription_plan
+      || 'free',
+  ).toLowerCase();
+}
+
+export function getSubscriptionExpiry(restaurant) {
+  return restaurant?.subscription?.end_date ?? restaurant?.subscription_expires_at ?? null;
+}
+
+export function getSubscriptionStatus(restaurant, now = new Date()) {
+  if (!restaurant) return 'pending';
+  const normalized = normalizeStatus(restaurant?.subscription?.status);
+  const nowMs = now.getTime();
+  const expMs = parseDateMs(getSubscriptionExpiry(restaurant));
+  const isExpiredByDate = expMs != null && expMs <= nowMs;
+
+  if (normalized === 'expired' || isExpiredByDate) return 'expired';
+  if (normalized === 'trial') return 'trial';
+  if (normalized === 'pending') return 'pending';
+  if (normalized === 'canceled') return expMs != null && expMs > nowMs ? 'canceled' : 'expired';
+  if (normalized === 'active') return 'active';
+
+  return getCurrentPlanSlug(restaurant) === 'free' ? 'trial' : 'active';
+}
+
+export function isSubscriptionAccessAllowed(restaurant, scope = 'app', now = new Date()) {
+  const status = getSubscriptionStatus(restaurant, now);
+  if (status === 'expired') return false;
+  if (scope === 'public_menu') return status !== 'pending';
+  return true;
+}
+
+export function getSubscriptionSnapshot(restaurant, now = new Date()) {
+  const plan = getCurrentPlanSlug(restaurant);
+  const status = getSubscriptionStatus(restaurant, now);
+  const expiresAt = getSubscriptionExpiry(restaurant);
+  return {
+    plan,
+    status,
+    expiresAt,
+    access: {
+      app: isSubscriptionAccessAllowed(restaurant, 'app', now),
+      publicMenu: isSubscriptionAccessAllowed(restaurant, 'public_menu', now),
+    },
+  };
+}
+
+/** Backward-compatible helper used by existing UI/guards. */
 export function isSubscriptionActive(restaurant) {
   if (!restaurant) return false;
   const sub = restaurant.subscription;
   if (sub) {
-    if (sub.status === 'cancelled' || sub.status === 'expired') return false;
-    const end = sub.end_date;
-    if (end == null || end === '') return true;
-    const t = new Date(end).getTime();
-    if (Number.isNaN(t)) return true;
-    return t > Date.now();
+    return isSubscriptionAccessAllowed(restaurant, 'public_menu');
   }
-  const exp = restaurant.subscription_expires_at;
-  if (exp == null || exp === '') return true;
-  const t = new Date(exp).getTime();
-  if (Number.isNaN(t)) return true;
-  return t > Date.now();
+  return isSubscriptionAccessAllowed(restaurant, 'public_menu');
 }
 
 /** @param {string|object} restaurantOrSlug — restaurant row (with optional `subscription.plan`) or plan slug */

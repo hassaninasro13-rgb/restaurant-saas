@@ -49,7 +49,7 @@
 
 <script type="module">
 import { supabase } from '../supabase/client.js';
-import { setPendingRestaurantName } from '../supabase/restaurants.js';
+import { setPendingRestaurantName, clearPendingRestaurantName, createRestaurantForNewUser } from '../supabase/restaurants.js';
 import { isSupabaseConfigured } from '../supabase/config.js';
 import { getMyRestaurantAccess, getRoleHomePath } from '../supabase/restaurant-users.js';
 
@@ -94,26 +94,65 @@ document.getElementById('btn-create-account')?.addEventListener('click', async (
   btn.innerHTML = '<span class="spinner"></span>';
   setPendingRestaurantName(name);
 
-  const emailRedirectTo = new URL('login.html', window.location.href).href;
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo },
   });
 
-  btn.disabled = false;
-  btn.textContent = 'Create Restaurant Account';
-
   if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Create Restaurant Account';
     setAlert(error.message || 'Inscription impossible.');
     return;
   }
 
-  if (data?.session?.user) {
-    window.location.href = 'create-restaurant.html';
+  let session = data?.session || null;
+  let user = session?.user || data?.user || null;
+
+  if (!session) {
+    const signInRes = await supabase.auth.signInWithPassword({ email, password });
+    if (signInRes.error || !signInRes.data?.session?.user) {
+      btn.disabled = false;
+      btn.textContent = 'Create Restaurant Account';
+      setAlert(
+        'Le compte a ete cree, mais la connexion automatique a echoue. Desactivez la confirmation email dans Supabase Auth pour ce flow, puis reconnectez-vous.',
+      );
+      return;
+    }
+    session = signInRes.data.session;
+    user = signInRes.data.session.user;
+  }
+
+  const { data: existingAccess, error: accessErr } = await getMyRestaurantAccess(user);
+  if (accessErr) {
+    btn.disabled = false;
+    btn.textContent = 'Create Restaurant Account';
+    setAlert(accessErr.message || 'Impossible de verifier votre acces restaurant.');
     return;
   }
-  setAlert('Compte cree. Verifiez votre email puis connectez-vous pour finaliser votre restaurant.', 'success');
+
+  let targetPath = existingAccess ? getRoleHomePath(existingAccess.role) : 'dashboard.html';
+  if (!existingAccess) {
+    const created = await createRestaurantForNewUser(user.id, name);
+    if (created.error || !created.data?.id) {
+      btn.disabled = false;
+      btn.textContent = 'Create Restaurant Account';
+      setAlert(
+        (created.error?.message || 'Compte cree mais creation du restaurant impossible.') +
+          ' Ouvrez la page de creation pour finaliser.',
+      );
+      return;
+    }
+    clearPendingRestaurantName();
+    targetPath = created.demoCreated ? 'dashboard.html?demo=1' : 'dashboard.html';
+  } else {
+    clearPendingRestaurantName();
+  }
+
+  setAlert('Votre compte et votre restaurant sont prets. Redirection...', 'success');
+  setTimeout(() => {
+    window.location.href = targetPath;
+  }, 500);
 });
 
 bootstrapRedirectIfLogged();

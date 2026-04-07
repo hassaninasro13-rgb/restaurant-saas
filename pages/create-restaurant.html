@@ -377,7 +377,6 @@ import {
   uploadRestaurantCover,
   ensureDemoSetupForRestaurant,
 } from '../supabase/restaurants.js';
-import { notifyNewRestaurantSignup } from '../supabase/email.js';
 
 let session = null;
 let logoFile = null;
@@ -513,10 +512,6 @@ window.createRestaurant = async function() {
     const dashLink = document.querySelector('a[href="dashboard.html"]');
     if (dashLink) dashLink.href = 'dashboard.html?demo=1';
   }
-  try {
-    await notifyNewRestaurantSignup(data.id);
-  } catch (_) {}
-
   await syncAuthContext(session.user.id);
   document.getElementById('success-link').textContent = `onetapmenu.dz/menu/${data.slug}`;
   goStep(3);

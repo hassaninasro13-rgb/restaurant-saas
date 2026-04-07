@@ -388,6 +388,7 @@ import {
   MAX_OPTIMIZED_PRODUCT_BYTES,
   fileLooksLikeImage,
 } from '../js/image-optimize.js';
+import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
 
 let restaurant = null;
 let categories = [];
@@ -422,6 +423,15 @@ function revokePreviewObjectUrl() {
   await syncAuthContext(session.user.id);
   const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isSubscriptionAccessAllowed(rest, 'app')) {
+    toast('Your subscription has expired', 'error');
+    window.location.href = 'dashboard.html?sub=expired';
+    return;
+  }
+  const subStatus = getSubscriptionStatus(rest);
+  if (subStatus === 'pending' || subStatus === 'canceled') {
+    toast(`Subscription warning: ${subStatus}`, 'warning');
+  }
   restaurant = rest;
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;

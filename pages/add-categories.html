@@ -256,6 +256,7 @@ import {
   setCategoryVisibleForRestaurant,
   deleteCategoryForRestaurant,
 } from '../supabase/categories.js';
+import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
 
 let restaurant = null;
 let editingId = null;
@@ -273,6 +274,15 @@ const FOOD_EMOJIS = ['🍽️','🥗','🍕','🍔','🌮','🍜','🍣','🥩',
     ({ data: rest } = await getRestaurant(session.user.id));
   }
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isSubscriptionAccessAllowed(rest, 'app')) {
+    toast('Your subscription has expired', 'error');
+    window.location.href = 'dashboard.html?sub=expired';
+    return;
+  }
+  const subStatus = getSubscriptionStatus(rest);
+  if (subStatus === 'pending' || subStatus === 'canceled') {
+    toast(`Subscription warning: ${subStatus}`, 'warning');
+  }
   restaurant = rest;
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;

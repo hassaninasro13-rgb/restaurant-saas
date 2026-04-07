@@ -189,6 +189,7 @@ import {
   getRoleHomePath,
   isRestaurantRoleAllowed,
 } from '../supabase/restaurant-users.js';
+import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
 
 let restaurant = null;
 let allOrders = [];
@@ -276,6 +277,15 @@ window.kitchenAdvance = async function(id, status) {
   await syncAuthContext(session.user.id);
   const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
+  if (!isSubscriptionAccessAllowed(rest, 'app')) {
+    toast('Your subscription has expired', 'error');
+    window.location.href = 'dashboard.html?sub=expired';
+    return;
+  }
+  const subStatus = getSubscriptionStatus(rest);
+  if (subStatus === 'pending' || subStatus === 'canceled') {
+    toast(`Subscription warning: ${subStatus}`, 'warning');
+  }
   restaurant = rest;
   applyStaffShellBranding(rest);
   hydrateI18n(document);

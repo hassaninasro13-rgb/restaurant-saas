@@ -19,8 +19,8 @@
     --lp-brand-soft: #ede9ff;
     --lp-grad-a: #f5f8ff;
     --lp-grad-b: #fff8f1;
-    --lp-shadow: 0 18px 42px rgba(16, 24, 40, 0.08);
-    --lp-shadow-soft: 0 8px 20px rgba(16, 24, 40, 0.06);
+    --lp-shadow: 0 22px 56px rgba(16, 24, 40, 0.1);
+    --lp-shadow-soft: 0 10px 24px rgba(16, 24, 40, 0.08);
   }
   body {
     margin: 0;
@@ -31,6 +31,17 @@
       var(--lp-bg);
   }
   .lp-wrap { max-width: 1200px; margin: 0 auto; padding: 18px 20px 72px; }
+  .btn {
+    border-radius: 12px;
+    transition: transform .22s ease, box-shadow .22s ease, background-color .22s ease, border-color .22s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    box-shadow: 0 10px 22px rgba(91, 56, 245, 0.28);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 14px 28px rgba(91, 56, 245, 0.36);
+  }
   .lp-nav {
     position: sticky;
     top: 10px;
@@ -42,7 +53,7 @@
     padding: 10px 14px;
     border-radius: 16px;
     border: 1px solid var(--lp-border);
-    background: rgba(255, 255, 255, 0.82);
+    background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(10px);
     box-shadow: var(--lp-shadow-soft);
   }
@@ -124,6 +135,7 @@
       radial-gradient(circle at 100% 0%, #e7f0ff 0%, transparent 42%),
       linear-gradient(160deg, var(--lp-grad-a), var(--lp-grad-b));
     padding: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
   }
   .lp-grid-overlay {
     position: absolute;
@@ -133,7 +145,18 @@
     opacity: 0.4;
     pointer-events: none;
   }
-  .lp-widget-stack { position: relative; display: grid; gap: 12px; z-index: 1; }
+  .lp-widget-stack { position: relative; display: grid; gap: 14px; z-index: 1; min-height: 430px; }
+  .lp-widget.layer-a { width: 85%; }
+  .lp-widget.layer-b { width: 78%; margin-left: auto; margin-top: -2px; }
+  .lp-widget.layer-c { width: 88%; margin-top: 8px; }
+  .lp-widget.layer-d {
+    position: absolute;
+    right: 20px;
+    top: 128px;
+    width: 44%;
+    z-index: 3;
+    transform: rotate(-2deg);
+  }
   .lp-widget {
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(16, 24, 40, 0.09);
@@ -144,6 +167,25 @@
   .lp-widget-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:.76rem; color:var(--lp-subtle); font-weight:700; }
   .lp-mini-bars { display: grid; gap: 7px; }
   .lp-mini-bars span { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #c9d6ff, #eef2ff); border: 1px solid rgba(91, 56, 245, 0.12); }
+  .lp-order-row {
+    display: grid;
+    grid-template-columns: 1.6fr auto auto;
+    gap: 8px;
+    align-items: center;
+    font-size: .74rem;
+    color: var(--lp-muted);
+    margin-bottom: 7px;
+  }
+  .lp-order-pill {
+    display: inline-flex;
+    justify-content: center;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-weight: 700;
+  }
+  .lp-order-price { font-weight: 700; color: var(--lp-text); }
   .lp-mini-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
   .lp-mini-kpi {
     border-radius: 11px;
@@ -156,8 +198,8 @@
   .lp-mini-kpi span { color: var(--lp-subtle); font-size: .72rem; }
   .lp-floating {
     position: absolute;
-    right: 16px;
-    bottom: 18px;
+    left: 16px;
+    bottom: 20px;
     border-radius: 12px;
     border: 1px solid rgba(16, 24, 40, 0.12);
     background: #fff;
@@ -168,7 +210,14 @@
     z-index: 2;
   }
   .lp-floating strong { display: block; color: var(--lp-text); margin-bottom: 3px; font-size: .82rem; }
-  .lp-section { margin-top: 34px; }
+  .lp-section {
+    margin-top: 34px;
+    border: 1px solid var(--lp-border);
+    border-radius: 22px;
+    padding: 26px;
+    background: linear-gradient(180deg, #ffffff, #fbfcff);
+    box-shadow: var(--lp-shadow-soft);
+  }
   .lp-section-head { margin-bottom: 14px; text-align: center; }
   .lp-section-head h2 { margin: 0 0 6px; font-family: var(--font-display); font-size: 2.02rem; letter-spacing: -0.02em; }
   .lp-section-head p { margin: 0; color: var(--lp-muted); font-size: .95rem; }
@@ -176,7 +225,7 @@
     margin-top: 20px;
     border: 1px solid var(--lp-border);
     border-radius: 16px;
-    background: #fff;
+    background: linear-gradient(180deg, #fff, #f9fbff);
     padding: 14px 18px;
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -201,14 +250,23 @@
     background: linear-gradient(180deg, #fff, #fbfcff);
     padding: 18px;
     box-shadow: var(--lp-shadow-soft);
+    transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+  }
+  .lp-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(91,56,245,.22);
+    box-shadow: 0 18px 34px rgba(16,24,40,.12);
   }
   .lp-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
     margin-bottom: 10px;
-    background: linear-gradient(135deg, #7b61ff, #4ba3ff);
-    box-shadow: 0 8px 16px rgba(91, 56, 245, 0.25);
+    border: 1px solid rgba(91,56,245,.25);
+    background:
+      radial-gradient(circle at 70% 25%, rgba(255,255,255,.7), transparent 40%),
+      linear-gradient(135deg, #7b61ff, #4ba3ff);
+    box-shadow: 0 10px 18px rgba(91, 56, 245, 0.28);
   }
   .lp-card h3 { margin: 0 0 6px; font-size: 1.02rem; letter-spacing: -0.01em; }
   .lp-card p { margin: 0; color: var(--lp-muted); font-size: .87rem; line-height: 1.58; }
@@ -251,11 +309,14 @@
     background: #fff;
     padding: 22px 20px;
     box-shadow: var(--lp-shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   .lp-price-card.reco {
     border-color: rgba(91, 56, 245, 0.38);
     background: linear-gradient(180deg, #f9f7ff 0%, #ffffff 100%);
-    box-shadow: 0 14px 32px rgba(91, 56, 245, 0.18);
+    box-shadow: 0 20px 42px rgba(91, 56, 245, 0.25), 0 0 0 1px rgba(124, 103, 255, 0.3) inset;
     transform: translateY(-3px);
   }
   .lp-chip {
@@ -271,7 +332,8 @@
   .lp-price-card h3 { margin: 0 0 4px; font-size: 1.02rem; }
   .lp-price-tag { margin: 0 0 9px; font-family: var(--font-display); font-size: 1.75rem; letter-spacing: -0.02em; }
   .lp-price-note { margin: 0 0 12px; color: var(--lp-muted); font-size: .85rem; line-height: 1.5; }
-  .lp-list { color: var(--lp-muted); font-size: .83rem; line-height: 1.7; }
+  .lp-list { color: var(--lp-muted); font-size: .83rem; line-height: 1.7; margin-bottom: 10px; }
+  .lp-price-btn { margin-top: auto; width: 100%; justify-content: center; }
   .lp-final {
     margin-top: 34px;
     border-radius: 22px;
@@ -281,11 +343,10 @@
       radial-gradient(circle at 100% 100%, rgba(98, 176, 255, 0.32), transparent 38%),
       #0b1221;
     color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 14px;
   }
   .lp-final h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 1.7rem; letter-spacing: -0.02em; }
   .lp-final p { margin: 0; color: rgba(255,255,255,.76); font-size: .92rem; }
@@ -314,7 +375,11 @@
     .lp-hero { padding: 14px; border-radius: 20px; }
     .lp-hero-copy { padding: 18px; }
     .lp-hero h1 { font-size: 1.82rem; }
+    .lp-widget.layer-a, .lp-widget.layer-b, .lp-widget.layer-c, .lp-widget.layer-d { width: 100%; position: static; transform: none; margin: 0; }
+    .lp-widget-stack { min-height: 0; }
+    .lp-floating { position: static; }
     .lp-mini-kpis, .lp-features, .lp-price, .lp-trust-grid { grid-template-columns: 1fr; }
+    .lp-section { padding: 20px; }
     .lp-final { padding: 22px; }
     .lp-final h3 { font-size: 1.35rem; }
   }
@@ -352,7 +417,7 @@
       <div class="lp-hero-visual">
         <div class="lp-grid-overlay"></div>
         <div class="lp-widget-stack">
-          <article class="lp-widget">
+          <article class="lp-widget layer-a">
             <div class="lp-widget-head"><span>Dashboard OneTap</span><span>Temps reel</span></div>
             <div class="lp-mini-bars">
               <span style="width:92%;"></span>
@@ -360,14 +425,20 @@
               <span style="width:83%;"></span>
             </div>
           </article>
-          <article class="lp-widget">
+          <article class="lp-widget layer-b">
             <div class="lp-widget-head"><span>QR et menu digital</span><span>Actif</span></div>
             <div class="lp-mini-bars">
               <span style="width:88%;"></span>
               <span style="width:58%;"></span>
             </div>
           </article>
-          <article class="lp-widget">
+          <article class="lp-widget layer-c">
+            <div class="lp-widget-head"><span>Kitchen screen</span><span>11 commandes</span></div>
+            <div class="lp-order-row"><span>Table 7 · Burger + Frites</span><span class="lp-order-pill">En prep</span><span class="lp-order-price">2 100 DZD</span></div>
+            <div class="lp-order-row"><span>Takeaway · Salade Caesar</span><span class="lp-order-pill">Nouveau</span><span class="lp-order-price">1 350 DZD</span></div>
+            <div class="lp-order-row" style="margin-bottom:0;"><span>Table 3 · Pizza Margherita</span><span class="lp-order-pill">Pret</span><span class="lp-order-price">1 800 DZD</span></div>
+          </article>
+          <article class="lp-widget layer-d">
             <div class="lp-widget-head"><span>KPI operationnels</span><span>Cette semaine</span></div>
             <div class="lp-mini-kpis">
               <div class="lp-mini-kpi"><strong>+31%</strong><span>Commandes</span></div>
@@ -478,6 +549,7 @@
           <p class="lp-price-tag">0 DZD</p>
           <p class="lp-price-note">Ideal pour lancer votre menu digital et valider votre flux OneTap.</p>
           <div class="lp-list">Menu QR<br>Prise de commande standard<br>Mise en route guidee</div>
+          <a href="get-started.html" class="btn btn-secondary btn-sm lp-price-btn">Choisir Free</a>
         </article>
         <article class="lp-price-card reco">
           <span class="lp-chip">Plan recommande</span>
@@ -485,12 +557,14 @@
           <p class="lp-price-tag">Sur demande</p>
           <p class="lp-price-note">Pour les operations qui veulent scaler le service et fluidifier la coordination.</p>
           <div class="lp-list">Dashboard avance<br>Kitchen screen complet<br>Gestion multi-utilisateurs</div>
+          <a href="get-started.html" class="btn btn-primary btn-sm lp-price-btn">Passer au Pro</a>
         </article>
         <article class="lp-price-card">
           <h3>Enterprise</h3>
           <p class="lp-price-tag">Sur devis</p>
           <p class="lp-price-note">Pour groupes et chaines avec exigences avancees et besoin d'accompagnement dedie.</p>
           <div class="lp-list">Support prioritaire<br>Configuration personnalisee<br>Suivi operationnel premium</div>
+          <a href="get-started.html" class="btn btn-secondary btn-sm lp-price-btn">Contacter l'equipe</a>
         </article>
       </div>
     </section>

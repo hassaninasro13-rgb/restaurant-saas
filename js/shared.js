@@ -17,8 +17,9 @@ export {
 } from '../supabase/auth.js';
 export { getRestaurantForUser as getRestaurant } from '../supabase/restaurants.js';
 export { mergeRestaurantSettings } from '../supabase/restaurant-settings.js';
-import { t, hydrateI18n, setI18nLanguage, getActiveLang, normalizeLang } from './i18n.js';
-export { t, hydrateI18n, setI18nLanguage, getActiveLang, normalizeLang };
+import { t, setLang, getLang, render } from './i18n.js';
+export { t, setLang, getLang, render };
+setLang(getLang());
 
 const DEFAULT_ACCENT = '#e85c2c';
 
@@ -83,11 +84,6 @@ export function applyRestaurantTheme(themeColor) {
   root.style.setProperty('--accent-rgb', hexToAccentRgbString(base));
 }
 
-/** Sets html lang + dir and active i18n dictionary. */
-export function applyRestaurantHtmlLang(language) {
-  setI18nLanguage(language);
-}
-
 export function getRestaurantCurrency(rest) {
   return rest?.settings?.currency || 'DZD';
 }
@@ -103,7 +99,7 @@ export function getRestaurantLocale(rest) {
 export function applyRestaurantClientPrefs(rest) {
   const s = rest?.settings;
   applyRestaurantTheme(s?.theme_color);
-  setI18nLanguage(s?.language);
+  setLang(getLang());
 }
 
 /** Staff sidebar: optional logo next to brand (ids: #staff-sidebar-logo, #staff-sidebar-logo-img). */

@@ -247,7 +247,7 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
-import { getRestaurant, hideLoader, toast, applyStaffShellBranding } from '../js/shared.js';
+import { getRestaurant, hideLoader, toast, applyStaffShellBranding, getLang, setLang } from '../js/shared.js';
 import {
   listCategoriesWithProductCounts,
   getCategoryForRestaurant,
@@ -256,7 +256,9 @@ import {
   setCategoryVisibleForRestaurant,
   deleteCategoryForRestaurant,
 } from '../supabase/categories.js';
-import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
+import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
+
+setLang(getLang());
 
 let restaurant = null;
 let editingId = null;
@@ -274,14 +276,14 @@ const FOOD_EMOJIS = ['🍽️','🥗','🍕','🍔','🌮','🍜','🍣','🥩',
     ({ data: rest } = await getRestaurant(session.user.id));
   }
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
-  if (!isSubscriptionAccessAllowed(rest, 'app')) {
-    toast('Your subscription has expired', 'error');
+  const enforcement = enforceSubscriptionAccess(rest);
+  if (!enforcement.allowed) {
+    toast(enforcement.message || 'Your subscription has expired', 'error');
     window.location.href = 'dashboard.html?sub=expired';
     return;
   }
-  const subStatus = getSubscriptionStatus(rest);
-  if (subStatus === 'pending' || subStatus === 'canceled') {
-    toast(`Subscription warning: ${subStatus}`, 'warning');
+  if (enforcement.status === 'pending' || enforcement.status === 'canceled') {
+    toast(enforcement.message || `Subscription warning: ${enforcement.status}`, 'warning');
   }
   restaurant = rest;
   applyStaffShellBranding(rest);

@@ -259,6 +259,8 @@ import {
   hideLoader,
   toast,
   applyStaffShellBranding,
+  getLang,
+  setLang,
 } from '../js/shared.js';
 import {
   getMyRestaurantAccess,
@@ -276,7 +278,9 @@ import {
   ensureOpeningHoursTemplate,
   upsertOpeningHour,
 } from '../supabase/restaurant-settings.js';
-import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
+import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
+
+setLang(getLang());
 
 const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
@@ -547,14 +551,14 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
     window.location.href = 'create-restaurant.html';
     return;
   }
-  if (!isSubscriptionAccessAllowed(rest, 'app')) {
-    toast('Your subscription has expired', 'error');
+  const enforcement = enforceSubscriptionAccess(rest);
+  if (!enforcement.allowed) {
+    toast(enforcement.message || 'Your subscription has expired', 'error');
     window.location.href = 'dashboard.html?sub=expired';
     return;
   }
-  const subStatus = getSubscriptionStatus(rest);
-  if (subStatus === 'pending' || subStatus === 'canceled') {
-    toast(`Subscription warning: ${subStatus}`, 'warning');
+  if (enforcement.status === 'pending' || enforcement.status === 'canceled') {
+    toast(enforcement.message || `Subscription warning: ${enforcement.status}`, 'warning');
   }
   restaurant = rest;
   applyStaffShellBranding(rest);

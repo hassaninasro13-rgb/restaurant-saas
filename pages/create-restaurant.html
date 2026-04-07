@@ -369,7 +369,7 @@
 
 <script type="module">
 import { requireAuth, syncAuthContext } from '../supabase/auth.js';
-import { slugify, toast } from '../js/shared.js';
+import { slugify, toast, getLang, setLang } from '../js/shared.js';
 import {
   getRestaurantIdForUser,
   createRestaurant as insertRestaurantRow,
@@ -377,6 +377,8 @@ import {
   uploadRestaurantCover,
   ensureDemoSetupForRestaurant,
 } from '../supabase/restaurants.js';
+
+setLang(getLang());
 
 let session = null;
 let logoFile = null;

@@ -181,7 +181,8 @@ import {
   getRestaurantLocale,
   applyStaffShellBranding,
   t,
-  hydrateI18n,
+  getLang,
+  setLang,
 } from '../js/shared.js';
 import { listOrdersWithItems, updateOrderStatus } from '../supabase/orders.js';
 import {
@@ -189,7 +190,9 @@ import {
   getRoleHomePath,
   isRestaurantRoleAllowed,
 } from '../supabase/restaurant-users.js';
-import { getSubscriptionStatus, isSubscriptionAccessAllowed } from '../supabase/subscriptions.js';
+import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
+
+setLang(getLang());
 
 let restaurant = null;
 let allOrders = [];
@@ -277,18 +280,17 @@ window.kitchenAdvance = async function(id, status) {
   await syncAuthContext(session.user.id);
   const { data: rest } = await getRestaurantById(access.restaurant_id);
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
-  if (!isSubscriptionAccessAllowed(rest, 'app')) {
-    toast('Your subscription has expired', 'error');
+  const enforcement = enforceSubscriptionAccess(rest);
+  if (!enforcement.allowed) {
+    toast(enforcement.message || 'Your subscription has expired', 'error');
     window.location.href = 'dashboard.html?sub=expired';
     return;
   }
-  const subStatus = getSubscriptionStatus(rest);
-  if (subStatus === 'pending' || subStatus === 'canceled') {
-    toast(`Subscription warning: ${subStatus}`, 'warning');
+  if (enforcement.status === 'pending' || enforcement.status === 'canceled') {
+    toast(enforcement.message || `Subscription warning: ${enforcement.status}`, 'warning');
   }
   restaurant = rest;
   applyStaffShellBranding(rest);
-  hydrateI18n(document);
   document.getElementById('sb-rest-name').textContent = rest.name;
   await loadKitchen();
   hideLoader();

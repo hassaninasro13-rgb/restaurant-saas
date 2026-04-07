@@ -1,4 +1,4 @@
-## Email notification functions
+## Functions
 
 Deploy:
 
@@ -6,6 +6,7 @@ Deploy:
 2. `supabase functions deploy notify-new-order --no-verify-jwt`
 3. `supabase functions deploy notify-user-invited`
 4. `supabase functions deploy notify-subscription-expiry`
+5. `supabase functions deploy handle-payment-webhook`
 
 Required secrets:
 
@@ -21,3 +22,7 @@ Provider:
 Expiry reminders:
 
 - Run `notify-subscription-expiry` with a cron/scheduler once per day.
+
+Payment webhooks:
+
+- `handle-payment-webhook` is a placeholder endpoint for future Stripe/Paddle integration.

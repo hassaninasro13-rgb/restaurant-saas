@@ -191,6 +191,29 @@
     background: #fff;
     outline: none;
   }
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: visible;
+  }
+  #lang-switcher {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 72px !important;
+    height: 36px !important;
+    margin-left: 10px !important;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 700;
+    cursor: pointer;
+    position: relative !important;
+    z-index: 20 !important;
+  }
 
   .dash-cat-table {
     width: 100%;
@@ -371,7 +394,7 @@
       <div class="topbar-left">
         <h1 class="topbar-title" data-i18n="dash.title">Tableau de bord</h1>
       </div>
-      <div class="topbar-right">
+      <div class="topbar-actions">
         <a id="topbar-menu-link" href="#" target="_blank" class="topbar-menu-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
           <span data-i18n="dash.viewMenu">Voir mon menu</span>
@@ -380,19 +403,24 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span data-i18n="dash.addProduct">Ajouter un produit</span>
         </a>
+        <select id="lang-switcher" class="select" style="margin-left:10px;display:inline-block;">
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+          <option value="ar">AR</option>
+        </select>
       </div>
     </header>
 
     <div class="page-content">
       <div id="demo-created-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(46,140,87,.35);background:rgba(46,140,87,.08);">
-        <strong style="color:var(--green);">Demo data has been created. You can edit or delete it.</strong>
+        <strong style="color:var(--green);" data-i18n="dash.demoCreated">Demo data has been created. You can edit or delete it.</strong>
       </div>
       <div id="sub-expired-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(220,80,80,.45);background:rgba(220,80,80,.08);">
         <strong style="color:var(--red);" data-i18n="dash.subExpiredTitle">Menu public désactivé</strong>
         <p style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;" data-i18n="dash.subExpiredBody">Votre abonnement est expiré : les clients ne voient plus le menu. Renouvelez ou contactez le support.</p>
       </div>
       <div id="sub-status-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(200,140,40,.45);background:rgba(255,200,80,.09);">
-        <strong id="sub-status-banner-title">Subscription warning</strong>
+        <strong id="sub-status-banner-title" data-i18n="dash.subWarningTitle">Subscription warning</strong>
         <p id="sub-status-banner-body" style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;"></p>
       </div>
 
@@ -428,7 +456,10 @@
       <div class="card" id="subscription-status-card" style="margin-bottom:24px;">
         <div class="section-header" style="margin-bottom:14px;">
           <h3 data-i18n="dash.subscription">Abonnement</h3>
-          <a href="admin.html" id="dash-admin-sub-link" class="btn btn-secondary btn-sm" style="display:none;" data-i18n="dash.adminPanel">Panneau admin</a>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button type="button" id="btn-upgrade-plan" class="btn btn-primary btn-sm" data-i18n="dash.upgradePlanBtn">Upgrade Plan</button>
+            <a href="admin.html" id="dash-admin-sub-link" class="btn btn-secondary btn-sm" style="display:none;" data-i18n="dash.adminPanel">Panneau admin</a>
+          </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;">
           <div>
@@ -450,6 +481,20 @@
       <div id="plan-limits-banner" class="card" style="display:none;margin-bottom:16px;border-color:rgba(200,140,40,.45);background:rgba(255,200,80,.09);">
         <strong style="color:var(--amber);" data-i18n="dash.planLimitsWarnTitle">Limites du plan dépassées</strong>
         <p id="plan-limits-warn-body" style="margin:8px 0 0;font-size:.88rem;color:var(--ink2);line-height:1.45;"></p>
+      </div>
+      <div id="upgrade-plan-modal" style="display:none;position:fixed;inset:0;background:rgba(12,12,12,.45);z-index:80;padding:20px;">
+        <div class="card" style="max-width:520px;margin:80px auto 0;">
+          <div class="section-header" style="margin-bottom:8px;">
+            <h3 data-i18n="dash.upgradeTitle">Upgrade Plan</h3>
+            <button type="button" id="btn-close-upgrade-modal" class="btn btn-ghost btn-sm" data-i18n="dash.close">Close</button>
+          </div>
+          <p style="font-size:.9rem;color:var(--ink2);margin-bottom:14px;" data-i18n="dash.upgradeLead">Contact us to upgrade your plan.</p>
+          <div style="background:var(--cream2);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.82rem;color:var(--ink2);line-height:1.45;margin-bottom:12px;">
+            <div><strong data-i18n="dash.upgradeRestaurant">Restaurant</strong>: <span id="upgrade-modal-restaurant">—</span></div>
+            <div><strong data-i18n="dash.upgradeEmail">Email</strong>: <span id="upgrade-modal-email">—</span></div>
+          </div>
+          <a id="btn-upgrade-whatsapp" class="btn btn-primary btn-full" target="_blank" rel="noopener noreferrer" data-i18n="dash.upgradeContactWa">Contact on WhatsApp</a>
+        </div>
       </div>
 
       <!-- STATS -->
@@ -606,7 +651,8 @@ import {
   getRestaurantLocale,
   applyStaffShellBranding,
   t,
-  hydrateI18n,
+  getLang,
+  setLang,
 } from '../js/shared.js';
 import {
   countOrdersSince,
@@ -631,8 +677,7 @@ import {
   subscriptionLabel,
   formatSubscriptionExpiry,
   checkIsPlatformAdmin,
-  getSubscriptionStatus,
-  isSubscriptionAccessAllowed,
+  enforceSubscriptionAccess,
 } from '../supabase/subscriptions.js';
 import {
   getMyRestaurantAccess,
@@ -640,8 +685,11 @@ import {
   isRestaurantRoleAllowed,
 } from '../supabase/restaurant-users.js';
 
+setLang(getLang());
+
 let restaurant = null;
 let currentSession = null;
+const WHATSAPP_UPGRADE_NUMBER = '213XXXXXXXXX';
 
 function escHtml(s) {
   return String(s ?? '')
@@ -719,6 +767,34 @@ function renderSubscriptionUI(rest) {
     const link = document.getElementById('dash-admin-sub-link');
     if (link) link.style.display = ok ? 'inline-flex' : 'none';
   });
+}
+
+function buildUpgradeWhatsappUrl() {
+  const restName = String(restaurant?.name || '-').trim();
+  const email = String(currentSession?.user?.email || '-').trim();
+  const currentPlan = String(restaurant?.subscription?.plan?.slug || restaurant?.subscription_plan || 'free').toLowerCase();
+  const selectedPlan = currentPlan === 'enterprise' ? 'Enterprise' : (currentPlan === 'pro' ? 'Enterprise' : 'Pro');
+  const text = encodeURIComponent(
+    `Hello, I want to upgrade my plan.\n\nRestaurant: ${restName}\nEmail: ${email}\nPlan: ${selectedPlan}\n\nPlease send me details.`,
+  );
+  return `https://wa.me/${WHATSAPP_UPGRADE_NUMBER}?text=${text}`;
+}
+
+function openUpgradeModal() {
+  const modal = document.getElementById('upgrade-plan-modal');
+  if (!modal) return;
+  const restEl = document.getElementById('upgrade-modal-restaurant');
+  const emailEl = document.getElementById('upgrade-modal-email');
+  const waBtn = document.getElementById('btn-upgrade-whatsapp');
+  if (restEl) restEl.textContent = restaurant?.name || '-';
+  if (emailEl) emailEl.textContent = currentSession?.user?.email || '-';
+  if (waBtn) waBtn.href = buildUpgradeWhatsappUrl();
+  modal.style.display = '';
+}
+
+function closeUpgradeModal() {
+  const modal = document.getElementById('upgrade-plan-modal');
+  if (modal) modal.style.display = 'none';
 }
 
 function fmtPlanCap(n) {
@@ -808,7 +884,6 @@ async function init() {
   if (!rest) { window.location.href = 'create-restaurant.html'; return; }
   restaurant = rest;
   applyStaffShellBranding(rest);
-  hydrateI18n(document);
 
   // Update UI with restaurant info
   const name = rest.name;
@@ -818,16 +893,15 @@ async function init() {
   document.getElementById('welcome-title').textContent = t('dash.welcome', { name });
   renderDashboardBranding();
   renderSubscriptionUI(rest);
-  const subStatus = getSubscriptionStatus(rest);
-  const appAccessOk = isSubscriptionAccessAllowed(rest, 'app');
-  if (!appAccessOk) {
+  const enforcement = enforceSubscriptionAccess(rest);
+  if (!enforcement.allowed) {
     const expired = document.getElementById('sub-expired-banner');
     if (expired) {
       expired.style.display = '';
       const title = expired.querySelector('strong');
       const body = expired.querySelector('p');
-      if (title) title.textContent = 'Subscription expired';
-      if (body) body.textContent = 'Your subscription has expired';
+      if (title) title.textContent = t('dash.subExpiredTitle');
+      if (body) body.textContent = t('dash.subExpiredShort');
     }
     document.getElementById('stats-grid')?.style.setProperty('display', 'none');
     document.querySelector('.quick-actions')?.style.setProperty('display', 'none');
@@ -837,19 +911,20 @@ async function init() {
     hideLoader();
     return;
   }
-  if (subStatus === 'pending' || subStatus === 'canceled') {
+  if (enforcement.status === 'pending' || enforcement.status === 'canceled') {
     const banner = document.getElementById('sub-status-banner');
     const title = document.getElementById('sub-status-banner-title');
     const body = document.getElementById('sub-status-banner-body');
     if (banner && title && body) {
       banner.style.display = '';
-      title.textContent = 'Subscription warning';
-      body.textContent = `Status: ${subStatus}. Limited access may apply until activation.`;
+      title.textContent = t('dash.subWarningTitle');
+      body.textContent = enforcement.status === 'pending' ? t('dash.subPendingWarn') : t('dash.subCanceledWarn');
     }
   }
 
   const menuUrl = getMenuPublicUrl(rest.slug);
-  document.getElementById('topbar-menu-link').href = menuUrl;
+  const topbarMenuLink = document.getElementById('topbar-menu-link');
+  if (topbarMenuLink) topbarMenuLink.href = menuUrl;
   document.getElementById('qa-menu-link').href = menuUrl;
   const urlInput = document.getElementById('menu-public-url');
   if (urlInput) urlInput.value = menuUrl;
@@ -866,6 +941,19 @@ async function init() {
   document.getElementById('btn-dash-upload-cover').onclick = () => document.getElementById('dash-cover-input').click();
   document.getElementById('dash-logo-input').onchange = (e) => handleDashLogoUpload(e.target.files[0]);
   document.getElementById('dash-cover-input').onchange = (e) => handleDashCoverUpload(e.target.files[0]);
+  document.getElementById('btn-upgrade-plan').onclick = openUpgradeModal;
+  document.getElementById('btn-close-upgrade-modal').onclick = closeUpgradeModal;
+  const select = document.getElementById('lang-switcher');
+  if (select) {
+    select.value = getLang();
+    select.addEventListener('change', (e) => {
+      setLang(e.target.value);
+      location.reload();
+    });
+  }
+  document.getElementById('upgrade-plan-modal').onclick = (e) => {
+    if (e.target?.id === 'upgrade-plan-modal') closeUpgradeModal();
+  };
 
   await Promise.all([
     loadStats(),

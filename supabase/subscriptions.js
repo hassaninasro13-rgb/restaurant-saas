@@ -53,25 +53,82 @@ export function getSubscriptionStatus(restaurant, now = new Date()) {
   return getCurrentPlanSlug(restaurant) === 'free' ? 'trial' : 'active';
 }
 
+export function enforceSubscriptionAccess(subscription, now = new Date()) {
+  const source = subscription && typeof subscription === 'object' ? subscription : null;
+  const status = normalizeStatus(source?.status) || getSubscriptionStatus(source, now);
+  if (status === 'expired') {
+    return {
+      allowed: false,
+      status,
+      message: 'Your subscription has expired',
+    };
+  }
+  if (status === 'pending') {
+    return {
+      allowed: true,
+      status,
+      message: 'Subscription is pending. Limited access may apply until activation.',
+    };
+  }
+  if (status === 'canceled') {
+    return {
+      allowed: true,
+      status,
+      message: 'Subscription is canceled. Limited access may apply until expiry.',
+    };
+  }
+  return { allowed: true, status };
+}
+
 export function isSubscriptionAccessAllowed(restaurant, scope = 'app', now = new Date()) {
-  const status = getSubscriptionStatus(restaurant, now);
-  if (status === 'expired') return false;
-  if (scope === 'public_menu') return status !== 'pending';
+  const enforcement = enforceSubscriptionAccess(restaurant, now);
+  if (!enforcement.allowed) return false;
+  if (scope === 'public_menu') return enforcement.status !== 'pending';
   return true;
 }
 
 export function getSubscriptionSnapshot(restaurant, now = new Date()) {
   const plan = getCurrentPlanSlug(restaurant);
-  const status = getSubscriptionStatus(restaurant, now);
+  const enforcement = enforceSubscriptionAccess(restaurant, now);
   const expiresAt = getSubscriptionExpiry(restaurant);
   return {
     plan,
-    status,
+    status: enforcement.status,
     expiresAt,
     access: {
-      app: isSubscriptionAccessAllowed(restaurant, 'app', now),
-      publicMenu: isSubscriptionAccessAllowed(restaurant, 'public_menu', now),
+      app: enforcement.allowed,
+      publicMenu: enforcement.allowed && enforcement.status !== 'pending',
     },
+  };
+}
+
+export async function getCurrentSubscription(restaurantId) {
+  const id = String(restaurantId || '').trim();
+  if (!id) return { data: null, error: new Error('restaurant_id is required.') };
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('id, restaurant_id, plan_id, status, start_date, end_date, billing_provider, created_at, updated_at, plans(*)')
+    .eq('restaurant_id', id)
+    .maybeSingle();
+  if (error || !data) return { data: null, error: error || new Error('Subscription not found.') };
+  const plan = Array.isArray(data.plans) ? data.plans[0] : data.plans;
+  const restaurantLike = {
+    subscription: { ...data, plan },
+    subscription_plan: plan?.slug || 'free',
+    subscription_expires_at: data.end_date || null,
+  };
+  const snapshot = getSubscriptionSnapshot(restaurantLike);
+  const enforcement = enforceSubscriptionAccess(restaurantLike);
+  return {
+    data: {
+      ...data,
+      plan,
+      status: snapshot.status,
+      expires_at: snapshot.expiresAt,
+      access_allowed: enforcement.allowed,
+      access_message: enforcement.message || null,
+    },
+    error: null,
   };
 }
 

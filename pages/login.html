@@ -243,10 +243,12 @@
 </main>
 
 <script type="module">
-import { supabase } from '../js/shared.js';
+import { supabase, getLang, setLang } from '../js/shared.js';
 import { checkIsPlatformAdmin } from '../supabase/subscriptions.js';
 import { isSupabaseConfigured } from '../supabase/config.js';
 import { getMyRestaurantAccess, getRoleHomePath } from '../supabase/restaurant-users.js';
+
+setLang(getLang());
 
 window.showTab = function(tab) {
   document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';

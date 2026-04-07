@@ -914,13 +914,16 @@ import {
   getRestaurantLocale,
   applyRestaurantClientPrefs,
   t,
-  hydrateI18n,
+  getLang,
+  setLang,
 } from '../js/shared.js';
 import { loadPublicMenuBySlug, getOpeningHoursForDay } from '../supabase/public-menu.js';
 import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orders.js';
 import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
 import { notifyNewOrderCreated } from '../supabase/email.js';
 import { hydrateCart, persistCart as persistCartLs, clearCartStorage as clearCartStorageLs } from '../js/onetap-cart.js';
+
+setLang(getLang());
 
 let restaurant = null;
 let categories = [];
@@ -1069,7 +1072,6 @@ async function tryRestoreResolvedSourceSession(rest) {
   orderCurrency = getRestaurantCurrency(rest);
   orderLocale = getRestaurantLocale(rest);
   applyRestaurantClientPrefs(rest);
-  hydrateI18n(document);
   cart = hydrateCart(slug, products);
 
   await resolveSourceFromUrlParam(rest);

@@ -273,7 +273,7 @@
 <script type="module">
 import { requireAuth, signOut, syncAuthContext } from '../supabase/auth.js';
 import { tryCreateRestaurantFromPending } from '../supabase/restaurants.js';
-import { hideLoader, toast, fmtCurrency, slugify } from '../js/shared.js';
+import { hideLoader, toast, fmtCurrency, slugify, getLang, setLang } from '../js/shared.js';
 import { sendSubscriptionExpiryReminders } from '../supabase/email.js';
 import {
   checkIsPlatformAdmin,
@@ -281,9 +281,11 @@ import {
   adminUpdateRestaurant,
   adminCreateRestaurant,
   isSubscriptionActive,
-  getSubscriptionStatus,
+  enforceSubscriptionAccess,
 } from '../supabase/subscriptions.js';
 import { fetchAllOrdersForPlatformAdmin, computePlatformAnalytics } from '../supabase/platform-analytics.js';
+
+setLang(getLang());
 
 let cachedRestaurants = [];
 let orderCounts = {};
@@ -328,7 +330,7 @@ function escapeHtml(s) {
 }
 
 function subBadge(r) {
-  const status = getSubscriptionStatus(r);
+  const status = enforceSubscriptionAccess(r).status;
   if (status === 'active') return '<span class="badge-ok">Active</span>';
   if (status === 'trial') return '<span class="badge-ok">Trial</span>';
   if (status === 'pending') return '<span class="badge-bad">Pending</span>';

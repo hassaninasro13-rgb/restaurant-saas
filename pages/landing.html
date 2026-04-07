@@ -3,538 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneTap Menu - Plateforme SaaS Restaurant</title>
+  <title>OneTap Menu — SaaS Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f7f9ff;
-      --surface: #ffffff;
-      --surface-soft: #f3f6ff;
-      --text: #0f172a;
-      --muted: #5b6478;
-      --line: #dbe2f3;
-      --brand: #5b3df5;
-      --brand-2: #3f8cff;
-      --ok: #0f9d75;
-      --shadow: 0 20px 40px rgba(16, 24, 40, 0.10);
-      --shadow-soft: 0 10px 24px rgba(16, 24, 40, 0.08);
-      --radius: 16px;
-      --radius-lg: 24px;
-      --max: 1180px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Inter, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(700px 420px at -10% -10%, #e7eeff 0%, transparent 60%),
-        radial-gradient(650px 380px at 110% 0%, #fff1d9 0%, transparent 58%),
-        var(--bg);
-      line-height: 1.6;
-    }
-    a { color: inherit; text-decoration: none; }
-
-    .container { max-width: var(--max); margin: 0 auto; padding: 20px 20px 28px; }
-
-    .nav {
-      position: sticky;
-      top: 10px;
-      z-index: 20;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 12px 16px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 10px 26px rgba(16, 24, 40, 0.09);
-    }
-    .brand { font-size: 1.06rem; font-weight: 800; letter-spacing: -0.02em; }
-    .nav-links { display: flex; gap: 16px; color: var(--muted); font-size: 0.9rem; }
-    .nav-actions { display: flex; gap: 10px; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 11px 16px;
-      border-radius: 13px;
-      border: 1px solid transparent;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
-      cursor: pointer;
-    }
-    .btn-primary {
-      color: #fff;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      box-shadow: 0 12px 24px rgba(91, 61, 245, 0.30);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(91, 61, 245, 0.32); }
-    .btn-secondary {
-      background: #fff;
-      border-color: var(--line);
-      color: var(--text);
-    }
-    .btn-secondary:hover {
-      background: #f7f9ff;
-      border-color: #cfd8ef;
-    }
-
-    .hero {
-      margin-top: 30px;
-      display: grid;
-      grid-template-columns: 1.02fr 0.98fr;
-      gap: 28px;
-      align-items: stretch;
-    }
-    .hero-copy, .hero-visual {
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-    .hero-copy { padding: 40px 38px; }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 11px;
-      border-radius: 999px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      color: #4338ca;
-      background: #edf0ff;
-      margin-bottom: 16px;
-    }
-    h1 {
-      font-size: 3.15rem;
-      line-height: 1.01;
-      letter-spacing: -0.036em;
-      margin-bottom: 16px;
-    }
-    .lead { color: var(--muted); margin-bottom: 24px; max-width: 57ch; font-size: 1.01rem; }
-    .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-    .note { font-size: 0.8rem; color: var(--muted); }
-
-    .hero-visual {
-      position: relative;
-      padding: 20px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 100% 0%, #e9f1ff 0%, transparent 48%),
-        linear-gradient(160deg, #f9fbff, #f4f7ff);
-    }
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(91, 61, 245, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(91, 61, 245, 0.06) 1px, transparent 1px);
-      background-size: 26px 26px;
-      opacity: 0.36;
-      pointer-events: none;
-    }
-    .hero-stack {
-      position: relative;
-      min-height: 480px;
-      z-index: 1;
-    }
-    .hero-card {
-      border: 1px solid #d7def1;
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 14px 30px rgba(16, 24, 40, 0.12);
-      padding: 12px;
-    }
-    .hero-card h4 {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #6b7391;
-      margin-bottom: 8px;
-    }
-    .dash-card {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 82%;
-      padding: 14px;
-    }
-    .qr-card {
-      position: absolute;
-      right: 0;
-      top: 82px;
-      width: 53%;
-      z-index: 3;
-      transform: rotate(-1.4deg);
-    }
-    .kitchen-card {
-      position: absolute;
-      left: 4%;
-      top: 206px;
-      width: 84%;
-      z-index: 2;
-      padding: 14px;
-    }
-    .kpi-row {
-      position: absolute;
-      left: 2%;
-      bottom: 4px;
-      width: 96%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      z-index: 4;
-    }
-    .kpi-mini {
-      border: 1px solid #d7def1;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.96);
-      box-shadow: 0 10px 24px rgba(16, 24, 40, 0.1);
-      padding: 8px 9px;
-    }
-    .kpi-mini strong { display: block; font-size: 0.98rem; line-height: 1.1; color: var(--text); }
-    .kpi-mini span { font-size: 0.71rem; color: #68708e; }
-    .dash-top {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .dash-pill {
-      border: 1px solid #dce4ff;
-      border-radius: 10px;
-      padding: 7px;
-      background: #f8faff;
-      font-size: 0.71rem;
-      color: #5e6682;
-    }
-    .dash-pill strong { display:block; font-size: .9rem; color: #0f172a; }
-    .dash-bars { display: grid; gap: 6px; }
-    .dash-bar {
-      height: 8px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #c8d5ff, #e9eeff);
-      border: 1px solid #dbe3ff;
-    }
-    .hero-qr-row {
-      display: grid;
-      grid-template-columns: 1.35fr auto;
-      gap: 6px;
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-bottom: 6px;
-      align-items: center;
-    }
-    .hero-chip { background: #edf1ff; color: #3d41be; border-radius: 999px; font-weight: 700; padding: 2px 7px; }
-    .hero-kitchen-row {
-      display: grid;
-      grid-template-columns: 1.8fr auto auto;
-      gap: 8px;
-      font-size: 0.73rem;
-      color: #5d6683;
-      margin-bottom: 7px;
-      align-items: center;
-    }
-    .hero-kitchen-row strong { color: var(--text); font-size: 0.74rem; }
-
-    .section {
-      margin-top: 34px;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: var(--surface);
-      padding: 28px;
-      box-shadow: var(--shadow-soft);
-      position: relative;
-    }
-    .section::before {
-      content: '';
-      position: absolute;
-      left: 28px;
-      right: 28px;
-      top: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(99, 120, 160, 0.28), transparent);
-    }
-    .section h2 {
-      font-size: 2rem;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .section p.sub {
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
-
-    #features { padding: 32px; }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      align-items: stretch;
-    }
-    .feature {
-      border: 1px solid #d7def1;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-      padding: 20px;
-      box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
-      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-    }
-    .feature:hover {
-      transform: translateY(-4px);
-      border-color: #c6d3ff;
-      box-shadow: 0 18px 34px rgba(16, 24, 40, 0.12);
-    }
-    .feature-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
-      margin-bottom: 12px;
-      border: 1px solid #dbe3ff;
-      background:
-        radial-gradient(circle at 68% 24%, rgba(255,255,255,.8), transparent 42%),
-        linear-gradient(135deg, #6b4af6, #53a0ff);
-      box-shadow: 0 8px 16px rgba(91, 61, 245, 0.24);
-    }
-    .feature h3 { font-size: 1.06rem; margin-bottom: 8px; letter-spacing: -0.015em; }
-    .feature p { color: var(--muted); font-size: 0.89rem; line-height: 1.6; }
-
-    #pricing { padding: 32px; }
-    .pricing {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      align-items: stretch;
-    }
-    .price-card {
-      border: 1px solid #d7def1;
-      border-radius: 20px;
-      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    .price-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 34px rgba(16, 24, 40, 0.12);
-      border-color: #c8d4ff;
-    }
-    .price-card.recommended {
-      position: relative;
-      border-color: #a9bfff;
-      background: linear-gradient(180deg, #f3f6ff 0%, #ffffff 100%);
-      box-shadow: 0 20px 38px rgba(91, 61, 245, 0.24);
-      transform: translateY(-4px);
-    }
-    .price-badge {
-      position: absolute;
-      top: -10px;
-      right: 14px;
-      display: inline-flex;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.68rem;
-      letter-spacing: 0.05em;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #3f37b2;
-      background: #e9eeff;
-      border: 1px solid #c7d5ff;
-    }
-    .price-card h3 { font-size: 1.05rem; letter-spacing: -0.015em; }
-    .price { font-size: 1.95rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.08; }
-    .price-note { color: var(--muted); font-size: 0.87rem; line-height: 1.58; margin-bottom: 2px; }
-    .list { color: var(--muted); font-size: 0.85rem; line-height: 1.72; margin-bottom: 10px; }
-    .price-card .btn {
-      margin-top: auto;
-      width: 100%;
-      justify-content: center;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-size: 0.86rem;
-      font-weight: 700;
-    }
-    .price-card.recommended .btn-primary {
-      box-shadow: 0 14px 28px rgba(91, 61, 245, 0.32);
-    }
-
-    .cta {
-      margin-top: 34px;
-      text-align: center;
-      border-radius: 24px;
-      padding: 44px 26px;
-      color: #fff;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(165, 137, 255, 0.35), transparent 46%),
-        radial-gradient(circle at 100% 100%, rgba(98, 176, 255, 0.3), transparent 40%),
-        #0c1323;
-      box-shadow: var(--shadow);
-    }
-    .cta h2 { font-size: 2.04rem; margin-bottom: 12px; letter-spacing: -0.03em; }
-    .cta p { color: rgba(255,255,255,0.78); margin-bottom: 18px; }
-
-    .footer {
-      margin-top: 24px;
-      padding: 16px 2px 8px;
-      border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    @media (max-width: 980px) {
-      .hero { grid-template-columns: 1fr; gap: 18px; }
-      .features, .pricing { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 2.45rem; }
-      .hero-copy { padding: 32px; }
-      .section { padding: 24px; }
-      .section::before { left: 24px; right: 24px; }
-    }
-    @media (max-width: 720px) {
-      .container { padding: 14px 14px 22px; }
-      .nav-links { display: none; }
-      .nav { top: 8px; border-radius: 14px; padding: 10px 12px; }
-      .features, .pricing { grid-template-columns: 1fr; }
-      .hero-copy { padding: 22px; }
-      h1 { font-size: 1.92rem; }
-      .dash-card, .qr-card, .kitchen-card { width: 100%; position: static; transform: none; margin: 0 0 10px; }
-      .kpi-row { position: static; width: 100%; left: auto; bottom: auto; }
-      .hero-stack { min-height: auto; }
-      .section { padding: 20px; }
-      .section::before { left: 20px; right: 20px; }
-      .cta { padding: 30px 20px; border-radius: 20px; }
-      .cta h2 { font-size: 1.58rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="../css/landing.css">
 </head>
-<body>
-  <div class="container">
-    <header class="nav">
-      <a class="brand" href="landing.html">OneTap Menu</a>
-      <nav class="nav-links">
+<body class="landing-page">
+  <div class="lp-shell">
+    <header class="lp-nav">
+      <a class="lp-brand" href="landing.html">
+        <span class="lp-brand-dot"></span>
+        OneTap Menu
+      </a>
+      <nav class="lp-links">
         <a href="#features">Fonctionnalites</a>
         <a href="#pricing">Tarifs</a>
         <a href="login.html">Connexion</a>
       </nav>
-      <div class="nav-actions">
-        <a class="btn btn-secondary" href="login.html">Connexion</a>
-        <a class="btn btn-primary" href="get-started.html">Demarrer</a>
+      <div class="lp-nav-actions">
+        <a class="lp-btn lp-btn-secondary" href="login.html">Connexion</a>
+        <a class="lp-btn lp-btn-primary" href="get-started.html">Demarrer</a>
       </div>
     </header>
 
-    <section class="hero">
-      <div class="hero-copy">
-        <span class="pill">Plateforme SaaS restaurant</span>
-        <h1>Le cockpit premium pour piloter commandes, cuisine et operation depuis une seule interface.</h1>
-        <p class="lead">OneTap Menu modernise l'experience restaurant: menu digital, QR ordering et workflow cuisine synchronise, avec une vision claire des performances en temps reel.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="get-started.html">Creer mon restaurant</a>
-          <a class="btn btn-secondary" href="login.html">Explorer la plateforme</a>
+    <section class="lp-hero">
+      <div class="lp-hero-copy">
+        <span class="lp-badge">Plateforme SaaS operations restaurant</span>
+        <h1>Le systeme premium pour piloter menu digital, QR ordering et cuisine en temps reel.</h1>
+        <p>OneTap centralise vos commandes, fluidifie la production en cuisine et donne une vision claire de vos performances depuis un tableau de bord unique.</p>
+        <div class="lp-hero-cta">
+          <a class="lp-btn lp-btn-primary" href="get-started.html">Creer mon restaurant</a>
+          <a class="lp-btn lp-btn-secondary" href="login.html">Explorer la plateforme</a>
         </div>
-        <p class="note">Activation en quelques minutes · Sans installation complexe · Accompagnement humain</p>
+        <small>Activation en quelques minutes · Sans installation complexe · Support humain</small>
       </div>
 
-      <div class="hero-visual">
-        <div class="hero-grid"></div>
-        <div class="hero-stack">
-          <article class="hero-card dash-card">
-            <h4>Dashboard</h4>
-            <div class="dash-top">
-              <div class="dash-pill"><strong>154</strong>Commandes aujourd'hui</div>
-              <div class="dash-pill"><strong>321K DZD</strong>CA journalier</div>
-            </div>
-            <div class="dash-bars">
-              <div class="dash-bar" style="width:94%;"></div>
-              <div class="dash-bar" style="width:72%;"></div>
-              <div class="dash-bar" style="width:86%;"></div>
-            </div>
-          </article>
-          <article class="hero-card qr-card">
-            <h4>QR Ordering</h4>
-            <div class="hero-qr-row"><span>Table 6 · Scan actif</span><span class="hero-chip">LIVE</span></div>
-            <div class="hero-qr-row"><span>Takeaway · Paiement</span><span class="hero-chip">PENDING</span></div>
-            <div class="hero-qr-row" style="margin-bottom:0;"><span>Delivery · Confirme</span><span class="hero-chip">OK</span></div>
-          </article>
-          <article class="hero-card kitchen-card">
-            <h4>Kitchen Screen</h4>
-            <div class="hero-kitchen-row"><span>Table 8 · Burger maison</span><span class="hero-chip">En prep</span><strong>2 400</strong></div>
-            <div class="hero-kitchen-row"><span>Takeaway · Salade</span><span class="hero-chip">Nouveau</span><strong>1 300</strong></div>
-            <div class="hero-kitchen-row" style="margin-bottom:0;"><span>Table 2 · Pizza</span><span class="hero-chip">Pret</span><strong>1 900</strong></div>
-          </article>
-          <div class="kpi-row">
-            <article class="kpi-mini"><strong>+32%</strong><span>Commandes</span></article>
-            <article class="kpi-mini"><strong>-27%</strong><span>Attente</span></article>
-            <article class="kpi-mini"><strong>98%</strong><span>Flux stable</span></article>
+      <div class="lp-mockup">
+        <div class="lp-grid-overlay"></div>
+
+        <article class="lp-card lp-dashboard">
+          <h4>Dashboard</h4>
+          <div class="lp-kpi-strip">
+            <div><strong>154</strong><span>Commandes</span></div>
+            <div><strong>321K DZD</strong><span>CA journalier</span></div>
           </div>
+          <div class="lp-bars">
+            <span style="width:94%"></span>
+            <span style="width:69%"></span>
+            <span style="width:82%"></span>
+          </div>
+        </article>
+
+        <article class="lp-card lp-qr">
+          <h4>QR Ordering</h4>
+          <div class="lp-row"><span>Table 6 · Scan actif</span><em>LIVE</em></div>
+          <div class="lp-row"><span>Takeaway · Paiement</span><em>PENDING</em></div>
+          <div class="lp-row"><span>Delivery · Confirme</span><em>OK</em></div>
+        </article>
+
+        <article class="lp-card lp-kitchen">
+          <h4>Kitchen Screen</h4>
+          <div class="lp-row3"><span>Table 8 · Burger maison</span><em>En prep</em><strong>2 400</strong></div>
+          <div class="lp-row3"><span>Takeaway · Salade</span><em>Nouveau</em><strong>1 300</strong></div>
+          <div class="lp-row3"><span>Table 2 · Pizza</span><em>Pret</em><strong>1 900</strong></div>
+        </article>
+
+        <div class="lp-kpi-cards">
+          <article class="lp-mini"><strong>+32%</strong><span>Commandes</span></article>
+          <article class="lp-mini"><strong>-27%</strong><span>Attente</span></article>
+          <article class="lp-mini"><strong>98%</strong><span>Flux stable</span></article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="features">
-      <h2>Fonctionnalites essentielles</h2>
-      <p class="sub">Un template SaaS propre pour presenter une offre claire et performante.</p>
-      <div class="features">
-        <article class="feature"><div class="feature-icon"></div><h3>Menu digital</h3><p>Exposez une carte moderne, elegante et lisible sur mobile pour maximiser la conversion.</p></article>
-        <article class="feature"><div class="feature-icon"></div><h3>QR ordering</h3><p>Vos clients commandent rapidement depuis la table sans application ni friction inutile.</p></article>
-        <article class="feature"><div class="feature-icon"></div><h3>Kitchen screen</h3><p>Le flux cuisine devient clair, visuel et priorise pour mieux gerer les pics de service.</p></article>
-        <article class="feature"><div class="feature-icon"></div><h3>Dashboard</h3><p>Suivez commandes, produits, categories et indicateurs dans une interface centralisee.</p></article>
-        <article class="feature"><div class="feature-icon"></div><h3>Abonnements</h3><p>Structure SaaS evolutive avec plans adaptes a votre volume et vos besoins operationnels.</p></article>
-        <article class="feature"><div class="feature-icon"></div><h3>Multilingue</h3><p>Une experience FR, AR et EN pour aligner l'equipe et simplifier l'adoption du produit.</p></article>
+    <section class="lp-section" id="features">
+      <header>
+        <h2>Fonctionnalites essentielles</h2>
+        <p>Une suite complete pour gerer les operations terrain avec une experience SaaS moderne.</p>
+      </header>
+      <div class="lp-features">
+        <article class="lp-feature"><i></i><h3>Menu digital</h3><p>Carte claire et rapide sur mobile pour fluidifier l'experience client.</p></article>
+        <article class="lp-feature"><i></i><h3>QR ordering</h3><p>Commande directe depuis la table sans application.</p></article>
+        <article class="lp-feature"><i></i><h3>Kitchen screen</h3><p>Priorisation visuelle des commandes en production.</p></article>
+        <article class="lp-feature"><i></i><h3>Dashboard</h3><p>Vue unifiee des ventes, produits et performance.</p></article>
+        <article class="lp-feature"><i></i><h3>Abonnements</h3><p>Plans evolutifs selon la taille de votre operation.</p></article>
+        <article class="lp-feature"><i></i><h3>Multilingue</h3><p>Experience FR, AR, EN pour toute votre equipe.</p></article>
       </div>
     </section>
 
-    <section class="section" id="pricing">
-      <h2>Tarification simple</h2>
-      <p class="sub">Commencez rapidement, puis evoluez vers un plan adapte.</p>
-      <div class="pricing">
-        <article class="price-card">
+    <section class="lp-section" id="pricing">
+      <header>
+        <h2>Tarification claire et evolutive</h2>
+        <p>Demarrez vite, puis montez en puissance avec un plan adapte.</p>
+      </header>
+      <div class="lp-pricing">
+        <article class="lp-price-card">
           <h3>Free</h3>
-          <p class="price">0 DZD</p>
-          <p class="price-note">Pour demarrer rapidement et lancer une operation digitale simple.</p>
-          <div class="list">Menu digital<br>QR ordering essentiel<br>Mise en route guidee</div>
-          <a class="btn btn-secondary" href="get-started.html">Commencer gratuitement</a>
+          <p class="lp-price">0 DZD</p>
+          <p class="lp-copy">Pour valider rapidement votre flux operationnel.</p>
+          <ul><li>Menu digital</li><li>QR ordering essentiel</li><li>Onboarding guide</li></ul>
+          <a class="lp-btn lp-btn-secondary" href="get-started.html">Commencer</a>
         </article>
-        <article class="price-card recommended">
-          <span class="price-badge">Recommande</span>
+
+        <article class="lp-price-card lp-recommended">
+          <span class="lp-pill">Recommande</span>
           <h3>Pro</h3>
-          <p class="price">Sur demande</p>
-          <p class="price-note">Le meilleur choix pour les restaurants avec volume regulier et equipe active.</p>
-          <div class="list">Dashboard avance<br>Kitchen screen complet<br>Gestion equipe multi-role</div>
-          <a class="btn btn-primary" href="get-started.html">Demander le plan Pro</a>
+          <p class="lp-price">Sur demande</p>
+          <p class="lp-copy">Pour restaurants avec volume regulier et equipe active.</p>
+          <ul><li>Dashboard avance</li><li>Kitchen complet</li><li>Gestion multi-roles</li></ul>
+          <a class="lp-btn lp-btn-primary" href="get-started.html">Demander Pro</a>
         </article>
-        <article class="price-card">
+
+        <article class="lp-price-card">
           <h3>Enterprise</h3>
-          <p class="price">Sur devis</p>
-          <p class="price-note">Pour chaines et groupes exigeant un accompagnement et une configuration dedies.</p>
-          <div class="list">Support prioritaire<br>Configuration dediee<br>Accompagnement operationnel</div>
-          <a class="btn btn-secondary" href="get-started.html">Parler a l'equipe</a>
+          <p class="lp-price">Sur devis</p>
+          <p class="lp-copy">Pour groupes et structures avec besoins dedies.</p>
+          <ul><li>Support prioritaire</li><li>Configuration dediee</li><li>Accompagnement premium</li></ul>
+          <a class="lp-btn lp-btn-secondary" href="get-started.html">Contacter</a>
         </article>
       </div>
     </section>
 
-    <section class="cta">
-      <h2>Lancez OneTap dans votre restaurant aujourd'hui</h2>
-      <p>Passez a une operation plus rapide, plus claire et plus scalable.</p>
-      <a class="btn btn-primary" href="get-started.html">Creer mon restaurant</a>
+    <section class="lp-cta">
+      <h2>Passez a un standard SaaS plus exigeant</h2>
+      <p>Structurez votre operation restaurant avec un systeme fluide, mesurable et evolutif.</p>
+      <a class="lp-btn lp-btn-primary" href="get-started.html">Creer mon restaurant</a>
     </section>
 
-    <footer class="footer">
+    <footer class="lp-footer">
       <span>© 2026 OneTap Menu</span>
-      <span>SaaS restaurant · Menu digital · QR ordering · Kitchen</span>
+      <span>Menu digital · QR ordering · Kitchen · Dashboard</span>
     </footer>
   </div>
 </body>

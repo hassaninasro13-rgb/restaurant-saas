@@ -1,12 +1,12 @@
 export const config = {
-  verify_jwt: false,
+  verify_jwt: false
 };
 
 import { parseAdminEmailsFromEnv, sendEmail } from '../_shared/email.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'x-client-info, content-type',
 };
 
 Deno.serve(async (req) => {

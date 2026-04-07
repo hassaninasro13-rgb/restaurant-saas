@@ -15,9 +15,10 @@
   margin: 0;
   font-family: Inter, sans-serif;
   color: var(--text);
-  background: radial-gradient(800px 400px at 20% 10%, rgba(65,105,255,0.15), transparent),
-              radial-gradient(600px 300px at 80% 20%, rgba(138,43,226,0.12), transparent),
-              #0b0f1a !important;
+  background:
+    radial-gradient(800px 400px at 20% 10%, rgba(65,105,255,0.15), transparent),
+    radial-gradient(600px 300px at 80% 20%, rgba(138,43,226,0.12), transparent),
+    #0b0f1a !important;
 }
 
 html, body {

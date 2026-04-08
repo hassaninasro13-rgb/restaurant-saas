@@ -385,6 +385,16 @@ function setAlert(message, type = 'error') {
   root.innerHTML = message ? `<div class="alert alert-${type}">${message}</div>` : '';
 }
 
+async function waitForSession(maxMs = 2000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < maxMs) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) return session;
+    await new Promise((resolve) => setTimeout(resolve, 120));
+  }
+  return null;
+}
+
 async function bootstrapRedirectIfLogged() {
   if (sessionStorage.getItem('ot_signup_redirect') === '1') {
     sessionStorage.removeItem('ot_signup_redirect');
@@ -497,6 +507,14 @@ document.getElementById('btn-create-account')?.addEventListener('click', async (
     }
     session = signInRes.data.session;
     user = signInRes.data.session.user;
+  }
+
+  const readySession = await waitForSession(2200);
+  if (!readySession) {
+    btn.disabled = false;
+    btn.textContent = 'Create Restaurant Account';
+    setAlert('Compte créé mais session non prête. Veuillez réessayer.');
+    return;
   }
 
   clearPendingRestaurantName();

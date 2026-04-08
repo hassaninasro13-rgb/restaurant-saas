@@ -701,10 +701,10 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-/** Absolute URL to the public menu page `pages/menu.html?slug=…`. */
+/** Absolute URL to the public menu page `pages/index.html?slug=…`. */
 function getMenuPublicUrl(slug) {
   const q = new URLSearchParams({ slug: String(slug || '').trim() });
-  return new URL(`menu.html?${q}`, window.location.href).href;
+  return new URL(`index.html?${q}`, window.location.href).href;
 }
 
 async function renderMenuQr(menuUrl, slugForFilename) {

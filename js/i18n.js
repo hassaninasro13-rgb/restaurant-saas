@@ -43,7 +43,7 @@ const translations = {
     "dash.logoHeavy": "Logo trop lourd (max 2 MB).",
     "dash.logoOk": "Logo mis à jour.",
     "dash.manageAll": "Gérer tout",
-    "dash.menuUrlHelp": "Le QR ouvre menu.html?slug=votre-restaurant. Pour un canal (table, à emporter, etc.), ajoutez &source=nom (voir Sources).",
+    "dash.menuUrlHelp": "Le QR ouvre index.html?slug=votre-restaurant. Pour un canal (table, à emporter, etc.), ajoutez &source=nom (voir Sources).",
     "dash.moreProducts": "… et {n} autre(s) produit(s)",
     "dash.plan": "Plan",
     "dash.planLimitOrders": "Commandes / mois",

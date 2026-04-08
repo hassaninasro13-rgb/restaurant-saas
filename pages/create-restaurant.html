@@ -349,7 +349,8 @@
     const original = btn.innerHTML;
     btn.innerHTML = '...';
 
-    const slug = `${slugify(name)}-${Date.now().toString(36)}`;
+    const baseSlug = slugify(name) || 'restaurant';
+    const slug = `${baseSlug}-${Date.now().toString(36)}`;
 
     let logo_url = null;
     if (logoFile) {

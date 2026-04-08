@@ -107,11 +107,16 @@ export async function getRestaurantIdForUser(userId) {
 
 /** Public menu: active restaurant by slug */
 export async function getActiveRestaurantBySlug(slug) {
+  const normalized = String(slug || '').trim().toLowerCase();
+  if (!normalized) {
+    return { data: null, error: new Error('missing_slug') };
+  }
   const res = await supabase
     .from('restaurants')
     .select('*, restaurant_settings(*)')
-    .eq('slug', slug)
-    .eq('is_active', true)
+    .eq('slug', normalized)
+    // Keep public menu reachable for legacy rows where is_active is NULL.
+    .or('is_active.eq.true,is_active.is.null')
     .maybeSingle();
   if (res.data) res.data = mergeRestaurantSettings(res.data);
   return res;

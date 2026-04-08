@@ -72,31 +72,69 @@
       max-width: 420px;
     }
     .qr-card {
-      width: 148px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(255,255,255,.12);
-      backdrop-filter: blur(6px);
-      padding: 10px;
-      animation: floatY 3.5s ease-in-out infinite;
-      box-shadow: 0 14px 28px rgba(0,0,0,.22);
+      width: 176px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.36);
+      background: rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+      animation: floatY 3.5s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite;
+      box-shadow: 0 14px 28px rgba(0,0,0,.22), 0 0 0 1px rgba(232,75,42,.22) inset;
     }
-    .qr {
-      width: 100%;
-      aspect-ratio: 1/1;
-      border-radius: 10px;
-      background:
-        repeating-linear-gradient(0deg,#202020 0 7px,#fff 7px 14px),
-        repeating-linear-gradient(90deg,#202020 0 7px,#fff 7px 14px);
-      mix-blend-mode: multiply;
-    }
-    .qr-card span {
+    .scan-icon {
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 8px;
       display: block;
-      margin-top: 6px;
+      color: #ffd9cf;
+      opacity: .95;
+      animation: iconPulse 1.7s ease-in-out infinite;
+    }
+    .qr-box {
+      position: relative;
+      border-radius: 12px;
+      background: rgba(255,255,255,.92);
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.72);
+    }
+    .qr-svg {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: block;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .scan-line {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(232,75,42,.9), transparent);
+      box-shadow: 0 0 10px rgba(232,75,42,.65);
+      animation: scanBeam 2.4s linear infinite;
+      pointer-events: none;
+    }
+    .qr-label-fr,
+    .qr-label-ar {
+      display: block;
       text-align: center;
-      font-size: .72rem;
-      color: #fff;
       font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .qr-label-fr {
+      margin-top: 8px;
+      font-size: .72rem;
+    }
+    .qr-label-ar {
+      margin-top: 3px;
+      font-size: .72rem;
+      direction: rtl;
     }
     .stats {
       margin-top: 18px;
@@ -293,6 +331,20 @@
       0%,100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
+    @keyframes glowPulse {
+      0%,100% { box-shadow: 0 14px 28px rgba(0,0,0,.22), 0 0 0 1px rgba(232,75,42,.22) inset, 0 0 0 rgba(232,75,42,0); }
+      50% { box-shadow: 0 16px 32px rgba(0,0,0,.24), 0 0 0 1px rgba(232,75,42,.45) inset, 0 0 20px rgba(232,75,42,.28); }
+    }
+    @keyframes scanBeam {
+      0% { transform: translateY(0); opacity: .1; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(calc(100% + 116px)); opacity: .1; }
+    }
+    @keyframes iconPulse {
+      0%,100% { transform: scale(1); opacity: .9; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
     @media (max-width: 980px) {
       .shell { grid-template-columns: 1fr; }
       .left { padding: 28px 20px; }
@@ -308,8 +360,58 @@
       <p class="ar-sub">قائمة مطعمك، بمسح واحد من الهاتف</p>
 
       <div class="qr-card">
-        <div class="qr"></div>
-        <span>Scan QR</span>
+        <svg class="scan-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7V5a1 1 0 0 1 1-1h2M20 7V5a1 1 0 0 0-1-1h-2M4 17v2a1 1 0 0 0 1 1h2M20 17v2a1 1 0 0 1-1 1h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 12h8M10 9.5h4M10 14.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="qr-box">
+          <svg class="qr-svg" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" aria-label="QR code">
+            <rect width="84" height="84" fill="#fff"/>
+            <rect x="4" y="4" width="20" height="20" rx="2" fill="#E84B2A"/>
+            <rect x="8" y="8" width="12" height="12" rx="1" fill="#111"/>
+            <rect x="60" y="4" width="20" height="20" rx="2" fill="#E84B2A"/>
+            <rect x="64" y="8" width="12" height="12" rx="1" fill="#111"/>
+            <rect x="4" y="60" width="20" height="20" rx="2" fill="#E84B2A"/>
+            <rect x="8" y="64" width="12" height="12" rx="1" fill="#111"/>
+            <rect x="30" y="6" width="4" height="4" fill="#111"/>
+            <rect x="38" y="6" width="4" height="4" fill="#111"/>
+            <rect x="46" y="6" width="4" height="4" fill="#111"/>
+            <rect x="30" y="14" width="4" height="4" fill="#111"/>
+            <rect x="46" y="14" width="4" height="4" fill="#111"/>
+            <rect x="30" y="22" width="4" height="4" fill="#111"/>
+            <rect x="38" y="22" width="4" height="4" fill="#111"/>
+            <rect x="46" y="22" width="4" height="4" fill="#111"/>
+            <rect x="28" y="34" width="4" height="4" fill="#111"/>
+            <rect x="36" y="34" width="4" height="4" fill="#111"/>
+            <rect x="44" y="34" width="4" height="4" fill="#111"/>
+            <rect x="52" y="34" width="4" height="4" fill="#111"/>
+            <rect x="60" y="34" width="4" height="4" fill="#111"/>
+            <rect x="30" y="42" width="4" height="4" fill="#111"/>
+            <rect x="38" y="42" width="4" height="4" fill="#111"/>
+            <rect x="46" y="42" width="4" height="4" fill="#111"/>
+            <rect x="54" y="42" width="4" height="4" fill="#111"/>
+            <rect x="62" y="42" width="4" height="4" fill="#111"/>
+            <rect x="22" y="50" width="4" height="4" fill="#111"/>
+            <rect x="30" y="50" width="4" height="4" fill="#111"/>
+            <rect x="38" y="50" width="4" height="4" fill="#111"/>
+            <rect x="46" y="50" width="4" height="4" fill="#111"/>
+            <rect x="54" y="50" width="4" height="4" fill="#111"/>
+            <rect x="62" y="50" width="4" height="4" fill="#111"/>
+            <rect x="22" y="58" width="4" height="4" fill="#111"/>
+            <rect x="30" y="58" width="4" height="4" fill="#111"/>
+            <rect x="46" y="58" width="4" height="4" fill="#111"/>
+            <rect x="54" y="58" width="4" height="4" fill="#111"/>
+            <rect x="62" y="58" width="4" height="4" fill="#111"/>
+            <rect x="30" y="66" width="4" height="4" fill="#111"/>
+            <rect x="38" y="66" width="4" height="4" fill="#111"/>
+            <rect x="46" y="66" width="4" height="4" fill="#111"/>
+            <rect x="54" y="66" width="4" height="4" fill="#111"/>
+            <rect x="62" y="66" width="4" height="4" fill="#111"/>
+          </svg>
+          <div class="scan-line"></div>
+        </div>
+        <span class="qr-label-fr">Scannez pour commander</span>
+        <span class="qr-label-ar">امسح للطلب</span>
       </div>
 
       <div class="stats">

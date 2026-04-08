@@ -35,7 +35,17 @@ export async function getSession() {
 }
 
 export async function requireAuth(redirectTo = 'login.html') {
-  const { data: { session } } = await supabase.auth.getSession();
+  let { data: { session } } = await supabase.auth.getSession();
+
+  // Give Supabase a brief moment to hydrate session after signup/login redirects.
+  if (!session) {
+    const startedAt = Date.now();
+    while (!session && Date.now() - startedAt < 1800) {
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      ({ data: { session } } = await supabase.auth.getSession());
+    }
+  }
+
   if (!session) {
     clearAuthContext();
     window.location.href = redirectTo;

@@ -536,204 +536,166 @@ body {
   gap: 8px;
 }
 
-/* APP UI ELEMENTS */
-.app-header {
+/* BSS Food demo preview (aligned with pages/demo-menu.html) */
+.bss-preview {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 4px;
+  flex-direction: column;
+  min-height: 0;
+  background: #F8F4EF;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
-.app-logo-dot {
-  width: 18px; height: 18px;
-  background: var(--accent);
-  border-radius: 6px;
+.bss-preview-header {
+  background: #1A1A1A;
+  padding: 9px 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bss-preview-brand {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: #C8392B;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.bss-preview-list {
+  flex: 1;
+  overflow: hidden;
+  padding: 8px 7px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bss-pcard {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff;
+  border: 1px solid #E8E0D5;
+  border-radius: 12px;
+  padding: 7px 8px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.bss-pthumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  object-fit: cover;
   flex-shrink: 0;
   display: block;
+  background: #F8F4EF;
 }
 
-.app-name {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--ink);
-  font-family: var(--font-display);
-}
-
-.app-cats {
-  display: flex;
-  gap: 5px;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  padding: 0 2px;
-}
-
-.cat {
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 100px;
-  background: #EDEBE6;
-  color: var(--ink-mid);
-  white-space: nowrap;
-  cursor: default;
-}
-
-.cat.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* BACK PHONE ITEMS */
-.app-items-mini {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.mini-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #FFFFFF;
+.phone-front .bss-pthumb {
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
-  padding: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.07);
 }
 
-.mini-img {
-  width: 38px; height: 38px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.mi1 { background: linear-gradient(135deg, #E8B494, #C87840); }
-.mi2 { background: linear-gradient(135deg, #C8D4A8, #7C9450); }
-
-.mini-info {
-  display: flex;
-  flex-direction: column;
+.bss-pinfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.mi-name {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--ink);
+.bss-pname {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #1A1A1A;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.mi-price {
-  font-size: 0.58rem;
-  color: var(--accent);
-  font-weight: 600;
+.phone-front .bss-pname {
+  font-size: 0.7rem;
 }
 
-.mi-btn {
-  font-size: 0.55rem;
+.bss-pprice {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #C8392B;
+}
+
+.bss-pprice span {
+  font-size: 0.52rem;
   font-weight: 700;
-  font-family: var(--font-display);
-  background: var(--accent);
+  opacity: 0.88;
+}
+
+.bss-padd {
+  font-size: 0.52rem;
+  font-weight: 800;
+  font-family: inherit;
+  background: #C8392B;
   color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 4px 7px;
+  border-radius: 8px;
+  padding: 5px 8px;
   cursor: default;
   white-space: nowrap;
-}
-
-/* FRONT PHONE ITEMS */
-.app-items {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  flex: 1;
-  overflow: hidden;
-}
-
-.app-item {
-  display: flex;
-  gap: 8px;
-  background: #FFFFFF;
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 3px 10px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.05);
-}
-
-.app-item.featured {
-  border: 1.5px solid var(--accent-light);
-  box-shadow: 0 6px 14px rgba(212, 82, 26, .12), 0 1px 3px rgba(0,0,0,.06);
-}
-
-.item-img {
-  width: 52px; height: 52px;
-  border-radius: 10px;
   flex-shrink: 0;
+  line-height: 1.2;
 }
 
-.img-a { background: linear-gradient(135deg, #F0A868, #C85828); }
-.img-b { background: linear-gradient(135deg, #F8D888, #D4960A); }
-.img-c { background: linear-gradient(135deg, #D4A8C0, #9C4870); }
-
-.item-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 2px;
-  min-width: 0;
-}
-
-.item-name {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.item-desc {
+.phone-front .bss-padd {
   font-size: 0.56rem;
-  color: var(--ink-soft);
+  padding: 6px 9px;
+  border-radius: 9px;
 }
 
-.item-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
+.phone-back .bss-preview-brand {
+  font-size: 0.64rem;
 }
 
-.item-price {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--accent);
-  font-family: var(--font-display);
+.phone-back .bss-preview-list {
+  padding: 6px 5px 7px;
+  gap: 5px;
 }
 
-.add-btn {
-  font-size: 0.55rem;
-  font-weight: 700;
-  font-family: var(--font-display);
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  cursor: default;
-  box-shadow: 0 2px 6px rgba(212, 82, 26, .25);
+.phone-back .bss-pcard {
+  padding: 5px 6px;
+  border-radius: 10px;
+  gap: 5px;
 }
 
-.cart-bar {
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  font-family: var(--font-display);
+.phone-back .bss-pthumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+}
+
+.phone-back .bss-pname {
+  font-size: 0.56rem;
+}
+
+.phone-back .bss-pprice {
+  font-size: 0.52rem;
+}
+
+.phone-back .bss-padd {
+  font-size: 0.48rem;
+  padding: 4px 6px;
+}
+
+@media (max-width: 720px) {
+  .phone-back .bss-preview-brand {
+    font-size: 0.58rem;
+  }
+  .phone-front .bss-preview-brand {
+    font-size: 0.68rem;
+  }
 }
 
 /* QR CARD */

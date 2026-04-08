@@ -6,46 +6,373 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneTap — Create Restaurant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/shared.css">
 <style>
-  body { min-height: 100vh; display: grid; place-items: center; background: var(--cream); padding: 22px; }
-  .gs-card {
-    width: 100%;
-    max-width: 520px;
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 28px;
+  :root {
+    --ot-dark: #1A1208;
+    --ot-brand: #E84B2A;
+    --ot-bg: #FAF7F2;
+    --ot-border: rgba(26, 18, 8, 0.14);
+    --ot-text: #25170d;
+    --ot-muted: #78665a;
+    --ot-ok: #2f8f4d;
   }
-  .gs-title { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 6px; }
-  .gs-sub { color: var(--ink2); font-size: .88rem; margin-bottom: 18px; line-height: 1.45; }
-  .gs-footer { margin-top: 14px; font-size: .82rem; color: var(--ink3); text-align: center; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "DM Sans", sans-serif;
+    background: var(--ot-bg);
+    color: var(--ot-text);
+  }
+  .auth-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 40% 60%;
+  }
+  .auth-left {
+    position: relative;
+    padding: 44px 38px;
+    background:
+      radial-gradient(900px 500px at 12% 20%, rgba(232, 75, 42, 0.2), transparent 62%),
+      linear-gradient(180deg, #23170d 0%, var(--ot-dark) 100%);
+    color: #f7efe8;
+    overflow: hidden;
+  }
+  .auth-left::after {
+    content: "";
+    position: absolute;
+    inset: auto -140px -180px auto;
+    width: 360px;
+    height: 360px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(232, 75, 42, 0.3), transparent 70%);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+  }
+  .brand-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: var(--ot-brand);
+    box-shadow: 0 0 0 5px rgba(232, 75, 42, 0.22);
+  }
+  .left-content {
+    margin-top: 80px;
+    max-width: 420px;
+  }
+  .left-title {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(2rem, 3.2vw, 2.7rem);
+    line-height: 1.18;
+    letter-spacing: 0.2px;
+  }
+  .left-sub {
+    margin: 14px 0 0;
+    color: rgba(247, 239, 232, 0.78);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .stats {
+    margin-top: 34px;
+    display: grid;
+    gap: 12px;
+  }
+  .stat {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 13px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(4px);
+  }
+  .stat strong {
+    display: block;
+    font-size: 1rem;
+    color: #fff;
+  }
+  .stat span {
+    font-size: 0.84rem;
+    color: rgba(247, 239, 232, 0.72);
+  }
+  .auth-right {
+    display: grid;
+    place-items: center;
+    padding: 42px 22px;
+  }
+  .form-wrap {
+    width: 100%;
+    max-width: 540px;
+    background: #fff;
+    border: 1.5px solid var(--ot-border);
+    border-radius: 24px;
+    padding: 28px 26px 24px;
+    box-shadow: 0 14px 36px rgba(22, 14, 9, 0.08);
+  }
+  .progress {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .step {
+    border: 1px solid #ebdfd4;
+    border-radius: 999px;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    text-align: center;
+    color: var(--ot-muted);
+    background: #fff;
+  }
+  .step.active {
+    border-color: rgba(232, 75, 42, 0.4);
+    color: var(--ot-brand);
+    background: rgba(232, 75, 42, 0.07);
+    font-weight: 600;
+  }
+  .form-title {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(1.7rem, 2.7vw, 2rem);
+    line-height: 1.2;
+  }
+  .form-sub {
+    margin: 8px 0 16px;
+    color: var(--ot-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  #alert-area { margin-bottom: 10px; }
+  .field { margin-bottom: 11px; }
+  .field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4a3a2f;
+    margin-bottom: 5px;
+  }
+  .input-wrap {
+    position: relative;
+  }
+  .input-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    display: inline-grid;
+    place-items: center;
+    color: #8b796d;
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+  .input {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px 0 36px;
+    border: 1.5px solid #e8ddd2;
+    border-radius: 12px;
+    background: #fff;
+    font: inherit;
+    color: var(--ot-text);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .input:focus {
+    outline: none;
+    border-color: rgba(232, 75, 42, 0.7);
+    box-shadow: 0 0 0 4px rgba(232, 75, 42, 0.12);
+  }
+  .pass-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: #8b796d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .strength {
+    margin: 6px 0 10px;
+  }
+  .strength-track {
+    width: 100%;
+    height: 7px;
+    border-radius: 999px;
+    background: #efe5db;
+    overflow: hidden;
+  }
+  .strength-fill {
+    height: 100%;
+    width: 0%;
+    background: #d2c4b6;
+    transition: width .2s ease, background-color .2s ease;
+  }
+  .strength-label {
+    margin-top: 4px;
+    font-size: 0.74rem;
+    color: #89786c;
+  }
+  .btn-register {
+    width: 100%;
+    height: 46px;
+    border: 0;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    color: #fff;
+    background: var(--ot-brand);
+    box-shadow: 0 8px 20px rgba(232, 75, 42, 0.25);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  }
+  .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(232, 75, 42, 0.3);
+    filter: saturate(1.04);
+  }
+  .btn-register:disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+    transform: none;
+    box-shadow: none;
+  }
+  .trust {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .trust-badge {
+    border: 1px solid #eadfd5;
+    background: #fffaf5;
+    color: #6f5c50;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .gs-footer {
+    margin-top: 13px;
+    font-size: .8rem;
+    color: #7e6c60;
+    text-align: center;
+  }
+  .fade-up {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp .55s ease forwards;
+  }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .13s; }
+  .d3 { animation-delay: .2s; }
+  .d4 { animation-delay: .27s; }
+  .d5 { animation-delay: .34s; }
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (max-width: 980px) {
+    .auth-shell { grid-template-columns: 1fr; }
+    .auth-left { display: none; }
+    .auth-right { padding: 26px 16px; }
+    .form-wrap { max-width: 600px; }
+  }
 </style>
 </head>
 <body>
-  <main class="gs-card">
-    <h1 class="gs-title">Creer votre restaurant</h1>
-    <p class="gs-sub">Commencez par creer votre compte, puis nous vous redirigerons vers la creation de votre restaurant.</p>
-    <div id="alert-area"></div>
-    <div class="field">
-      <label for="rest-name">Nom du restaurant *</label>
-      <input id="rest-name" class="input" type="text" placeholder="Ex: El Bahia" autocomplete="organization">
-    </div>
-    <div class="field">
-      <label for="email">Email *</label>
-      <input id="email" class="input" type="email" placeholder="vous@restaurant.com" autocomplete="email">
-    </div>
-    <div class="field">
-      <label for="password">Mot de passe *</label>
-      <input id="password" class="input" type="password" placeholder="Minimum 8 caracteres" autocomplete="new-password">
-    </div>
-    <div class="field">
-      <label for="password2">Confirmer mot de passe *</label>
-      <input id="password2" class="input" type="password" placeholder="Retaper le mot de passe" autocomplete="new-password">
-    </div>
-    <button type="button" class="btn btn-primary btn-full btn-lg" id="btn-create-account">Create Restaurant Account</button>
-    <p class="gs-footer">Vous avez deja un compte ? <a href="login.html">Se connecter</a></p>
-  </main>
+  <div class="auth-shell">
+    <aside class="auth-left">
+      <div class="brand fade-up d1"><span class="brand-dot"></span>OneTap</div>
+      <div class="left-content">
+        <h1 class="left-title fade-up d2">Lancez votre restaurant digital en une seule etape.</h1>
+        <p class="left-sub fade-up d3">Créez votre compte OneTap et commencez a recevoir des commandes QR rapidement.</p>
+        <div class="stats">
+          <div class="stat fade-up d3"><strong>2 min setup</strong><span>Activez votre menu QR en quelques clics</span></div>
+          <div class="stat fade-up d4"><strong>500+ restaurants</strong><span>Faites confiance a une plateforme deja adoptee</span></div>
+          <div class="stat fade-up d5"><strong>Free</strong><span>Demarrage gratuit, sans carte bancaire</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="auth-right">
+      <section class="form-wrap">
+        <div class="progress fade-up d1">
+          <div class="step active">Account</div>
+          <div class="step">Restaurant</div>
+          <div class="step">Menu</div>
+        </div>
+
+        <h1 class="form-title fade-up d2">Creer votre restaurant</h1>
+        <p class="form-sub fade-up d2">Commencez par creer votre compte, puis nous vous redirigerons vers la creation de votre restaurant.</p>
+
+        <div id="alert-area" class="fade-up d2"></div>
+
+        <div class="field fade-up d3">
+          <label for="rest-name">Nom du restaurant *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🏷</span>
+            <input id="rest-name" class="input" type="text" placeholder="Ex: El Bahia" autocomplete="organization">
+          </div>
+        </div>
+
+        <div class="field fade-up d3">
+          <label for="email">Email *</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉</span>
+            <input id="email" class="input" type="email" placeholder="vous@restaurant.com" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="field fade-up d4">
+          <label for="password">Mot de passe *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input id="password" class="input" type="password" placeholder="Minimum 8 caracteres" autocomplete="new-password">
+            <button class="pass-toggle" type="button" data-target="password">Afficher</button>
+          </div>
+        </div>
+
+        <div class="strength fade-up d4">
+          <div class="strength-track"><div class="strength-fill" id="strength-fill"></div></div>
+          <div class="strength-label" id="strength-label">Force du mot de passe: faible</div>
+        </div>
+
+        <div class="field fade-up d4">
+          <label for="password2">Confirmer mot de passe *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔐</span>
+            <input id="password2" class="input" type="password" placeholder="Retaper le mot de passe" autocomplete="new-password">
+            <button class="pass-toggle" type="button" data-target="password2">Afficher</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-register fade-up d5" id="btn-create-account">Create Restaurant Account</button>
+
+        <div class="trust fade-up d5">
+          <span class="trust-badge">SSL sécurisé</span>
+          <span class="trust-badge">Aucune carte requise</span>
+          <span class="trust-badge">Support 7j/7</span>
+        </div>
+
+        <p class="gs-footer fade-up d5">Vous avez deja un compte ? <a href="login.html">Se connecter</a></p>
+      </section>
+    </main>
+  </div>
 
 <script type="module">
 import { supabase } from '../supabase/client.js';
@@ -65,6 +392,50 @@ async function bootstrapRedirectIfLogged() {
   const { data: access } = await getMyRestaurantAccess(session.user);
   window.location.href = access ? getRoleHomePath(access.role) : 'create-restaurant.html';
 }
+
+function scorePassword(value) {
+  let score = 0;
+  if (!value) return 0;
+  if (value.length >= 8) score += 1;
+  if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
+  if (/\d/.test(value)) score += 1;
+  if (/[^A-Za-z0-9]/.test(value)) score += 1;
+  return score;
+}
+
+function updateStrengthMeter() {
+  const value = document.getElementById('password').value;
+  const score = scorePassword(value);
+  const fill = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  const widths = ['0%', '25%', '50%', '75%', '100%'];
+  fill.style.width = widths[score];
+  if (score <= 1) {
+    fill.style.background = '#b98872';
+    label.textContent = 'Force du mot de passe: faible';
+  } else if (score <= 2) {
+    fill.style.background = '#d39a2c';
+    label.textContent = 'Force du mot de passe: moyen';
+  } else if (score === 3) {
+    fill.style.background = '#6ea24d';
+    label.textContent = 'Force du mot de passe: bon';
+  } else {
+    fill.style.background = '#2f8f4d';
+    label.textContent = 'Force du mot de passe: fort';
+  }
+}
+
+document.getElementById('password')?.addEventListener('input', updateStrengthMeter);
+
+document.querySelectorAll('.pass-toggle').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.getAttribute('data-target'));
+    if (!target) return;
+    const isPassword = target.type === 'password';
+    target.type = isPassword ? 'text' : 'password';
+    btn.textContent = isPassword ? 'Masquer' : 'Afficher';
+  });
+});
 
 document.getElementById('btn-create-account')?.addEventListener('click', async () => {
   if (!isSupabaseConfigured()) {
@@ -156,6 +527,7 @@ document.getElementById('btn-create-account')?.addEventListener('click', async (
 });
 
 bootstrapRedirectIfLogged();
+updateStrengthMeter();
 </script>
 </body>
 </html>

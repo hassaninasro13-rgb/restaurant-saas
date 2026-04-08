@@ -448,8 +448,18 @@ body {
   z-index: 2;
 }
 
+.phone-device {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .phone-frame {
-  background: #1A1612;
+  background: transparent;
   border-radius: 36px;
   border: 2.5px solid #333;
   overflow: hidden;
@@ -457,6 +467,7 @@ body {
   box-shadow: var(--shadow-phone);
   transition: transform .22s ease, box-shadow .22s ease;
   isolation: isolate;
+  z-index: 2;
 }
 
 .phone-notch {

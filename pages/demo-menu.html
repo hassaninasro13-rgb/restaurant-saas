@@ -163,13 +163,14 @@
     .product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
     .product-card:active { transform: translateY(0); }
 
-    .product-emoji {
-      font-size: 32px;
+    .product-thumb {
       flex-shrink: 0;
-      width: 52px; height: 52px;
-      background: var(--bg);
+      width: 52px !important;
+      height: 52px !important;
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
+      object-fit: cover;
+      background: var(--bg);
+      display: block;
     }
 
     .product-info { flex: 1; }
@@ -364,9 +365,114 @@
     .size-tab.active { border-color: var(--red); background: #FEF2F0; color: var(--red); }
 
     @media (max-width: 400px) {
-      .product-emoji { width: 44px; height: 44px; font-size: 26px; }
+      .product-thumb { width: 44px !important; height: 44px !important; }
       .product-name { font-size: 14px; }
     }
+
+    /* ── PRODUCT MODAL ── */
+    .product-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .product-modal.open {
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .product-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.58);
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+    .product-modal.open .product-modal-backdrop { opacity: 1; }
+    .product-modal-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: min(92vh, 640px);
+      background: #fff;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.18);
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      direction: rtl;
+      overflow: hidden;
+    }
+    .product-modal.open .product-modal-sheet { transform: translateY(0); }
+    .product-modal-close {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+    .product-modal-hero {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      flex-shrink: 0;
+      display: block;
+      background: var(--bg);
+    }
+    .product-modal-body {
+      padding: 18px 18px 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .product-modal-name {
+      margin: 0 0 8px;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .product-modal-desc {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .product-modal-desc:empty { display: none; }
+    .product-modal-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+    .product-modal-price span { font-size: 14px; font-weight: 700; opacity: 0.85; }
+    .product-modal-add {
+      width: 100%;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 12px;
+      background: var(--red);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .product-modal-add:hover { filter: brightness(1.05); }
+    .product-modal-add:active { filter: brightness(0.95); }
   </style>
 </head>
 <body>
@@ -399,12 +505,12 @@
 
 <!-- CATEGORIES -->
 <div class="cats-nav">
-  <button class="cat-btn active" onclick="showCat('pizza')">🍕 بيتزا</button>
-  <button class="cat-btn" onclick="showCat('tacos')">🌮 تاكوس</button>
-  <button class="cat-btn" onclick="showCat('plats')">🍽️ الأطباق</button>
-  <button class="cat-btn" onclick="showCat('sandwichs')">🥪 سندويش</button>
-  <button class="cat-btn" onclick="showCat('desserts')">🍰 حلويات</button>
-  <button class="cat-btn" onclick="showCat('boissons')">🥤 مشروبات</button>
+  <button type="button" class="cat-btn active" onclick="showCat('pizza', this)">🍕 بيتزا</button>
+  <button type="button" class="cat-btn" onclick="showCat('tacos', this)">🌮 تاكوس</button>
+  <button type="button" class="cat-btn" onclick="showCat('plats', this)">🍽️ الأطباق</button>
+  <button type="button" class="cat-btn" onclick="showCat('sandwichs', this)">🥪 سندويش</button>
+  <button type="button" class="cat-btn" onclick="showCat('desserts', this)">🍰 حلويات</button>
+  <button type="button" class="cat-btn" onclick="showCat('boissons', this)">🥤 مشروبات</button>
 </div>
 
 <div class="main">
@@ -425,8 +531,8 @@
         <div class="section-line"></div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">Mixte</div>
           <div class="product-desc">صلصة طماطم، دجاج مفروم، لحم مفروم، جبن، موتزاريلا</div>
@@ -437,8 +543,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">3 Saison</div>
           <div class="product-desc">صلصة طماطم، لحم مفروم، دجاج مفروم، دجاج مدخن، جبن، موتزاريلا</div>
@@ -449,8 +555,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">4 Saison</div>
           <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، دجاج مدخن، تونة، موتزاريلا</div>
@@ -461,8 +567,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">Special</div>
           <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، تونة، كممبار، فطر طبيعي، موتزاريلا، شيدر</div>
@@ -473,8 +579,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">BSS</div>
           <div class="product-desc">صلصة طماطم، جبن، شورما، لحم مفروم، دجاج مدخن، جمبيري، لحم بقر مدخن، فطر، تونة</div>
@@ -494,8 +600,8 @@
         <div class="section-line"></div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">Mixte</div>
           <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، حواف جبنية، موتزاريلا، شيدر</div>
@@ -506,8 +612,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">3 Saison</div>
           <div class="product-desc">صلصة طماطم، لحم مفروم، دجاج مفروم، دجاج مدخن، موتزاريلا، شيدر، حواف جبنية</div>
@@ -518,8 +624,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">Special 8 Saison</div>
           <div class="product-desc">صلصة طماطم، جبن، دجاج مدخن، لحم مفروم، شورما، كممبار، دجاج متبل، فطر طبيعي، دجاج مفروم، موتزاريلا، شيدر، حواف جبنية</div>
@@ -530,8 +636,8 @@
         </div>
       </div>
 
-      <div class="product-card" onclick="addToCart(this)">
-        <div class="product-emoji">🍕</div>
+      <div class="product-card" onclick="openProductModal(this)">
+        <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
         <div class="product-info">
           <div class="product-name">BSS Miga</div>
           <div class="product-desc">صلصة طماطم، جبن، جمبيري، لحم مفروم، فطر بقر مدخن، دجاج متبل، فطر طبيعي، شورما، دجاج مفروم، كممبار، موتزاريلا، شيدر، حواف</div>
@@ -550,26 +656,26 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🍕</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">Marguerite</div><div class="product-desc">صلصة طماطم، جبن</div></div>
       <div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🍕</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">Marguerite Plus+</div><div class="product-desc">صلصة طماطم، جبن، جبن شيدر</div></div>
       <div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🍕</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">5 Fromage</div><div class="product-desc">صلصة بيضاء، جبن، شيدر، كممبار، موتزاريلا، غريار</div></div>
       <div class="product-right"><div class="product-price">650 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🍕</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">Poulet</div><div class="product-desc">صلصة طماطم، دجاج، دجاج متبل، جبن، موتزاريلا</div></div>
       <div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
@@ -655,14 +761,14 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🥙</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1551502909-e8ec6b9bf38a?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">Soufflé Viande</div></div>
       <div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)">
-      <div class="product-emoji">🥙</div>
+    <div class="product-card" onclick="openProductModal(this)">
+      <img class="product-thumb" src="https://images.unsplash.com/photo-1551502909-e8ec6b9bf38a?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/>
       <div class="product-info"><div class="product-name">Soufflé Poulet Giant</div></div>
       <div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div>
     </div>
@@ -676,14 +782,14 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍖</div><div class="product-info"><div class="product-name">Chawrma</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Viande Hachée</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Poulet Haché</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Kabda Poulet</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Mixte</div></div><div class="product-right"><div class="product-price">800 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Steak Viande</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Chawrma</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Viande Hachée</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Poulet Haché</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Kabda Poulet</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Mixte</div></div><div class="product-right"><div class="product-price">800 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Steak Viande</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
 
     <!-- Gratins -->
     <div class="section-header" style="margin-top:8px">
@@ -692,9 +798,9 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Poulet</div></div><div class="product-right"><div class="product-price">400–600 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Viande</div></div><div class="product-right"><div class="product-price">500–800 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Crispy</div></div><div class="product-right"><div class="product-price">500–700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gratin Poulet</div></div><div class="product-right"><div class="product-price">400–600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gratin Viande</div></div><div class="product-right"><div class="product-price">500–800 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gratin Crispy</div></div><div class="product-right"><div class="product-price">500–700 <span>DA</span></div><button class="add-btn">+</button></div></div>
 
     <!-- Boxes -->
     <div class="section-header" style="margin-top:8px">
@@ -703,9 +809,9 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">4 pièces chicken breast</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">8 pièces chicken breast</div></div><div class="product-right"><div class="product-price">1500 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Family chicken breast</div></div><div class="product-right"><div class="product-price">2500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">4 pièces chicken breast</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">8 pièces chicken breast</div></div><div class="product-right"><div class="product-price">1500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Family chicken breast</div></div><div class="product-right"><div class="product-price">2500 <span>DA</span></div><button class="add-btn">+</button></div></div>
   </div>
 
   <!-- ══ SANDWICHS ══ -->
@@ -716,24 +822,24 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Chawarma</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Kabda</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Viande Haché</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Raghif</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Arabi Chawarma</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Panozo Poulet</div></div><div class="product-right"><div class="product-price">500 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Panozo Viande</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Chawarma</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Kabda</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Viande Haché</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Raghif</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Arabi Chawarma</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Panozo Poulet</div></div><div class="product-right"><div class="product-price">500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Panozo Viande</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
 
     <div class="section-header" style="margin-top:8px">
       <span class="section-badge" style="background:#333">PANINI</span>
       <span class="section-title">Panini</span>
       <div class="section-line"></div>
     </div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini 3 Fromage</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini Poulet</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini Viande</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Panini 3 Fromage</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Panini Poulet</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1528735602780-2552d46b56dd?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Panini Viande</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
   </div>
 
   <!-- ══ DESSERTS ══ -->
@@ -746,49 +852,49 @@
 
     <div class="sub-section">
       <div class="sub-title">🍮 Tiramisu</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Tiramisu Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🟢</div><div class="product-info"><div class="product-name">Tiramisu Pistachio</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">Tiramisu Chocolate</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Tiramisu Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Tiramisu Pistachio</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Tiramisu Chocolate</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
 
     <div class="sub-section">
       <div class="sub-title">🥞 Box Crêpes</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">Pasta Chocolat</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Pasta Fraise</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Pasta Banane</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">⭐</div><div class="product-info"><div class="product-name">Pasta BSS</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pasta Chocolat</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pasta Fraise</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pasta Banane</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pasta BSS</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
 
     <div class="sub-section">
       <div class="sub-title">🍰 Gâteaux</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍮</div><div class="product-info"><div class="product-name">Crème brûlée</div></div><div class="product-right"><div class="product-price">250–350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">San Sebastian</div></div><div class="product-right"><div class="product-price">550–650 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🎂</div><div class="product-info"><div class="product-name">Matilda Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Cheesecake</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Can Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crème brûlée</div></div><div class="product-right"><div class="product-price">250–350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">San Sebastian</div></div><div class="product-right"><div class="product-price">550–650 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Matilda Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Cheesecake</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Can Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
 
     <div class="sub-section">
       <div class="sub-title">🧇 Crêpes</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥞</div><div class="product-info"><div class="product-name">Crêpe Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🟢</div><div class="product-info"><div class="product-name">Crêpe Pistachio</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Crêpe Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Crêpe Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍍</div><div class="product-info"><div class="product-name">Crêpe Ananas</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crêpe Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crêpe Pistachio</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crêpe Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crêpe Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Crêpe Ananas</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
 
     <div class="sub-section">
       <div class="sub-title">🧇 Gaufres</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧇</div><div class="product-info"><div class="product-name">Gaufre Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Gaufre Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Gaufre Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gaufre Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gaufre Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gaufre Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
 
     <div class="sub-section">
       <div class="sub-title">🥞 Pancakes</div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥞</div><div class="product-info"><div class="product-name">Pancake Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Pancake Banane</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
-      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Pancake Fraise</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pancake Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pancake Banane</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Pancake Fraise</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
     </div>
   </div>
 
@@ -800,32 +906,47 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍹</div><div class="product-info"><div class="product-name">Jus Banane</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Jus Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍋</div><div class="product-info"><div class="product-name">Jus Mojito</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍋</div><div class="product-info"><div class="product-name">Jus Citron</div></div><div class="product-right"><div class="product-price">200 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍊</div><div class="product-info"><div class="product-name">Jus Orange</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍹</div><div class="product-info"><div class="product-name">Jus Cocktail</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Banane</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Mojito</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Citron</div></div><div class="product-right"><div class="product-price">200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Orange</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus Cocktail</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
 
     <div class="section-header" style="margin-top:8px">
       <span class="section-badge" style="background:#555">MILKSHAKE</span>
       <span class="section-title">Milkshake</span>
       <div class="section-line"></div>
     </div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥤</div><div class="product-info"><div class="product-name">Milkshake Banane</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥤</div><div class="product-info"><div class="product-name">Milkshake Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Milkshake Banane</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Milkshake Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
 
     <div class="section-header" style="margin-top:8px">
       <span class="section-badge" style="background:#333">SOFT</span>
       <span class="section-title">Canette & Jus</span>
       <div class="section-line"></div>
     </div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥫</div><div class="product-info"><div class="product-name">Canette gazeuse 33cl</div></div><div class="product-right"><div class="product-price">100 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧃</div><div class="product-info"><div class="product-name">Jus 33cl</div></div><div class="product-right"><div class="product-price">80 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍶</div><div class="product-info"><div class="product-name">Gazeuse 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
-    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧃</div><div class="product-info"><div class="product-name">Jus 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Canette gazeuse 33cl</div></div><div class="product-right"><div class="product-price">100 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus 33cl</div></div><div class="product-right"><div class="product-price">80 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Gazeuse 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="openProductModal(this)"><img class="product-thumb" src="https://images.unsplash.com/photo-1622597463915-fa1b2ec87ee3?w=80&h=80&fit=crop&q=80" alt="" width="52" height="52" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0"/><div class="product-info"><div class="product-name">Jus 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
   </div>
 
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="product-modal" class="product-modal" aria-hidden="true">
+  <div class="product-modal-backdrop" onclick="closeProductModal()"></div>
+  <div class="product-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="product-modal-name">
+    <button type="button" class="product-modal-close" onclick="closeProductModal()" aria-label="إغلاق">×</button>
+    <img id="product-modal-img" class="product-modal-hero" src="" alt="" width="800" height="220" />
+    <div class="product-modal-body">
+      <h2 id="product-modal-name" class="product-modal-name"></h2>
+      <p id="product-modal-desc" class="product-modal-desc"></p>
+      <div id="product-modal-price" class="product-modal-price"></div>
+      <button type="button" class="product-modal-add" onclick="modalAddToCart()">أضف للسلة +</button>
+    </div>
+  </div>
 </div>
 
 <!-- CART FAB -->
@@ -836,12 +957,58 @@
 
 <script>
   let cartCount = 0;
+  let modalProductCard = null;
 
-  function showCat(id) {
+  function heroImageFromThumb(src) {
+    if (!src) return '';
+    const base = src.split('?')[0];
+    return base + '?w=1600&h=880&fit=crop&q=85';
+  }
+
+  function openProductModal(card) {
+    modalProductCard = card;
+    const thumb = card.querySelector('.product-thumb');
+    const nameEl = card.querySelector('.product-name');
+    const descEl = card.querySelector('.product-desc');
+    const priceEl = card.querySelector('.product-price');
+    const img = document.getElementById('product-modal-img');
+    img.src = heroImageFromThumb(thumb && thumb.src);
+    img.alt = nameEl ? nameEl.textContent.trim() : '';
+    document.getElementById('product-modal-name').textContent = nameEl ? nameEl.textContent.trim() : '';
+    const desc = descEl ? descEl.textContent.trim() : '';
+    const descNode = document.getElementById('product-modal-desc');
+    descNode.textContent = desc;
+    document.getElementById('product-modal-price').innerHTML = priceEl ? priceEl.innerHTML : '';
+    const modal = document.getElementById('product-modal');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeProductModal() {
+    const modal = document.getElementById('product-modal');
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    modalProductCard = null;
+  }
+
+  function modalAddToCart() {
+    if (modalProductCard) addToCart(modalProductCard);
+    closeProductModal();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('product-modal').classList.contains('open')) {
+      closeProductModal();
+    }
+  });
+
+  function showCat(id, btn) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('cat-' + id).classList.add('active');
-    event.target.classList.add('active');
+    if (btn) btn.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

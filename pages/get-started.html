@@ -13,8 +13,8 @@
       --dark: #1A1208;
       --brand: #E84B2A;
       --cream: #FAF7F2;
-      --text: #1f1610;
-      --muted: #7c6d62;
+      --ink: #20170f;
+      --muted: #7f7064;
       --border: #e8ddd2;
     }
     * { box-sizing: border-box; }
@@ -22,8 +22,8 @@
       margin: 0;
       min-height: 100vh;
       font-family: "DM Sans", sans-serif;
+      color: var(--ink);
       background: var(--cream);
-      color: var(--text);
     }
     .shell {
       min-height: 100vh;
@@ -32,68 +32,96 @@
     }
     .left {
       position: relative;
-      padding: 38px;
-      color: #f8efe8;
-      background:
-        radial-gradient(620px 340px at 12% 8%, rgba(232, 75, 42, .28), transparent 70%),
-        linear-gradient(180deg, #25170e 0%, var(--dark) 100%);
       overflow: hidden;
-    }
-    .left::before {
-      content: "";
-      position: absolute;
-      inset: auto 24px 26px 24px;
-      height: 240px;
-      border-radius: 18px;
+      color: #fff;
+      padding: 34px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)),
-        radial-gradient(circle at 24% 28%, rgba(232,75,42,.24), transparent 48%),
-        #2a1c12;
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 22px 38px rgba(0,0,0,.25);
+        linear-gradient(rgba(26,18,8,.72), rgba(26,18,8,.82)),
+        url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80") center/cover no-repeat;
     }
-    .brand {
+    .logo {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       font-family: "Playfair Display", serif;
-      font-size: 1.08rem;
+      font-size: 1.15rem;
       font-weight: 700;
+      letter-spacing: .2px;
     }
-    .brand-dot {
+    .dot {
       width: 11px;
       height: 11px;
       border-radius: 999px;
       background: var(--brand);
-      box-shadow: 0 0 0 5px rgba(232, 75, 42, .2);
+      box-shadow: 0 0 0 5px rgba(232,75,42,.2);
     }
     .left h1 {
-      margin: 80px 0 12px;
+      margin: 68px 0 12px;
       font-family: "Playfair Display", serif;
-      font-size: clamp(2rem, 3vw, 2.6rem);
-      line-height: 1.16;
-      letter-spacing: .2px;
-    }
-    .left p {
-      margin: 0;
-      color: rgba(248,239,232,.72);
-      font-size: .95rem;
-      line-height: 1.6;
+      font-size: clamp(2rem, 3vw, 2.7rem);
+      line-height: 1.15;
+      letter-spacing: .1px;
       max-width: 420px;
     }
-    .chips {
-      margin-top: 24px;
-      display: grid;
-      gap: 10px;
-      max-width: 380px;
+    .left .ar-sub {
+      margin: 0 0 20px;
+      direction: rtl;
+      text-align: right;
+      color: rgba(255,255,255,.86);
+      font-size: .95rem;
+      max-width: 420px;
     }
-    .chip {
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 14px;
-      padding: 11px 12px;
-      background: rgba(255,255,255,.05);
-      font-size: .83rem;
-      color: rgba(248,239,232,.92);
+    .qr-card {
+      width: 148px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(6px);
+      padding: 10px;
+      animation: floatY 3.5s ease-in-out infinite;
+      box-shadow: 0 14px 28px rgba(0,0,0,.22);
+    }
+    .qr {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 10px;
+      background:
+        repeating-linear-gradient(0deg,#202020 0 7px,#fff 7px 14px),
+        repeating-linear-gradient(90deg,#202020 0 7px,#fff 7px 14px);
+      mix-blend-mode: multiply;
+    }
+    .qr-card span {
+      display: block;
+      margin-top: 6px;
+      text-align: center;
+      font-size: .72rem;
+      color: #fff;
+      font-weight: 600;
+    }
+    .stats {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      min-width: 90px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+      padding: 10px 10px 8px;
+      text-align: center;
+    }
+    .stat strong {
+      display: block;
+      font-size: 1.12rem;
+      line-height: 1.1;
+    }
+    .stat small {
+      display: block;
+      margin-top: 3px;
+      font-size: .68rem;
+      color: rgba(255,255,255,.8);
     }
     .right {
       display: grid;
@@ -104,49 +132,49 @@
     .card {
       width: 100%;
       max-width: 560px;
-      background: #fff;
-      border: 1.5px solid var(--border);
       border-radius: 22px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      box-shadow: 0 14px 34px rgba(20,12,7,.08);
       padding: 26px 24px;
-      box-shadow: 0 14px 34px rgba(20, 12, 7, .08);
     }
     .steps {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3,1fr);
       gap: 8px;
       margin-bottom: 18px;
     }
     .step {
-      border: 1px solid #ebdfd4;
+      border: 1px solid #eadfd3;
       border-radius: 999px;
+      text-align: center;
       padding: 7px 10px;
       font-size: .74rem;
-      text-align: center;
       color: var(--muted);
       background: #fff;
     }
     .step.active {
+      border-color: rgba(232,75,42,.36);
       color: var(--brand);
       background: rgba(232,75,42,.08);
-      border-color: rgba(232,75,42,.35);
       font-weight: 600;
     }
     .title {
       margin: 0;
       font-family: "Playfair Display", serif;
-      font-size: clamp(1.6rem, 2.4vw, 2rem);
-      line-height: 1.18;
+      font-size: clamp(1.6rem,2.5vw,2rem);
+      line-height: 1.2;
     }
     .sub {
-      margin: 8px 0 2px;
+      margin: 8px 0 0;
       color: var(--muted);
       font-size: .88rem;
       line-height: 1.55;
     }
     .sub-ar {
-      margin: 0 0 14px;
-      text-align: right;
+      margin: 4px 0 14px;
       direction: rtl;
+      text-align: right;
       color: var(--muted);
       font-size: .84rem;
     }
@@ -155,9 +183,9 @@
     .field label {
       display: block;
       margin-bottom: 5px;
-      font-size: .8rem;
+      font-size: .79rem;
       font-weight: 600;
-      color: #4d3c31;
+      color: #4c3b30;
     }
     .input-wrap { position: relative; }
     .icon {
@@ -165,8 +193,8 @@
       left: 10px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: .8rem;
       color: #8b796d;
+      font-size: .8rem;
       pointer-events: none;
     }
     input {
@@ -174,10 +202,10 @@
       height: 44px;
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      background: #fff;
-      color: var(--text);
-      font: inherit;
       padding: 0 12px 0 34px;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
       transition: border-color .2s, box-shadow .2s;
     }
     input:focus {
@@ -199,7 +227,7 @@
       padding: 4px 6px;
     }
     .strength {
-      margin: 7px 0 11px;
+      margin: 7px 0 10px;
     }
     .bar {
       width: 100%;
@@ -226,12 +254,12 @@
       height: 46px;
       border: 0;
       border-radius: 12px;
+      background: var(--brand);
+      color: #fff;
       font: inherit;
       font-weight: 700;
-      color: #fff;
-      background: var(--brand);
-      box-shadow: 0 8px 20px rgba(232,75,42,.25);
       cursor: pointer;
+      box-shadow: 0 8px 20px rgba(232,75,42,.25);
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
     }
     #submit-btn:hover {
@@ -261,23 +289,33 @@
       color: #7e6c60;
       font-size: .8rem;
     }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
     @media (max-width: 980px) {
       .shell { grid-template-columns: 1fr; }
-      .left { padding: 28px 20px 300px; }
-      .left h1 { margin-top: 32px; }
+      .left { padding: 28px 20px; }
+      .left h1 { margin-top: 30px; }
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <aside class="left">
-      <div class="brand"><span class="brand-dot"></span>OneTap Menu</div>
-      <h1>Lancez votre restaurant digital en une seule étape.</h1>
-      <p>Créez votre compte OneTap et commencez a recevoir des commandes QR rapidement.</p>
-      <div class="chips">
-        <div class="chip"><strong>2 min setup</strong> — Activez votre menu QR en quelques clics</div>
-        <div class="chip"><strong>500+ restaurants</strong> — Faites confiance a une plateforme deja adoptee</div>
-        <div class="chip"><strong>Free</strong> — Demarrage gratuit, sans carte bancaire</div>
+      <div class="logo"><span class="dot"></span>OneTap Menu</div>
+      <h1>Votre menu, scanné en une seconde.</h1>
+      <p class="ar-sub">قائمة مطعمك، بمسح واحد من الهاتف</p>
+
+      <div class="qr-card">
+        <div class="qr"></div>
+        <span>Scan QR</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><strong>2min</strong><small>setup</small></div>
+        <div class="stat"><strong>500+</strong><small>restaurants</small></div>
+        <div class="stat"><strong>100%</strong><small>free</small></div>
       </div>
     </aside>
 
@@ -291,13 +329,13 @@
 
         <h1 class="title">Créer votre restaurant</h1>
         <p class="sub">Commencez par créer votre compte, puis nous vous redirigerons vers la création de votre restaurant.</p>
-        <p class="sub-ar">أنشئ حسابك أولًا، ثم نوجهك مباشرة لإنشاء المطعم.</p>
+        <p class="sub-ar">أنشئ حسابك أولًا ثم سنوجهك مباشرة لإنشاء المطعم.</p>
 
         <div id="alert-area"></div>
 
         <form id="signup-form">
           <div class="field">
-            <label for="restaurant-name">Nom du restaurant *</label>
+            <label for="restaurant-name">Nom du restaurant / اسم المطعم *</label>
             <div class="input-wrap">
               <span class="icon">🏷</span>
               <input id="restaurant-name" type="text" placeholder="Ex: El Bahia" autocomplete="organization">
@@ -305,7 +343,7 @@
           </div>
 
           <div class="field">
-            <label for="email">Email *</label>
+            <label for="email">Email / البريد الإلكتروني *</label>
             <div class="input-wrap">
               <span class="icon">✉</span>
               <input id="email" type="email" placeholder="vous@restaurant.com" autocomplete="email">
@@ -313,7 +351,7 @@
           </div>
 
           <div class="field">
-            <label for="password">Mot de passe *</label>
+            <label for="password">Mot de passe / كلمة المرور *</label>
             <div class="input-wrap">
               <span class="icon">🔒</span>
               <input id="password" type="password" placeholder="Minimum 8 caracteres" autocomplete="new-password">
@@ -327,7 +365,7 @@
           </div>
 
           <div class="field">
-            <label for="confirm-password">Confirmer mot de passe *</label>
+            <label for="confirm-password">Confirmer / تأكيد كلمة المرور *</label>
             <div class="input-wrap">
               <span class="icon">🔐</span>
               <input id="confirm-password" type="password" placeholder="Retaper le mot de passe" autocomplete="new-password">

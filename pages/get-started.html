@@ -376,7 +376,7 @@
 
 <script type="module">
 import { supabase } from '../supabase/client.js';
-import { setPendingRestaurantName, clearPendingRestaurantName, createRestaurantForNewUser } from '../supabase/restaurants.js';
+import { setPendingRestaurantName, clearPendingRestaurantName } from '../supabase/restaurants.js';
 import { isSupabaseConfigured } from '../supabase/config.js';
 import { getMyRestaurantAccess, getRoleHomePath } from '../supabase/restaurant-users.js';
 
@@ -386,6 +386,11 @@ function setAlert(message, type = 'error') {
 }
 
 async function bootstrapRedirectIfLogged() {
+  if (sessionStorage.getItem('ot_signup_redirect') === '1') {
+    sessionStorage.removeItem('ot_signup_redirect');
+    window.location.replace('create-restaurant.html');
+    return;
+  }
   if (!isSupabaseConfigured()) return;
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
@@ -494,36 +499,10 @@ document.getElementById('btn-create-account')?.addEventListener('click', async (
     user = signInRes.data.session.user;
   }
 
-  const { data: existingAccess, error: accessErr } = await getMyRestaurantAccess(user);
-  if (accessErr) {
-    btn.disabled = false;
-    btn.textContent = 'Create Restaurant Account';
-    setAlert(accessErr.message || 'Impossible de verifier votre acces restaurant.');
-    return;
-  }
-
-  let targetPath = existingAccess ? getRoleHomePath(existingAccess.role) : 'dashboard.html';
-  if (!existingAccess) {
-    const created = await createRestaurantForNewUser(user.id, name);
-    if (created.error || !created.data?.id) {
-      btn.disabled = false;
-      btn.textContent = 'Create Restaurant Account';
-      setAlert(
-        (created.error?.message || 'Compte cree mais creation du restaurant impossible.') +
-          ' Ouvrez la page de creation pour finaliser.',
-      );
-      return;
-    }
-    clearPendingRestaurantName();
-    targetPath = created.demoCreated ? 'dashboard.html?demo=1' : 'dashboard.html';
-  } else {
-    clearPendingRestaurantName();
-  }
-
-  setAlert('Votre compte et votre restaurant sont prets. Redirection...', 'success');
-  setTimeout(() => {
-    window.location.href = targetPath;
-  }, 500);
+  clearPendingRestaurantName();
+  setAlert('Compte cree avec succes. Redirection...', 'success');
+  sessionStorage.setItem('ot_signup_redirect', '1');
+  window.location.replace('create-restaurant.html');
 });
 
 bootstrapRedirectIfLogged();

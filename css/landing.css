@@ -464,7 +464,7 @@ body {
   border: 2.5px solid #333;
   overflow: hidden;
   position: relative;
-  box-shadow: var(--shadow-phone);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1.5px rgba(255,255,255,0.15);
   transition: transform .22s ease, box-shadow .22s ease;
   isolation: isolate;
   z-index: 2;
@@ -849,9 +849,10 @@ body {
 .step-card {
   position: relative;
   padding: 36px 28px;
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   background: var(--bg);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(0,0,0,0.10);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
 }
 
@@ -905,9 +906,10 @@ body {
 
 .feat-card {
   background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid rgba(0,0,0,0.10);
+  border-radius: 20px;
   padding: 32px 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   transition: box-shadow .2s, transform .2s, border-color .2s;
 }
 
@@ -921,7 +923,8 @@ body {
   grid-column: 1 / 2;
   grid-row: 1 / 3;
   background: var(--ink);
-  border-color: var(--ink);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
 }
 
 .feat-large h3 { color: #fff; }
@@ -937,7 +940,8 @@ body {
 
 .feat-accent {
   background: var(--ink);
-  border-color: var(--ink);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
 }
 
 .feat-accent h3 { color: #fff; }
@@ -979,11 +983,12 @@ body {
 }
 
 .price-card {
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(0,0,0,0.12);
   border-radius: var(--radius-xl);
   padding: 40px 36px;
   position: relative;
   background: var(--bg);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
   transition: box-shadow .2s, transform .2s;
 }
 
@@ -995,7 +1000,7 @@ body {
 .price-popular {
   background: var(--ink);
   border-color: var(--ink);
-  box-shadow: 0 14px 38px rgba(14, 12, 10, .2);
+  box-shadow: 0 8px 40px rgba(212,82,26,0.18);
 }
 
 .price-popular .price-tier,

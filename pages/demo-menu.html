@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BSS Food — Menu Demo | OneTap Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #C8392B; --red-dark: #A02E22;
+      --gold: #D4A017; --ink: #1A1A1A;
+      --bg: #F8F4EF; --white: #FFFFFF;
+      --border: #E8E0D5; --muted: #8C7B6E;
+    }
+    html, body { min-height: 100%; }
+    body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--ink); }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--ink);
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .resto-info { display: flex; align-items: center; gap: 10px; }
+
+    .resto-logo {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .resto-name { font-size: 16px; font-weight: 700; color: white; }
+    .resto-tag { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: white;
+    }
+
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; }
+
+    /* ── BANNER ── */
+    .banner {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2D1A0E 50%, #1A1A1A 100%);
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(200,57,43,0.2) 0%, transparent 70%);
+    }
+
+    .banner-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      position: relative;
+    }
+
+    .banner-title span { color: var(--red); }
+
+    .banner-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+      position: relative;
+    }
+
+    /* ── CATEGORIES NAV ── */
+    .cats-nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      position: sticky; top: 56px; z-index: 99;
+    }
+
+    .cats-nav::-webkit-scrollbar { display: none; }
+
+    .cat-btn {
+      flex-shrink: 0;
+      padding: 12px 16px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .cat-btn.active { color: var(--red); border-bottom-color: var(--red); }
+    .cat-btn:hover { color: var(--ink); }
+
+    /* ── MAIN ── */
+    .main { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 28px; display: none; }
+    .section.active { display: block; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .section-badge {
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── PRODUCT CARD ── */
+    .product-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .product-card:active { transform: translateY(0); }
+
+    .product-emoji {
+      font-size: 32px;
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      background: var(--bg);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .product-info { flex: 1; }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+
+    .product-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .product-right { text-align: left; flex-shrink: 0; }
+
+    .product-price {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--red);
+      direction: ltr;
+    }
+
+    .product-price span { font-size: 11px; font-weight: 600; }
+
+    .add-btn {
+      width: 30px; height: 30px;
+      background: var(--red);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 6px;
+      margin-right: auto;
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover { background: var(--red-dark); }
+
+    /* ── TABLE PRODUCTS (Tacos) ── */
+    .table-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .table-header {
+      background: var(--ink);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-header-title { font-size: 15px; font-weight: 700; color: white; }
+    .table-header-emoji { font-size: 18px; }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .table-row:last-child { border-bottom: none; }
+
+    .table-row.header-row {
+      background: #F8F4EF;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .table-row .item-name { font-weight: 600; color: var(--ink); }
+    .table-cell { text-align: center; font-size: 12px; color: var(--muted); padding: 0 4px; }
+    .table-cell.price { color: var(--red); font-weight: 700; }
+
+    /* ── SUPPLEMENT ── */
+    .suppl-card {
+      background: #FEF9F0;
+      border: 1px dashed #E8C97A;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .suppl-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+
+    .suppl-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--ink);
+      padding: 3px 0;
+    }
+
+    .suppl-price { color: var(--red); font-weight: 700; direction: ltr; }
+
+    /* ── SUB SECTION ── */
+    .sub-section { margin-bottom: 18px; }
+    .sub-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--red);
+      display: inline-block;
+    }
+
+    /* ── CART BUTTON ── */
+    .cart-fab {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 28px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(200,57,43,0.4);
+      transition: all 0.2s;
+      z-index: 200;
+    }
+
+    .cart-fab:hover { background: var(--red-dark); transform: translateX(-50%) translateY(-2px); }
+    .cart-count {
+      background: white;
+      color: var(--red);
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    /* ── DEMO BADGE ── */
+    .demo-banner {
+      background: linear-gradient(90deg, #C8392B, #E84B2A);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      direction: rtl;
+    }
+
+    .demo-banner a {
+      color: white;
+      font-weight: 900;
+      text-decoration: underline;
+    }
+
+    /* ── PIZZA SIZES ── */
+    .size-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .size-tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .size-tab.active { border-color: var(--red); background: #FEF2F0; color: var(--red); }
+
+    @media (max-width: 400px) {
+      .product-emoji { width: 44px; height: 44px; font-size: 26px; }
+      .product-name { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DEMO BANNER -->
+<div class="demo-banner">
+  🎯 هذا منيو تجريبي — <a href="get-started.html">أنشئ منيوك مجاناً الآن</a>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="resto-info">
+    <div class="resto-logo">🔥</div>
+    <div>
+      <div class="resto-name">BSS Food</div>
+      <div class="resto-tag">وجبات سريعة • بسكرة</div>
+    </div>
+  </div>
+  <div class="status-badge">
+    <div class="status-dot"></div>
+    مفتوح
+  </div>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-title">BSS <span>Food</span> 🔥</div>
+  <div class="banner-sub">بيتزا • تاكوس • سندويش • حلويات</div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="cats-nav">
+  <button class="cat-btn active" onclick="showCat('pizza')">🍕 بيتزا</button>
+  <button class="cat-btn" onclick="showCat('tacos')">🌮 تاكوس</button>
+  <button class="cat-btn" onclick="showCat('plats')">🍽️ الأطباق</button>
+  <button class="cat-btn" onclick="showCat('sandwichs')">🥪 سندويش</button>
+  <button class="cat-btn" onclick="showCat('desserts')">🍰 حلويات</button>
+  <button class="cat-btn" onclick="showCat('boissons')">🥤 مشروبات</button>
+</div>
+
+<div class="main">
+
+  <!-- ══ PIZZA ══ -->
+  <div class="section active" id="cat-pizza">
+
+    <div class="size-tabs">
+      <div class="size-tab active" onclick="setPizzaSize(this,'medium')">Medium</div>
+      <div class="size-tab" onclick="setPizzaSize(this,'large')">Large (Miga)</div>
+    </div>
+
+    <!-- Medium -->
+    <div id="pizza-medium">
+      <div class="section-header">
+        <span class="section-badge">PIZZA</span>
+        <span class="section-title">Pizza Medium</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">Mixte</div>
+          <div class="product-desc">صلصة طماطم، دجاج مفروم، لحم مفروم، جبن، موتزاريلا</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1000 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">3 Saison</div>
+          <div class="product-desc">صلصة طماطم، لحم مفروم، دجاج مفروم، دجاج مدخن، جبن، موتزاريلا</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1200 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">4 Saison</div>
+          <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، دجاج مدخن، تونة، موتزاريلا</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1300 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">Special</div>
+          <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، تونة، كممبار، فطر طبيعي، موتزاريلا، شيدر</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1500 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">BSS</div>
+          <div class="product-desc">صلصة طماطم، جبن، شورما، لحم مفروم، دجاج مدخن، جمبيري، لحم بقر مدخن، فطر، تونة</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1700 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Large / Miga -->
+    <div id="pizza-large" style="display:none">
+      <div class="section-header">
+        <span class="section-badge">PIZZA</span>
+        <span class="section-title">Miga Pizza (L)</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">Mixte</div>
+          <div class="product-desc">صلصة طماطم، جبن، لحم مفروم، دجاج مفروم، حواف جبنية، موتزاريلا، شيدر</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1300 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">3 Saison</div>
+          <div class="product-desc">صلصة طماطم، لحم مفروم، دجاج مفروم، دجاج مدخن، موتزاريلا، شيدر، حواف جبنية</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">1500 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">Special 8 Saison</div>
+          <div class="product-desc">صلصة طماطم، جبن، دجاج مدخن، لحم مفروم، شورما، كممبار، دجاج متبل، فطر طبيعي، دجاج مفروم، موتزاريلا، شيدر، حواف جبنية</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">2200 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="addToCart(this)">
+        <div class="product-emoji">🍕</div>
+        <div class="product-info">
+          <div class="product-name">BSS Miga</div>
+          <div class="product-desc">صلصة طماطم، جبن، جمبيري، لحم مفروم، فطر بقر مدخن، دجاج متبل، فطر طبيعي، شورما، دجاج مفروم، كممبار، موتزاريلا، شيدر، حواف</div>
+        </div>
+        <div class="product-right">
+          <div class="product-price">2500 <span>DA</span></div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pizza L (small) -->
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#D4A017">PIZZA L</span>
+      <span class="section-title">Pizza L</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🍕</div>
+      <div class="product-info"><div class="product-name">Marguerite</div><div class="product-desc">صلصة طماطم، جبن</div></div>
+      <div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🍕</div>
+      <div class="product-info"><div class="product-name">Marguerite Plus+</div><div class="product-desc">صلصة طماطم، جبن، جبن شيدر</div></div>
+      <div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🍕</div>
+      <div class="product-info"><div class="product-name">5 Fromage</div><div class="product-desc">صلصة بيضاء، جبن، شيدر، كممبار، موتزاريلا، غريار</div></div>
+      <div class="product-right"><div class="product-price">650 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🍕</div>
+      <div class="product-info"><div class="product-name">Poulet</div><div class="product-desc">صلصة طماطم، دجاج، دجاج متبل، جبن، موتزاريلا</div></div>
+      <div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+
+    <!-- Supplément -->
+    <div class="suppl-card">
+      <div class="suppl-title">➕ Supplément</div>
+      <div class="suppl-row"><span>Bordure fromage</span><span class="suppl-price">100 DA</span></div>
+      <div class="suppl-row"><span>Chidar</span><span class="suppl-price">100 DA</span></div>
+      <div class="suppl-row"><span>Camembert</span><span class="suppl-price">100 DA</span></div>
+      <div class="suppl-row"><span>Gruyère</span><span class="suppl-price">150 DA</span></div>
+    </div>
+  </div>
+
+  <!-- ══ TACOS ══ -->
+  <div class="section" id="cat-tacos">
+    <div class="section-header">
+      <span class="section-badge">TACOS</span>
+      <span class="section-title">Nos Tacos</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-header-emoji">🌮</span>
+        <span class="table-header-title">Tacos — M / L / XL / XXL</span>
+      </div>
+      <div class="table-row header-row">
+        <span></span>
+        <span class="table-cell">M</span>
+        <span class="table-cell">L</span>
+        <span class="table-cell">XL</span>
+        <span class="table-cell">XXL</span>
+      </div>
+      <div class="table-row">
+        <span class="item-name">Poulet</span>
+        <span class="table-cell price">400</span>
+        <span class="table-cell price">500</span>
+        <span class="table-cell price">700</span>
+        <span class="table-cell price">1100</span>
+      </div>
+      <div class="table-row">
+        <span class="item-name">Viande</span>
+        <span class="table-cell price">500</span>
+        <span class="table-cell price">700</span>
+        <span class="table-cell price">900</span>
+        <span class="table-cell price">1300</span>
+      </div>
+      <div class="table-row">
+        <span class="item-name">Kabda</span>
+        <span class="table-cell price">500</span>
+        <span class="table-cell price">700</span>
+        <span class="table-cell price">1000</span>
+        <span class="table-cell price">1200</span>
+      </div>
+      <div class="table-row">
+        <span class="item-name">Mixte</span>
+        <span class="table-cell price">500</span>
+        <span class="table-cell price">700</span>
+        <span class="table-cell price">1000</span>
+        <span class="table-cell price">1200</span>
+      </div>
+      <div class="table-row">
+        <span class="item-name">Gratiné</span>
+        <span class="table-cell price">500</span>
+        <span class="table-cell price">600</span>
+        <span class="table-cell price">900</span>
+        <span class="table-cell price">1200</span>
+      </div>
+    </div>
+
+    <div class="suppl-card">
+      <div class="suppl-title">➕ Supplément Tacos</div>
+      <div class="suppl-row"><span>Chidar</span><span class="suppl-price">100 DA</span></div>
+      <div class="suppl-row"><span>Gruyère</span><span class="suppl-price">150 DA</span></div>
+      <div class="suppl-row"><span>Camembert</span><span class="suppl-price">100 DA</span></div>
+    </div>
+
+    <!-- Soufflé -->
+    <div class="section-header">
+      <span class="section-badge" style="background:#333">SOUFFLÉ</span>
+      <span class="section-title">Soufflé</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🥙</div>
+      <div class="product-info"><div class="product-name">Soufflé Viande</div></div>
+      <div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)">
+      <div class="product-emoji">🥙</div>
+      <div class="product-info"><div class="product-name">Soufflé Poulet Giant</div></div>
+      <div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PLATS ══ -->
+  <div class="section" id="cat-plats">
+    <div class="section-header">
+      <span class="section-badge">PLATS</span>
+      <span class="section-title">Les Plats</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍖</div><div class="product-info"><div class="product-name">Chawrma</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Viande Hachée</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Poulet Haché</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Kabda Poulet</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Mixte</div></div><div class="product-right"><div class="product-price">800 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥩</div><div class="product-info"><div class="product-name">Steak Viande</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+
+    <!-- Gratins -->
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#5C3317">GRATIN</span>
+      <span class="section-title">Les Gratins</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Poulet</div></div><div class="product-right"><div class="product-price">400–600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Viande</div></div><div class="product-right"><div class="product-price">500–800 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🫕</div><div class="product-info"><div class="product-name">Gratin Crispy</div></div><div class="product-right"><div class="product-price">500–700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+
+    <!-- Boxes -->
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#E84B2A">BOX</span>
+      <span class="section-title">Boxes Crispy Chicken</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">4 pièces chicken breast</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">8 pièces chicken breast</div></div><div class="product-right"><div class="product-price">1500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍗</div><div class="product-info"><div class="product-name">Family chicken breast</div></div><div class="product-right"><div class="product-price">2500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+  </div>
+
+  <!-- ══ SANDWICHS ══ -->
+  <div class="section" id="cat-sandwichs">
+    <div class="section-header">
+      <span class="section-badge">SANDWICHS</span>
+      <span class="section-title">Sandwichs & Panini</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Chawarma</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Poulet Marine</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Kabda</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Viande Haché</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Escalope</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Raghif</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Arabi Chawarma</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Panozo Poulet</div></div><div class="product-right"><div class="product-price">500 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥪</div><div class="product-info"><div class="product-name">Panozo Viande</div></div><div class="product-right"><div class="product-price">600 <span>DA</span></div><button class="add-btn">+</button></div></div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#333">PANINI</span>
+      <span class="section-title">Panini</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini 3 Fromage</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini Poulet</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥖</div><div class="product-info"><div class="product-name">Panini Viande</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+  </div>
+
+  <!-- ══ DESSERTS ══ -->
+  <div class="section" id="cat-desserts">
+    <div class="section-header">
+      <span class="section-badge" style="background:#C4873A">DESSERTS</span>
+      <span class="section-title">BSS Dessert Menu</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🍮 Tiramisu</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Tiramisu Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🟢</div><div class="product-info"><div class="product-name">Tiramisu Pistachio</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">Tiramisu Chocolate</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🥞 Box Crêpes</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">Pasta Chocolat</div></div><div class="product-right"><div class="product-price">700 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Pasta Fraise</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Pasta Banane</div></div><div class="product-right"><div class="product-price">850 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">⭐</div><div class="product-info"><div class="product-name">Pasta BSS</div></div><div class="product-right"><div class="product-price">1200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🍰 Gâteaux</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍮</div><div class="product-info"><div class="product-name">Crème brûlée</div></div><div class="product-right"><div class="product-price">250–350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍫</div><div class="product-info"><div class="product-name">San Sebastian</div></div><div class="product-right"><div class="product-price">550–650 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🎂</div><div class="product-info"><div class="product-name">Matilda Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Cheesecake</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Can Cake</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🧇 Crêpes</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥞</div><div class="product-info"><div class="product-name">Crêpe Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🟢</div><div class="product-info"><div class="product-name">Crêpe Pistachio</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Crêpe Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Crêpe Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍍</div><div class="product-info"><div class="product-name">Crêpe Ananas</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🧇 Gaufres</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧇</div><div class="product-info"><div class="product-name">Gaufre Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Gaufre Banane</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Gaufre Fraise</div></div><div class="product-right"><div class="product-price">450 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-title">🥞 Pancakes</div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥞</div><div class="product-info"><div class="product-name">Pancake Simple</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍌</div><div class="product-info"><div class="product-name">Pancake Banane</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+      <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Pancake Fraise</div></div><div class="product-right"><div class="product-price">400 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    </div>
+  </div>
+
+  <!-- ══ BOISSONS ══ -->
+  <div class="section" id="cat-boissons">
+    <div class="section-header">
+      <span class="section-badge" style="background:#0277BD">BOISSONS</span>
+      <span class="section-title">Boissons & Jus</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍹</div><div class="product-info"><div class="product-name">Jus Banane</div></div><div class="product-right"><div class="product-price">300 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍓</div><div class="product-info"><div class="product-name">Jus Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍋</div><div class="product-info"><div class="product-name">Jus Mojito</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍋</div><div class="product-info"><div class="product-name">Jus Citron</div></div><div class="product-right"><div class="product-price">200 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍊</div><div class="product-info"><div class="product-name">Jus Orange</div></div><div class="product-right"><div class="product-price">250 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍹</div><div class="product-info"><div class="product-name">Jus Cocktail</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#555">MILKSHAKE</span>
+      <span class="section-title">Milkshake</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥤</div><div class="product-info"><div class="product-name">Milkshake Banane</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥤</div><div class="product-info"><div class="product-name">Milkshake Fraise</div></div><div class="product-right"><div class="product-price">350 <span>DA</span></div><button class="add-btn">+</button></div></div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-badge" style="background:#333">SOFT</span>
+      <span class="section-title">Canette & Jus</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🥫</div><div class="product-info"><div class="product-name">Canette gazeuse 33cl</div></div><div class="product-right"><div class="product-price">100 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧃</div><div class="product-info"><div class="product-name">Jus 33cl</div></div><div class="product-right"><div class="product-price">80 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🍶</div><div class="product-info"><div class="product-name">Gazeuse 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
+    <div class="product-card" onclick="addToCart(this)"><div class="product-emoji">🧃</div><div class="product-info"><div class="product-name">Jus 1L</div></div><div class="product-right"><div class="product-price">150 <span>DA</span></div><button class="add-btn">+</button></div></div>
+  </div>
+
+</div>
+
+<!-- CART FAB -->
+<button class="cart-fab" id="cart-fab" style="display:none" onclick="showCart()">
+  🛒 عرض السلة
+  <div class="cart-count" id="cart-count">0</div>
+</button>
+
+<script>
+  let cartCount = 0;
+
+  function showCat(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('cat-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setPizzaSize(el, size) {
+    document.querySelectorAll('.size-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('pizza-medium').style.display = size === 'medium' ? 'block' : 'none';
+    document.getElementById('pizza-large').style.display = size === 'large' ? 'block' : 'none';
+  }
+
+  function addToCart(card) {
+    cartCount++;
+    document.getElementById('cart-count').textContent = cartCount;
+    document.getElementById('cart-fab').style.display = 'flex';
+    
+    card.style.background = '#FEF2F0';
+    card.style.borderColor = '#C8392B';
+    setTimeout(() => {
+      card.style.background = '';
+      card.style.borderColor = '';
+    }, 400);
+  }
+
+  function showCart() {
+    alert('🛒 هذا منيو تجريبي!\n\nأنشئ منيوك الحقيقي مجاناً على OneTap Menu\nوفعّل نظام الطلبات الحقيقي لزبائنك! 🚀');
+  }
+</script>
+
+</body>
+</html>

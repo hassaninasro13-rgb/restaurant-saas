@@ -1,147 +1,375 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneTap Menu - منيو QR للمطاعم</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مينيو QR – منيو رقمي للمطاعم الجزائرية</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/landing.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/landing.css" />
 </head>
-<body class="lp-page">
-  <div class="lp-container">
-    <header class="lp-nav">
-      <a class="lp-brand" href="landing.html">
-        <span class="lp-brand-dot"></span>
-        OneTap Menu
-      </a>
-      <nav class="lp-nav-links">
-        <a href="#features">المزايا</a>
-        <a href="#pricing">الأسعار</a>
-        <a href="login.html">تسجيل الدخول</a>
-      </nav>
-      <div class="lp-nav-cta">
-        <a class="lp-btn lp-btn-ghost" href="login.html">دخول</a>
-        <a class="lp-btn lp-btn-primary" href="get-started.html">ابدأ الآن</a>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="logo">
+        <span class="logo-icon">▦</span>
+        <span class="logo-text">مينيو<em>QR</em></span>
       </div>
-    </header>
+      <ul class="nav-links">
+        <li><a href="#">كيف يخدم</a></li>
+        <li><a href="#">الأسعار</a></li>
+        <li><a href="#">المميزات</a></li>
+      </ul>
+      <a href="#" class="nav-cta">ابدأ مجاناً</a>
+    </div>
+  </nav>
 
-    <main>
-      <section class="lp-hero">
-        <div class="lp-hero-copy">
-          <span class="lp-tag">مخصص للمطاعم في الجزائر</span>
-          <h1>حوّل منيو مطعمك إلى تجربة QR واضحة وسهلة</h1>
-          <p>خلي الزبون يمسح الكود، يشوف المنيو في هاتفه، ويطلب مباشرة. خدمة أسرع، طلبات أكثر، وتجربة عصرية لمطعمك.</p>
-          <div class="lp-hero-actions">
-            <a class="lp-btn lp-btn-primary" href="get-started.html">ابدأ منيو QR تاعك الآن</a>
-            <a class="lp-btn lp-btn-ghost" href="login.html">شاهد كيف تخدم</a>
-          </div>
-          <small>بدون بطاقة بنكية • تجربة مجانية</small>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-blob blob-1"></div>
+    <div class="hero-bg-blob blob-2"></div>
+
+    <div class="hero-inner">
+
+      <!-- LEFT: TEXT -->
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          متاح الآن للمطاعم الجزائرية
         </div>
 
-        <div class="lp-hero-visual">
-          <div class="lp-phone primary">
-            <div class="lp-phone-inner">
-              <div class="lp-phone-head">
-                <strong>مطعم القصبة</strong>
-                <span>منيو QR</span>
-              </div>
-              <div class="lp-cat-row">
-                <button class="active">أطباق</button>
-                <button>بيتزا</button>
-                <button>مشروبات</button>
-              </div>
-              <div class="lp-item">
-                <div class="lp-thumb t1"></div>
-                <div><h4>بيتزا مارغريتا</h4><p>صلصة + موزاريلا</p></div>
-                <div><strong>1400 دج</strong><button>أضف</button></div>
-              </div>
-              <div class="lp-item">
-                <div class="lp-thumb t2"></div>
-                <div><h4>برغر دجاج</h4><p>خبز طري + صوص</p></div>
-                <div><strong>1200 دج</strong><button>أضف</button></div>
-              </div>
-              <div class="lp-item">
-                <div class="lp-thumb t3"></div>
-                <div><h4>سلطة سيزر</h4><p>دجاج + خس + صوص</p></div>
-                <div><strong>950 دج</strong><button>أضف</button></div>
-              </div>
-              <div class="lp-total">السلة · 3 عناصر <strong>3550 دج</strong></div>
-            </div>
-          </div>
+        <h1 class="hero-headline">
+          خلي الزبون يشوف<br />
+          <span class="headline-accent">المينيو ويطلب</span><br />
+          بسهولة
+        </h1>
 
-          <div class="lp-phone secondary">
-            <div class="lp-phone-inner compact">
-              <div class="lp-mini-title">طلب سريع</div>
-              <div class="lp-mini-row"><span>شاورما</span><strong>900 دج</strong></div>
-              <div class="lp-mini-row"><span>بطاطا</span><strong>350 دج</strong></div>
-              <div class="lp-mini-row"><span>مشروب</span><strong>250 دج</strong></div>
-            </div>
-          </div>
+        <p class="hero-sub">
+          بمجرد مسح QR، الزبون يشوف المينيو من هاتفه ويطلب مباشرة بدون انتظار.
+        </p>
 
-          <div class="lp-qr-block">
-            <div class="lp-qr-stand">
-              <div class="lp-qr"></div>
-            </div>
-            <div class="lp-qr-steps">
-              <span>امسح</span>
-              <span>شوف</span>
-              <span>اطلب</span>
+        <ul class="hero-bullets">
+          <li>
+            <span class="bullet-icon">✦</span>
+            منيو رقمي واضح وسريع
+          </li>
+          <li>
+            <span class="bullet-icon">✦</span>
+            أسعار بالدينار الجزائري
+          </li>
+          <li>
+            <span class="bullet-icon">✦</span>
+            طلب مباشر من الهاتف
+          </li>
+          <li>
+            <span class="bullet-icon">✦</span>
+            يقلل وقت الانتظار بشكل كبير
+          </li>
+        </ul>
+
+        <div class="hero-actions">
+          <a href="#" class="btn-primary">
+            ابدأ الآن
+            <span class="btn-arrow">←</span>
+          </a>
+          <a href="#" class="btn-secondary">
+            <span class="play-icon">▶</span>
+            شوف كيف يخدم
+          </a>
+        </div>
+
+        <div class="hero-social-proof">
+          <div class="proof-avatars">
+            <span class="avatar av1">م</span>
+            <span class="avatar av2">ك</span>
+            <span class="avatar av3">ع</span>
+          </div>
+          <p>+120 مطعم يستخدمه في الجزائر</p>
+        </div>
+      </div>
+
+      <!-- RIGHT: PHONES -->
+      <div class="hero-visual">
+
+        <!-- Phone Back -->
+        <div class="phone phone-back">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="app-header">
+                <span class="app-logo-dot"></span>
+                <span class="app-name">مطعم النجمة</span>
+              </div>
+              <div class="app-cats">
+                <span class="cat active">الكل</span>
+                <span class="cat">مشاوي</span>
+                <span class="cat">سلطات</span>
+              </div>
+              <div class="app-items-mini">
+                <div class="mini-item">
+                  <div class="mini-img mi1"></div>
+                  <div class="mini-info">
+                    <span class="mi-name">طاجين دجاج</span>
+                    <span class="mi-price">850 دج</span>
+                  </div>
+                  <button class="mi-btn">أضف</button>
+                </div>
+                <div class="mini-item">
+                  <div class="mini-img mi2"></div>
+                  <div class="mini-info">
+                    <span class="mi-name">كسكس الغنم</span>
+                    <span class="mi-price">1200 دج</span>
+                  </div>
+                  <button class="mi-btn">أضف</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
 
-      <section class="lp-section" id="features">
-        <h2>كيف يساعدك OneTap يومياً</h2>
-        <div class="lp-feature-grid">
-          <article class="lp-feature-card">
-            <h3>منيو QR واضح</h3>
-            <p>الزبون يشوف الأصناف والأسعار مباشرة من هاتفه.</p>
-          </article>
-          <article class="lp-feature-card">
-            <h3>طلب أسهل</h3>
-            <p>أزرار إضافة واضحة لتقليل التردد وتسريع الطلب.</p>
-          </article>
-          <article class="lp-feature-card">
-            <h3>أخطاء أقل</h3>
-            <p>الطلب يوصلك واضح، بدون مشاكل الفهم الشفهي.</p>
-          </article>
-          <article class="lp-feature-card">
-            <h3>يدعم اللغات</h3>
-            <p>واجهة مرنة تلائم زبائنك وفريقك بسهولة.</p>
-          </article>
+        <!-- Phone Front -->
+        <div class="phone phone-front">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="app-header">
+                <span class="app-logo-dot"></span>
+                <span class="app-name">مطعم النجمة ⭐</span>
+              </div>
+              <div class="app-cats">
+                <span class="cat active">مشاوي</span>
+                <span class="cat">شوربة</span>
+                <span class="cat">حلويات</span>
+              </div>
+              <div class="app-items">
+                <div class="app-item featured">
+                  <div class="item-img img-a"></div>
+                  <div class="item-body">
+                    <span class="item-name">مشوي مختلط</span>
+                    <span class="item-desc">دجاج، لحم، ميرقاز مشوي</span>
+                    <div class="item-footer">
+                      <span class="item-price">1800 دج</span>
+                      <button class="add-btn">أضف +</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="app-item">
+                  <div class="item-img img-b"></div>
+                  <div class="item-body">
+                    <span class="item-name">شيش طاووق</span>
+                    <span class="item-desc">مع صلصة الثوم</span>
+                    <div class="item-footer">
+                      <span class="item-price">950 دج</span>
+                      <button class="add-btn">أضف +</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="app-item">
+                  <div class="item-img img-c"></div>
+                  <div class="item-body">
+                    <span class="item-name">ميرقاز مشوي</span>
+                    <span class="item-desc">مع خبز الفرن</span>
+                    <div class="item-footer">
+                      <span class="item-price">700 دج</span>
+                      <button class="add-btn">أضف +</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cart-bar">
+                <span>🛒 1 عناصر</span>
+                <span>اطلب الآن ←</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
 
-      <section class="lp-section" id="pricing">
-        <h2>خطط مناسبة لحجم مطعمك</h2>
-        <div class="lp-pricing-grid">
-          <article class="lp-price-card">
-            <h3>Starter</h3>
-            <p class="price">$19 / month</p>
-            <a class="lp-btn lp-btn-ghost" href="get-started.html">ابدأ</a>
-          </article>
-          <article class="lp-price-card featured">
-            <span class="badge">الأكثر اختياراً</span>
-            <h3>Pro</h3>
-            <p class="price">$49 / month</p>
-            <a class="lp-btn lp-btn-primary" href="get-started.html">جرّب مجاناً</a>
-          </article>
-          <article class="lp-price-card">
-            <h3>Business</h3>
-            <p class="price">$99 / month</p>
-            <a class="lp-btn lp-btn-ghost" href="get-started.html">تواصل معنا</a>
-          </article>
+        <!-- QR Card -->
+        <div class="qr-card">
+          <div class="qr-graphic">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <!-- QR pattern blocks -->
+              <rect x="4" y="4" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
+              <rect x="8" y="8" width="12" height="12" rx="1" fill="#1a1a2e"/>
+              <rect x="36" y="4" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
+              <rect x="40" y="8" width="12" height="12" rx="1" fill="#1a1a2e"/>
+              <rect x="4" y="36" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
+              <rect x="8" y="40" width="12" height="12" rx="1" fill="#1a1a2e"/>
+              <!-- Data cells -->
+              <rect x="28" y="4" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="28" y="12" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="36" y="28" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="44" y="28" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="52" y="28" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="28" y="36" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="36" y="44" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="44" y="36" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="52" y="44" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="28" y="52" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="44" y="52" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="52" y="52" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="4" y="28" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="12" y="28" width="4" height="4" fill="#1a1a2e"/>
+              <rect x="20" y="28" width="4" height="4" fill="#1a1a2e"/>
+            </svg>
+          </div>
+          <div class="qr-steps">
+            <div class="qr-step">
+              <span class="qr-num">١</span>
+              <span>امسح QR</span>
+            </div>
+            <div class="qr-arrow-v">↓</div>
+            <div class="qr-step">
+              <span class="qr-num">٢</span>
+              <span>شوف المينيو</span>
+            </div>
+            <div class="qr-arrow-v">↓</div>
+            <div class="qr-step">
+              <span class="qr-num">٣</span>
+              <span>اطلب مباشرة</span>
+            </div>
+          </div>
         </div>
-      </section>
-    </main>
 
-    <footer class="lp-footer">
-      <span>© 2026 OneTap Menu</span>
-      <span>منيو رقمي · QR · طلب أسهل</span>
-    </footer>
-  </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="section-inner">
+      <div class="section-label">كيف يخدم</div>
+      <h2 class="section-title">ثلاث خطوات وكمل</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon">📋</div>
+          <h3>سجّل مطعمك</h3>
+          <p>أدخل اسم مطعمك وأضف أصناف المينيو مع الأسعار بالدينار في دقائق.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon">▦</div>
+          <h3>احصل على QR</h3>
+          <p>نولّدلك كود QR خاص بمطعمك. اطبعه وحطه على الطاولات.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon">📱</div>
+          <h3>الزبون يطلب</h3>
+          <p>الزبون يمسح الكود، يشوف المينيو ويطلب مباشرة من هاتفه.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="section-inner">
+      <div class="section-label">المميزات</div>
+      <h2 class="section-title">كل ما تحتاجه في مكان واحد</h2>
+      <div class="features-grid">
+        <div class="feat-card feat-large">
+          <div class="feat-icon-wrap">⚡</div>
+          <h3>سريع وخفيف</h3>
+          <p>المينيو يفتح في ثانية على أي هاتف، حتى بالأنترنت الضعيف.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">💰</div>
+          <h3>أسعار بالدينار</h3>
+          <p>أضف الأسعار بـ DZD مباشرة.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">✏️</div>
+          <h3>تعديل فوري</h3>
+          <p>غيّر الأسعار والأصناف في أي وقت.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">📊</div>
+          <h3>إحصائيات</h3>
+          <p>شوف الأصناف الأكثر طلباً كل يوم.</p>
+        </div>
+        <div class="feat-card feat-accent">
+          <div class="feat-icon-wrap">🌙</div>
+          <h3>وضع ليلي</h3>
+          <p>المينيو يدعم الوضع الليلي تلقائياً.</p>
+        </div>
+        <div class="feat-card feat-large-2">
+          <div class="feat-icon-wrap">🔒</div>
+          <h3>آمن وموثوق</h3>
+          <p>بياناتك محفوظة بالكامل. لا تحتاج تطبيق، يخدم من المتصفح مباشرة.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing">
+    <div class="section-inner">
+      <div class="section-label">الأسعار</div>
+      <h2 class="section-title">باش تبدا بدون مخاطرة</h2>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-tier">مجاني</div>
+          <div class="price-amount"><span>0</span> دج/شهر</div>
+          <ul class="price-features">
+            <li>✓ حتى 20 صنف</li>
+            <li>✓ QR واحد</li>
+            <li>✓ تعديل المينيو</li>
+            <li class="dim">✗ إحصائيات</li>
+            <li class="dim">✗ دعم مخصص</li>
+          </ul>
+          <a href="#" class="btn-outline">ابدأ مجاناً</a>
+        </div>
+        <div class="price-card price-popular">
+          <div class="popular-badge">الأكثر طلباً</div>
+          <div class="price-tier">احترافي</div>
+          <div class="price-amount"><span>2500</span> دج/شهر</div>
+          <ul class="price-features">
+            <li>✓ أصناف غير محدودة</li>
+            <li>✓ عدة QR codes</li>
+            <li>✓ إحصائيات كاملة</li>
+            <li>✓ دعم مخصص</li>
+            <li>✓ وضع الطلب المباشر</li>
+          </ul>
+          <a href="#" class="btn-primary">ابدأ الآن</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BOTTOM -->
+  <section class="cta-bottom">
+    <div class="cta-inner">
+      <div class="cta-bg-shape"></div>
+      <h2>جاهز تحوّل مطعمك؟</h2>
+      <p>ابدأ اليوم بدون بطاقة بنكية. سجّل وجرّب مجاناً.</p>
+      <a href="#" class="btn-primary btn-xl">
+        ابدأ الآن مجاناً
+        <span class="btn-arrow">←</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="logo">
+        <span class="logo-icon">▦</span>
+        <span class="logo-text">مينيو<em>QR</em></span>
+      </div>
+      <p class="footer-tagline">منيو رقمي للمطاعم الجزائرية</p>
+      <div class="footer-links">
+        <a href="#">الشروط</a>
+        <a href="#">الخصوصية</a>
+        <a href="#">تواصل معنا</a>
+      </div>
+      <p class="footer-copy">© 2025 مينيوQR. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+
 </body>
 </html>

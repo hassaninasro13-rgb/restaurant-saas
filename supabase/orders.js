@@ -55,7 +55,7 @@ export async function countOrdersByStatus(restaurantId, status) {
 export async function sumDoneOrdersTotalSince(restaurantId, isoDate) {
   return supabase
     .from('orders')
-    .select('total_amount')
+    .select('total_amount, created_at')
     .eq('restaurant_id', restaurantId)
     .in('status', ['completed', 'done', 'delivered'])
     .gte('created_at', isoDate);

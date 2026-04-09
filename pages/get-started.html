@@ -427,13 +427,14 @@
           <div class="step">Menu / القائمة</div>
         </div>
 
-        <h1 class="title">Créer votre compte</h1>
-        <p class="sub">Commencez par créer votre compte, puis nous vous redirigerons vers la création de votre espace.</p>
-        <p class="sub-ar">أنشئ حسابك أولاً ثم سنتوجهك لإعداد نشاطك.</p>
+        <div id="signup-view">
+          <h1 class="title">Créer votre compte</h1>
+          <p class="sub">Commencez par créer votre compte, puis nous vous redirigerons vers la création de votre espace.</p>
+          <p class="sub-ar">أنشئ حسابك أولاً ثم سنتوجهك لإعداد نشاطك.</p>
 
-        <div id="alert-area"></div>
+          <div id="alert-area"></div>
 
-        <form id="signup-form">
+          <form id="signup-form">
           <div class="field">
             <label for="email">Email / البريد الإلكتروني *</label>
             <div class="input-wrap">
@@ -465,15 +466,47 @@
             </div>
           </div>
 
-          <button id="submit-btn" type="submit">Créer mon compte</button>
-        </form>
+            <button id="submit-btn" type="submit">Créer mon compte</button>
+          </form>
+        </div>
+
+        <div id="login-view" style="display:none">
+          <h1 class="title">Connexion</h1>
+          <p class="sub">Connectez-vous avec votre email et mot de passe.</p>
+          <p class="sub-ar">سجّل الدخول عبر البريد وكلمة المرور.</p>
+
+          <div id="login-alert-area"></div>
+
+          <form id="login-form">
+            <div class="field">
+              <label for="login-email">Email / البريد الإلكتروني *</label>
+              <div class="input-wrap">
+                <span class="icon">✉</span>
+                <input id="login-email" type="email" placeholder="vous@restaurant.com" autocomplete="email">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="login-password">Mot de passe / كلمة المرور *</label>
+              <div class="input-wrap">
+                <span class="icon">🔒</span>
+                <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password">
+                <button class="toggle" type="button" data-target="login-password">Afficher</button>
+              </div>
+            </div>
+
+            <button id="login-submit-btn" type="submit">Se connecter</button>
+          </form>
+
+          <p class="footer">Vous n'avez pas de compte ? <a href="#" id="link-back-signup">Créer un compte</a></p>
+        </div>
 
         <div class="badges">
           <span class="badge">SSL sécurisé</span>
           <span class="badge">Support 7/7</span>
         </div>
 
-        <p class="footer">Vous avez déjà un compte ? <a href="login.html">Se connecter</a></p>
+        <p class="footer">Vous avez déjà un compte ? <a href="#" id="link-show-login">Se connecter</a></p>
       </section>
     </main>
   </div>
@@ -486,6 +519,25 @@
     function setAlert(message, type = 'error') {
       const root = document.getElementById('alert-area');
       root.innerHTML = message ? `<div class="alert alert-${type}">${message}</div>` : '';
+    }
+
+    function setLoginAlert(message, type = 'error') {
+      const root = document.getElementById('login-alert-area');
+      root.innerHTML = message ? `<div class="alert alert-${type}">${message}</div>` : '';
+    }
+
+    function showLoginView() {
+      document.getElementById('signup-view').style.display = 'none';
+      document.getElementById('login-view').style.display = '';
+      setAlert('');
+      setLoginAlert('');
+    }
+
+    function showSignupView() {
+      document.getElementById('signup-view').style.display = '';
+      document.getElementById('login-view').style.display = 'none';
+      setAlert('');
+      setLoginAlert('');
     }
 
     function scorePassword(value) {
@@ -537,12 +589,11 @@
         setAlert('Supabase non configure. Ajoutez vos variables et lancez le build.');
         return;
       }
-      const restaurantName = document.getElementById('restaurant-name')?.value?.trim() || '';
       const email = document.getElementById('email')?.value?.trim() || '';
       const password = document.getElementById('password')?.value || '';
       const confirmPassword = document.getElementById('confirm-password')?.value || '';
 
-      if (!restaurantName || !email || !password || !confirmPassword) {
+      if (!email || !password || !confirmPassword) {
         setAlert('Veuillez remplir tous les champs.');
         return;
       }
@@ -559,7 +610,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = '...';
 
-      setPendingRestaurantName(restaurantName);
+      setPendingRestaurantName('');
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         submitBtn.disabled = false;
@@ -582,9 +633,50 @@
       window.location.href = 'create-restaurant.html';
     }
 
+    async function submitLogin() {
+      if (!isSupabaseConfigured()) {
+        setLoginAlert('Supabase non configure. Ajoutez vos variables et lancez le build.');
+        return;
+      }
+      const email = document.getElementById('login-email')?.value?.trim() || '';
+      const password = document.getElementById('login-password')?.value || '';
+      if (!email || !password) {
+        setLoginAlert('Veuillez remplir tous les champs.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('login-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '...';
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Se connecter';
+        setLoginAlert(error.message || 'Connexion impossible.');
+        return;
+      }
+      window.location.href = 'create-restaurant.html';
+    }
+
     document.getElementById('signup-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       await submitSignup();
+    });
+
+    document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await submitLogin();
+    });
+
+    document.getElementById('link-show-login')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      showLoginView();
+    });
+
+    document.getElementById('link-back-signup')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSignupView();
     });
 
     updateStrengthMeter();

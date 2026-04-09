@@ -230,31 +230,43 @@
     .finance-stats-grid,
     .ops-stats-grid { grid-template-columns: 1fr; }
   }
-  .finance-wrap {
-    position: relative;
+  .finance-mega-card {
     margin-bottom: 10px;
   }
-  .finance-wrap.finance-locked .finance-stats-inner {
-    filter: blur(10px);
-    user-select: none;
-    pointer-events: none;
+  .finance-mega-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
   }
-  .finance-lock-overlay {
-    position: absolute;
-    inset: 0;
-    display: none;
+  .finance-mega-head h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .btn-finance-lock-top {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 6px 10px;
+  }
+  .finance-collapsed {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 2;
-    pointer-events: none;
+    gap: 14px;
+    padding: 28px 16px 22px;
+    text-align: center;
   }
-  .finance-wrap.finance-locked .finance-lock-overlay { display: flex; }
-  .finance-lock-icon {
-    font-size: 2rem;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,.35));
+  .finance-collapsed .finance-big-lock {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.2));
+    line-height: 1;
   }
-  .btn-finance-reveal {
-    margin-bottom: 14px;
+  .finance-panel-expanded-inner {
+    margin-top: 0;
   }
   #finance-pin-modal {
     display: none;
@@ -630,9 +642,16 @@
       </div>
 
       <!-- FINANCIAL STATS (PIN protected) -->
-      <button type="button" class="btn btn-secondary btn-sm btn-finance-reveal" id="btn-show-finance">إظهار البيانات المالية 🔐</button>
-      <div class="finance-wrap finance-locked" id="finance-wrap">
-        <div class="finance-stats-inner" id="finance-stats-inner">
+      <div class="card finance-mega-card" id="finance-mega-panel">
+        <div class="finance-mega-head">
+          <h3>📊 البيانات المالية 🔒</h3>
+          <button type="button" class="btn btn-ghost btn-sm btn-finance-lock-top" id="btn-finance-lock-now" title="قفل">🔒</button>
+        </div>
+        <div id="finance-panel-collapsed" class="finance-collapsed">
+          <span class="finance-big-lock" aria-hidden="true">🔒</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-show-finance">إظهار البيانات</button>
+        </div>
+        <div id="finance-panel-expanded" class="finance-panel-expanded-inner" hidden>
           <div class="finance-stats-grid" id="financial-stats-grid">
             <div class="finance-card finance-card--today">
               <div class="kpi-head">
@@ -667,9 +686,6 @@
               <div class="kpi-sub" id="stat-revenue-yoy-sub">—</div>
             </div>
           </div>
-        </div>
-        <div class="finance-lock-overlay" id="finance-lock-overlay" aria-hidden="true">
-          <span class="finance-lock-icon" title="">🔒</span>
         </div>
       </div>
 
@@ -887,8 +903,9 @@ function escHtml(s) {
 }
 
 const FINANCE_PIN_KEY = 'onetap_financial_pin';
-const FINANCE_UNLOCK_UNTIL_KEY = 'onetap_financial_unlock_until';
-const FINANCE_UNLOCK_MS = 30 * 60 * 1000;
+
+/** In-memory only; locks on page leave or manual lock (no timed unlock). */
+let financePanelUnlocked = false;
 
 function ensureFinancePinDefault() {
   if (localStorage.getItem(FINANCE_PIN_KEY) == null) {
@@ -901,32 +918,18 @@ function getStoredFinancePin() {
   return localStorage.getItem(FINANCE_PIN_KEY) || '1234';
 }
 
-function isFinanceUnlocked() {
-  const until = parseInt(localStorage.getItem(FINANCE_UNLOCK_UNTIL_KEY) || '0', 10);
-  return Number.isFinite(until) && Date.now() < until;
-}
-
-function setFinanceUnlockedSession() {
-  localStorage.setItem(FINANCE_UNLOCK_UNTIL_KEY, String(Date.now() + FINANCE_UNLOCK_MS));
+function lockFinancePanel() {
+  financePanelUnlocked = false;
+  applyFinanceLockUi();
 }
 
 function applyFinanceLockUi() {
-  const wrap = document.getElementById('finance-wrap');
-  if (!wrap) return;
-  const locked = !isFinanceUnlocked();
-  wrap.classList.toggle('finance-locked', locked);
-  const btn = document.getElementById('btn-show-finance');
-  if (btn) btn.style.display = locked ? '' : 'none';
-}
-
-function scheduleFinanceLockTimer() {
-  clearTimeout(window.__financeLockTimer);
-  if (!isFinanceUnlocked()) return;
-  const until = parseInt(localStorage.getItem(FINANCE_UNLOCK_UNTIL_KEY) || '0', 10);
-  const ms = Math.max(0, until - Date.now());
-  window.__financeLockTimer = setTimeout(() => {
-    applyFinanceLockUi();
-  }, ms);
+  const collapsed = document.getElementById('finance-panel-collapsed');
+  const expanded = document.getElementById('finance-panel-expanded');
+  if (!collapsed || !expanded) return;
+  const locked = !financePanelUnlocked;
+  collapsed.hidden = !locked;
+  expanded.hidden = locked;
 }
 
 function openFinancePinModal() {
@@ -957,10 +960,9 @@ function submitFinancePin() {
     if (err) err.textContent = 'PIN غير صحيح';
     return;
   }
-  setFinanceUnlockedSession();
+  financePanelUnlocked = true;
   closeFinancePinModal();
   applyFinanceLockUi();
-  scheduleFinanceLockTimer();
 }
 
 let financePinListenersBound = false;
@@ -968,6 +970,7 @@ function bindFinancePinUi() {
   if (financePinListenersBound) return;
   financePinListenersBound = true;
   document.getElementById('btn-show-finance')?.addEventListener('click', openFinancePinModal);
+  document.getElementById('btn-finance-lock-now')?.addEventListener('click', lockFinancePanel);
   document.getElementById('finance-pin-submit')?.addEventListener('click', submitFinancePin);
   document.getElementById('finance-pin-cancel')?.addEventListener('click', closeFinancePinModal);
   document.getElementById('finance-pin-modal')?.addEventListener('click', (e) => {
@@ -976,9 +979,13 @@ function bindFinancePinUi() {
   document.getElementById('finance-pin-input')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submitFinancePin();
   });
+  try {
+    localStorage.removeItem('onetap_financial_unlock_until');
+  } catch (_) { /* ignore */ }
   ensureFinancePinDefault();
+  financePanelUnlocked = false;
   applyFinanceLockUi();
-  scheduleFinanceLockTimer();
+  window.addEventListener('pagehide', () => lockFinancePanel());
 }
 
 /** Absolute URL to the public menu page `pages/index.html?slug=…`. */
@@ -1187,8 +1194,7 @@ async function init() {
       if (body) body.textContent = t('dash.subExpiredShort');
     }
     document.getElementById('stats-grid')?.style.setProperty('display', 'none');
-    document.getElementById('btn-show-finance')?.style.setProperty('display', 'none');
-    document.getElementById('finance-wrap')?.style.setProperty('display', 'none');
+    document.getElementById('finance-mega-panel')?.style.setProperty('display', 'none');
     document.querySelector('.quick-actions')?.style.setProperty('display', 'none');
     document.getElementById('dash-categories-container')?.style.setProperty('display', 'none');
     document.getElementById('dash-products-container')?.style.setProperty('display', 'none');

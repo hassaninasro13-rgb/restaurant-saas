@@ -230,6 +230,64 @@
     .finance-stats-grid,
     .ops-stats-grid { grid-template-columns: 1fr; }
   }
+  .finance-wrap {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .finance-wrap.finance-locked .finance-stats-inner {
+    filter: blur(10px);
+    user-select: none;
+    pointer-events: none;
+  }
+  .finance-lock-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .finance-wrap.finance-locked .finance-lock-overlay { display: flex; }
+  .finance-lock-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.35));
+  }
+  .btn-finance-reveal {
+    margin-bottom: 14px;
+  }
+  #finance-pin-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(12,12,12,.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #finance-pin-modal.open { display: flex; }
+  .finance-pin-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .finance-pin-card h3 { margin: 0 0 12px; font-size: 1rem; }
+  .finance-pin-card input {
+    width: 100%;
+    letter-spacing: .4em;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+  }
+  .finance-pin-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .finance-pin-err { color: var(--red); font-size: .82rem; margin-top: 8px; min-height: 1.2em; }
   .quick-action-card {
     background: #fff;
     border: 1.5px solid var(--border);
@@ -571,39 +629,59 @@
         </div>
       </div>
 
-      <!-- FINANCIAL STATS -->
-      <div class="finance-stats-grid" id="financial-stats-grid">
-        <div class="finance-card finance-card--today">
-          <div class="kpi-head">
-            <span class="kpi-icon">💰</span>
-            <div class="kpi-label">دخل اليوم</div>
+      <!-- FINANCIAL STATS (PIN protected) -->
+      <button type="button" class="btn btn-secondary btn-sm btn-finance-reveal" id="btn-show-finance">إظهار البيانات المالية 🔐</button>
+      <div class="finance-wrap finance-locked" id="finance-wrap">
+        <div class="finance-stats-inner" id="finance-stats-inner">
+          <div class="finance-stats-grid" id="financial-stats-grid">
+            <div class="finance-card finance-card--today">
+              <div class="kpi-head">
+                <span class="kpi-icon">💰</span>
+                <div class="kpi-label">دخل اليوم</div>
+              </div>
+              <div class="kpi-value" id="stat-revenue-today">—</div>
+              <div class="kpi-sub">الطلبات المكتملة اليوم</div>
+            </div>
+            <div class="finance-card finance-card--month">
+              <div class="kpi-head">
+                <span class="kpi-icon">📅</span>
+                <div class="kpi-label">دخل هذا الشهر</div>
+              </div>
+              <div class="kpi-value" id="stat-revenue-month">—</div>
+              <div class="kpi-sub">الطلبات المكتملة هذا الشهر</div>
+            </div>
+            <div class="finance-card finance-card--year">
+              <div class="kpi-head">
+                <span class="kpi-icon">📆</span>
+                <div class="kpi-label">دخل هذه السنة</div>
+              </div>
+              <div class="kpi-value" id="stat-revenue-year">—</div>
+              <div class="kpi-sub">الطلبات المكتملة هذه السنة</div>
+            </div>
+            <div class="finance-card finance-card--yoy">
+              <div class="kpi-head">
+                <span class="kpi-icon">📊</span>
+                <div class="kpi-label">مقارنة مع السنة الماضية %</div>
+              </div>
+              <div class="kpi-value" id="stat-revenue-yoy">—</div>
+              <div class="kpi-sub" id="stat-revenue-yoy-sub">—</div>
+            </div>
           </div>
-          <div class="kpi-value" id="stat-revenue-today">—</div>
-          <div class="kpi-sub">الطلبات المكتملة اليوم</div>
         </div>
-        <div class="finance-card finance-card--month">
-          <div class="kpi-head">
-            <span class="kpi-icon">📅</span>
-            <div class="kpi-label">دخل هذا الشهر</div>
-          </div>
-          <div class="kpi-value" id="stat-revenue-month">—</div>
-          <div class="kpi-sub">الطلبات المكتملة هذا الشهر</div>
+        <div class="finance-lock-overlay" id="finance-lock-overlay" aria-hidden="true">
+          <span class="finance-lock-icon" title="">🔒</span>
         </div>
-        <div class="finance-card finance-card--year">
-          <div class="kpi-head">
-            <span class="kpi-icon">📆</span>
-            <div class="kpi-label">دخل هذه السنة</div>
+      </div>
+
+      <div id="finance-pin-modal" role="dialog" aria-modal="true" aria-labelledby="finance-pin-title">
+        <div class="finance-pin-card">
+          <h3 id="finance-pin-title">PIN (4 أرقام)</h3>
+          <input type="password" id="finance-pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="••••">
+          <p class="finance-pin-err" id="finance-pin-err"></p>
+          <div class="finance-pin-actions">
+            <button type="button" class="btn btn-primary" id="finance-pin-submit">تأكيد</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="finance-pin-cancel">إلغاء</button>
           </div>
-          <div class="kpi-value" id="stat-revenue-year">—</div>
-          <div class="kpi-sub">الطلبات المكتملة هذه السنة</div>
-        </div>
-        <div class="finance-card finance-card--yoy">
-          <div class="kpi-head">
-            <span class="kpi-icon">📊</span>
-            <div class="kpi-label">مقارنة مع السنة الماضية %</div>
-          </div>
-          <div class="kpi-value" id="stat-revenue-yoy">—</div>
-          <div class="kpi-sub" id="stat-revenue-yoy-sub">—</div>
         </div>
       </div>
 
@@ -806,6 +884,101 @@ function escHtml(s) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
+}
+
+const FINANCE_PIN_KEY = 'onetap_financial_pin';
+const FINANCE_UNLOCK_UNTIL_KEY = 'onetap_financial_unlock_until';
+const FINANCE_UNLOCK_MS = 30 * 60 * 1000;
+
+function ensureFinancePinDefault() {
+  if (localStorage.getItem(FINANCE_PIN_KEY) == null) {
+    localStorage.setItem(FINANCE_PIN_KEY, '1234');
+  }
+}
+
+function getStoredFinancePin() {
+  ensureFinancePinDefault();
+  return localStorage.getItem(FINANCE_PIN_KEY) || '1234';
+}
+
+function isFinanceUnlocked() {
+  const until = parseInt(localStorage.getItem(FINANCE_UNLOCK_UNTIL_KEY) || '0', 10);
+  return Number.isFinite(until) && Date.now() < until;
+}
+
+function setFinanceUnlockedSession() {
+  localStorage.setItem(FINANCE_UNLOCK_UNTIL_KEY, String(Date.now() + FINANCE_UNLOCK_MS));
+}
+
+function applyFinanceLockUi() {
+  const wrap = document.getElementById('finance-wrap');
+  if (!wrap) return;
+  const locked = !isFinanceUnlocked();
+  wrap.classList.toggle('finance-locked', locked);
+  const btn = document.getElementById('btn-show-finance');
+  if (btn) btn.style.display = locked ? '' : 'none';
+}
+
+function scheduleFinanceLockTimer() {
+  clearTimeout(window.__financeLockTimer);
+  if (!isFinanceUnlocked()) return;
+  const until = parseInt(localStorage.getItem(FINANCE_UNLOCK_UNTIL_KEY) || '0', 10);
+  const ms = Math.max(0, until - Date.now());
+  window.__financeLockTimer = setTimeout(() => {
+    applyFinanceLockUi();
+  }, ms);
+}
+
+function openFinancePinModal() {
+  const modal = document.getElementById('finance-pin-modal');
+  const input = document.getElementById('finance-pin-input');
+  const err = document.getElementById('finance-pin-err');
+  if (!modal || !input) return;
+  modal.classList.add('open');
+  input.value = '';
+  if (err) err.textContent = '';
+  input.focus();
+}
+
+function closeFinancePinModal() {
+  document.getElementById('finance-pin-modal')?.classList.remove('open');
+}
+
+function submitFinancePin() {
+  const input = document.getElementById('finance-pin-input');
+  const err = document.getElementById('finance-pin-err');
+  if (!input) return;
+  const digits = String(input.value || '').replace(/\D/g, '');
+  if (digits.length !== 4) {
+    if (err) err.textContent = 'أدخل 4 أرقام';
+    return;
+  }
+  if (digits !== getStoredFinancePin()) {
+    if (err) err.textContent = 'PIN غير صحيح';
+    return;
+  }
+  setFinanceUnlockedSession();
+  closeFinancePinModal();
+  applyFinanceLockUi();
+  scheduleFinanceLockTimer();
+}
+
+let financePinListenersBound = false;
+function bindFinancePinUi() {
+  if (financePinListenersBound) return;
+  financePinListenersBound = true;
+  document.getElementById('btn-show-finance')?.addEventListener('click', openFinancePinModal);
+  document.getElementById('finance-pin-submit')?.addEventListener('click', submitFinancePin);
+  document.getElementById('finance-pin-cancel')?.addEventListener('click', closeFinancePinModal);
+  document.getElementById('finance-pin-modal')?.addEventListener('click', (e) => {
+    if (e.target?.id === 'finance-pin-modal') closeFinancePinModal();
+  });
+  document.getElementById('finance-pin-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitFinancePin();
+  });
+  ensureFinancePinDefault();
+  applyFinanceLockUi();
+  scheduleFinanceLockTimer();
 }
 
 /** Absolute URL to the public menu page `pages/index.html?slug=…`. */
@@ -1014,6 +1187,8 @@ async function init() {
       if (body) body.textContent = t('dash.subExpiredShort');
     }
     document.getElementById('stats-grid')?.style.setProperty('display', 'none');
+    document.getElementById('btn-show-finance')?.style.setProperty('display', 'none');
+    document.getElementById('finance-wrap')?.style.setProperty('display', 'none');
     document.querySelector('.quick-actions')?.style.setProperty('display', 'none');
     document.getElementById('dash-categories-container')?.style.setProperty('display', 'none');
     document.getElementById('dash-products-container')?.style.setProperty('display', 'none');
@@ -1065,6 +1240,8 @@ async function init() {
   document.getElementById('upgrade-plan-modal').onclick = (e) => {
     if (e.target?.id === 'upgrade-plan-modal') closeUpgradeModal();
   };
+
+  bindFinancePinUi();
 
   await Promise.all([
     loadStats(),
@@ -1160,6 +1337,8 @@ async function loadStats() {
   if (newCount > 0) { badge.style.display = ''; badge.textContent = newCount; }
 
   document.getElementById('stat-orders-sub').textContent = t('dash.statTotalOrders', { n: ordersRes.count ?? 0 });
+
+  applyFinanceLockUi();
 }
 
 async function loadDashboardCategories() {

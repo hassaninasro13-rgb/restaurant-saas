@@ -202,6 +202,12 @@
       </div>
 
       <div class="settings-card">
+        <h3>PIN du tableau de bord (revenus)</h3>
+        <p style="font-size:.8rem;color:var(--ink2);margin:-8px 0 12px;">Le PIN protège l’affichage des revenus sur le tableau de bord. Il est stocké localement sur cet appareil (par défaut&nbsp;: 1234).</p>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-change-finance-pin">تغيير PIN</button>
+      </div>
+
+      <div class="settings-card">
         <h3>Horaires (par jour)</h3>
         <p style="font-size:.8rem;color:var(--ink2);margin:-8px 0 12px;">Utilisés pour le badge « ouvert / fermé » sur le menu public.</p>
         <div style="overflow-x:auto;">
@@ -585,6 +591,40 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
     renderHours(hrs || []);
   }
   await loadRestaurantUsers();
+
+  const FINANCE_PIN_KEY = 'onetap_financial_pin';
+  function ensureFinancePinDefault() {
+    if (localStorage.getItem(FINANCE_PIN_KEY) == null) {
+      localStorage.setItem(FINANCE_PIN_KEY, '1234');
+    }
+  }
+  document.getElementById('btn-change-finance-pin')?.addEventListener('click', () => {
+    ensureFinancePinDefault();
+    const current = localStorage.getItem(FINANCE_PIN_KEY) || '1234';
+    const oldRaw = window.prompt('PIN actuel (4 chiffres) :');
+    if (oldRaw === null) return;
+    const old = String(oldRaw).replace(/\D/g, '');
+    if (old !== current) {
+      toast('PIN incorrect', 'error');
+      return;
+    }
+    const neuRaw = window.prompt('Nouveau PIN (4 chiffres) :');
+    if (neuRaw === null) return;
+    const neu = String(neuRaw).replace(/\D/g, '');
+    if (neu.length !== 4) {
+      toast('Le PIN doit contenir 4 chiffres', 'error');
+      return;
+    }
+    const neu2Raw = window.prompt('Confirmer le nouveau PIN :');
+    if (neu2Raw === null) return;
+    const neu2 = String(neu2Raw).replace(/\D/g, '');
+    if (neu !== neu2) {
+      toast('Les PIN ne correspondent pas', 'error');
+      return;
+    }
+    localStorage.setItem(FINANCE_PIN_KEY, neu);
+    toast('PIN mis à jour', 'success');
+  });
 
   document.getElementById('btn-add-user')?.addEventListener('click', async () => {
     const email = document.getElementById('user-email').value.trim();

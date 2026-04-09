@@ -16,51 +16,143 @@
 
   /* LEFT PANEL */
   .auth-visual {
-    background: var(--ink);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 48px;
     position: relative;
     overflow: hidden;
+    color: #fff;
+    padding: 34px;
+    background:
+      linear-gradient(rgba(26,18,8,.72), rgba(26,18,8,.82)),
+      url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80") center/cover no-repeat;
   }
-  .auth-visual::before {
-    content: '';
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: "Playfair Display", serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: #E84B2A;
+    box-shadow: 0 0 0 5px rgba(232,75,42,.2);
+  }
+  .auth-visual h1 {
+    margin: 68px 0 12px;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(2rem, 3vw, 2.7rem);
+    line-height: 1.15;
+    letter-spacing: .1px;
+    max-width: 420px;
+  }
+  .auth-visual .ar-sub {
+    margin: 0 0 20px;
+    direction: rtl;
+    text-align: right;
+    color: rgba(255,255,255,.86);
+    font-size: .95rem;
+    max-width: 420px;
+  }
+  .qr-card {
+    width: 176px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.36);
+    background: rgba(255,255,255,.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+    animation: floatY 3.5s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite;
+    box-shadow: 0 14px 28px rgba(0,0,0,.22), 0 0 0 1px rgba(232,75,42,.22) inset;
+  }
+  .scan-icon {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto 8px;
+    display: block;
+    color: #ffd9cf;
+    opacity: .95;
+    animation: iconPulse 1.7s ease-in-out infinite;
+  }
+  .qr-box {
+    position: relative;
+    border-radius: 12px;
+    background: rgba(255,255,255,.92);
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,.72);
+  }
+  .qr-svg {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: block;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .scan-line {
     position: absolute;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(var(--accent-rgb), .32) 0%, transparent 70%);
-    top: -100px; left: -100px;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(232,75,42,.9), transparent);
+    box-shadow: 0 0 10px rgba(232,75,42,.65);
+    animation: scanBeam 2.4s linear infinite;
     pointer-events: none;
   }
-  .auth-visual::after {
-    content: '';
-    position: absolute;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(var(--accent-rgb), .16) 0%, transparent 70%);
-    bottom: 60px; right: -60px;
-    pointer-events: none;
+  .stats {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
-  .auth-brand {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--accent);
-    letter-spacing: -.03em;
-    position: relative;
-    z-index: 1;
+  .stat {
+    min-width: 90px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(255,255,255,.08);
+    padding: 10px 10px 8px;
+    text-align: center;
   }
-  .auth-brand span { color: #fff; }
-  .auth-tagline {
-    font-size: .85rem;
-    color: rgba(255,255,255,.4);
-    margin-top: 4px;
+  .stat strong {
+    display: block;
+    font-size: 1.12rem;
+    line-height: 1.1;
   }
-  .auth-visual-content {
-    position: relative;
-    z-index: 1;
+  .stat small {
+    display: block;
+    margin-top: 3px;
+    font-size: .68rem;
+    color: rgba(255,255,255,.8);
+  }
+  @keyframes floatY {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes glowPulse {
+    0%,100% { box-shadow: 0 14px 28px rgba(0,0,0,.22), 0 0 0 1px rgba(232,75,42,.22) inset, 0 0 0 rgba(232,75,42,0); }
+    50% { box-shadow: 0 16px 32px rgba(0,0,0,.24), 0 0 0 1px rgba(232,75,42,.45) inset, 0 0 20px rgba(232,75,42,.28); }
+  }
+  @keyframes scanBeam {
+    0% { transform: translateY(0); opacity: .1; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translateY(calc(100% + 116px)); opacity: .1; }
+  }
+  @keyframes iconPulse {
+    0%,100% { transform: scale(1); opacity: .9; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+  .auth-visual-footer {
+    color: rgba(255,255,255,.25);
+    font-size: .75rem;
   }
   .auth-visual-headline {
-    font-family: var(--font-display);
+    font-family: "Playfair Display", serif;
     font-size: 2.4rem;
     font-weight: 800;
     color: #fff;
@@ -170,21 +262,65 @@
 
 <!-- LEFT VISUAL -->
 <aside class="auth-visual">
-  <div>
-    <div class="auth-brand">OneTap<span>Menu</span></div>
-    <div class="auth-tagline">Système de menu digital pour l'Algérie</div>
-  </div>
-  <div class="auth-visual-content">
-    <div class="auth-visual-headline">
-      Votre menu en ligne,<br><em>en 5 minutes.</em>
+  <div class="logo"><span class="dot"></span>OneTap Menu</div>
+  <h1>Votre menu, scanné en une seconde.</h1>
+  <p class="ar-sub">قائمتك، بمسح واحد من الهاتف</p>
+  <div class="qr-card">
+    <svg class="scan-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 7V5a1 1 0 0 1 1-1h2M20 7V5a1 1 0 0 0-1-1h-2M4 17v2a1 1 0 0 0 1 1h2M20 17v2a1 1 0 0 1-1 1h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M8 12h8M10 9.5h4M10 14.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <div class="qr-box">
+      <svg class="qr-svg" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" aria-label="QR code">
+        <rect width="84" height="84" fill="#fff"/>
+        <rect x="4" y="4" width="20" height="20" rx="2" fill="#E84B2A"/>
+        <rect x="8" y="8" width="12" height="12" rx="1" fill="#111"/>
+        <rect x="60" y="4" width="20" height="20" rx="2" fill="#E84B2A"/>
+        <rect x="64" y="8" width="12" height="12" rx="1" fill="#111"/>
+        <rect x="4" y="60" width="20" height="20" rx="2" fill="#E84B2A"/>
+        <rect x="8" y="64" width="12" height="12" rx="1" fill="#111"/>
+        <rect x="30" y="6" width="4" height="4" fill="#111"/>
+        <rect x="38" y="6" width="4" height="4" fill="#111"/>
+        <rect x="46" y="6" width="4" height="4" fill="#111"/>
+        <rect x="30" y="14" width="4" height="4" fill="#111"/>
+        <rect x="46" y="14" width="4" height="4" fill="#111"/>
+        <rect x="30" y="22" width="4" height="4" fill="#111"/>
+        <rect x="38" y="22" width="4" height="4" fill="#111"/>
+        <rect x="46" y="22" width="4" height="4" fill="#111"/>
+        <rect x="28" y="34" width="4" height="4" fill="#111"/>
+        <rect x="36" y="34" width="4" height="4" fill="#111"/>
+        <rect x="44" y="34" width="4" height="4" fill="#111"/>
+        <rect x="52" y="34" width="4" height="4" fill="#111"/>
+        <rect x="60" y="34" width="4" height="4" fill="#111"/>
+        <rect x="30" y="42" width="4" height="4" fill="#111"/>
+        <rect x="38" y="42" width="4" height="4" fill="#111"/>
+        <rect x="46" y="42" width="4" height="4" fill="#111"/>
+        <rect x="54" y="42" width="4" height="4" fill="#111"/>
+        <rect x="62" y="42" width="4" height="4" fill="#111"/>
+        <rect x="22" y="50" width="4" height="4" fill="#111"/>
+        <rect x="30" y="50" width="4" height="4" fill="#111"/>
+        <rect x="38" y="50" width="4" height="4" fill="#111"/>
+        <rect x="46" y="50" width="4" height="4" fill="#111"/>
+        <rect x="54" y="50" width="4" height="4" fill="#111"/>
+        <rect x="62" y="50" width="4" height="4" fill="#111"/>
+        <rect x="22" y="58" width="4" height="4" fill="#111"/>
+        <rect x="30" y="58" width="4" height="4" fill="#111"/>
+        <rect x="46" y="58" width="4" height="4" fill="#111"/>
+        <rect x="54" y="58" width="4" height="4" fill="#111"/>
+        <rect x="62" y="58" width="4" height="4" fill="#111"/>
+        <rect x="30" y="66" width="4" height="4" fill="#111"/>
+        <rect x="38" y="66" width="4" height="4" fill="#111"/>
+        <rect x="46" y="66" width="4" height="4" fill="#111"/>
+        <rect x="54" y="66" width="4" height="4" fill="#111"/>
+        <rect x="62" y="66" width="4" height="4" fill="#111"/>
+      </svg>
+      <div class="scan-line"></div>
     </div>
-    <ul class="auth-feature-list">
-      <li><span class="auth-feature-dot"></span>Menu digital avec QR code</li>
-      <li><span class="auth-feature-dot"></span>Commandes WhatsApp automatiques</li>
-      <li><span class="auth-feature-dot"></span>Tableau de bord en temps réel</li>
-      <li><span class="auth-feature-dot"></span>Gestion des catégories et produits</li>
-      <li><span class="auth-feature-dot"></span>Analytics et rapports</li>
-    </ul>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong>2min</strong><small>setup</small></div>
+    <div class="stat"><strong>500+</strong><small>commerces</small></div>
+    <div class="stat"><strong>100%</strong><small>free</small></div>
   </div>
   <div class="auth-visual-footer">© 2026 OneTap Menu — Made in Algeria 🇩🇿</div>
 </aside>

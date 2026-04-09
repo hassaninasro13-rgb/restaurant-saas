@@ -62,6 +62,29 @@
     inset: 0;
     background: radial-gradient(circle at 30% 50%, rgba(var(--accent-rgb), .35) 0%, transparent 60%);
   }
+  .menu-hero-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 18px 20px 16px;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.62) 55%, rgba(0,0,0,.78) 100%);
+  }
+  .menu-rest-name.hero-title {
+    font-size: clamp(1.8rem, 5vw, 2.25rem);
+    color: #fff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 10px rgba(0,0,0,.45);
+    line-height: 1.15;
+  }
+  .menu-rest-desc {
+    font-size: .9rem;
+    color: rgba(255,255,255,.88);
+    text-shadow: 0 1px 6px rgba(0,0,0,.35);
+    line-height: 1.35;
+    max-width: 92%;
+  }
 
   .menu-hero-info {
     padding: 20px 20px 16px;
@@ -713,10 +736,13 @@
 <div class="menu-header">
   <div class="menu-hero">
     <div class="menu-cover-placeholder" id="hero-placeholder"></div>
+    <div class="menu-hero-text">
+      <div class="menu-rest-name hero-title" id="rest-name" data-i18n="pub.loading">Chargement…</div>
+      <div class="menu-rest-desc" id="rest-desc-hero"></div>
+    </div>
   </div>
   <div class="menu-hero-info">
     <div id="menu-logo-area"></div>
-    <div class="menu-rest-name" id="rest-name" data-i18n="pub.loading">Chargement…</div>
     <div class="menu-rest-meta">
       <span id="rest-address"></span>
       <span id="rest-hours-badge"></span>
@@ -1031,6 +1057,7 @@ async function tryRestoreResolvedSourceSession(rest) {
 (async () => {
   if (!slug || !slug.trim()) {
     document.getElementById('rest-name').textContent = t('pub.menu');
+    document.getElementById('rest-desc-hero').textContent = '';
     document.getElementById('menu-body').innerHTML = `
       <div class="no-cat-msg" style="text-align:left;max-width:320px;margin:0 auto;">
         <p><strong>${esc(t('pub.slugHelpTitle'))}</strong></p>
@@ -1050,6 +1077,7 @@ async function tryRestoreResolvedSourceSession(rest) {
 
   if (!rest && menuBlockedReason === 'subscription_expired') {
     document.getElementById('rest-name').textContent = t('pub.menuUnavailable');
+    document.getElementById('rest-desc-hero').textContent = '';
     document.getElementById('menu-body').innerHTML = `<div class="no-cat-msg">${esc(t('pub.menuUnavailableSub'))}</div>`;
     hideLoader();
     return;
@@ -1057,6 +1085,7 @@ async function tryRestoreResolvedSourceSession(rest) {
 
   if (!rest) {
     document.getElementById('rest-name').textContent = t('pub.menuNotFound');
+    document.getElementById('rest-desc-hero').textContent = '';
     document.getElementById('menu-body').innerHTML = `<div class="no-cat-msg">${esc(t('pub.menuNotFoundSub'))}</div>`;
     hideLoader();
     return;
@@ -1080,6 +1109,7 @@ async function tryRestoreResolvedSourceSession(rest) {
   document.title = `${rest.name} — Menu`;
 
   document.getElementById('rest-name').textContent = rest.name;
+  document.getElementById('rest-desc-hero').textContent = rest.description || rest.address || '';
   if (rest.address) {
     document.getElementById('rest-address').innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> ${rest.address}`;
   }

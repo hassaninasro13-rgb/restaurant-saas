@@ -414,7 +414,7 @@
 
       <div class="stats">
         <div class="stat"><strong>2min</strong><small>setup</small></div>
-        <div class="stat"><strong>500+</strong><small>restaurants</small></div>
+        <div class="stat"><strong>500+</strong><small>commerces</small></div>
         <div class="stat"><strong>100%</strong><small>free</small></div>
       </div>
     </aside>
@@ -427,9 +427,9 @@
           <div class="step">Menu</div>
         </div>
 
-        <h1 class="title">Créer votre restaurant</h1>
-        <p class="sub">Commencez par créer votre compte, puis nous vous redirigerons vers la création de votre restaurant.</p>
-        <p class="sub-ar">أنشئ حسابك أولًا ثم سنوجهك مباشرة لإنشاء المطعم.</p>
+        <h1 class="title">Créer votre compte</h1>
+        <p class="sub">Commencez par créer votre compte, puis nous vous redirigerons vers la création de votre espace.</p>
+        <p class="sub-ar">أنشئ حسابك أولاً ثم سنتوجهك لإعداد نشاطك.</p>
 
         <div id="alert-area"></div>
 
@@ -465,7 +465,7 @@
             </div>
           </div>
 
-          <button id="submit-btn" type="submit">Create Restaurant Account</button>
+          <button id="submit-btn" type="submit">Créer mon compte</button>
         </form>
 
         <div class="badges">
@@ -564,7 +564,7 @@
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Create Restaurant Account';
+        submitBtn.textContent = 'Créer mon compte';
         setAlert(error.message || 'Inscription impossible.');
         return;
       }
@@ -576,7 +576,7 @@
       }
       if (!hasSession) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Create Restaurant Account';
+        submitBtn.textContent = 'Créer mon compte';
         setAlert('Le compte a ete cree, mais la connexion automatique a echoue.');
         return;
       }

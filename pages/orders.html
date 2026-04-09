@@ -367,12 +367,11 @@
     <div class="page-content">
 
       <!-- STATS ROW -->
-      <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px;" id="stats-row">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;" id="stats-row">
         <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statNew">Nouvelles</div><div class="stat-card-value" id="s-new" style="color:var(--blue)">—</div></div>
         <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statPreparing">En préparation</div><div class="stat-card-value" id="s-preparing" style="color:var(--amber)">—</div></div>
         <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statReady">Prêtes</div><div class="stat-card-value" id="s-ready" style="color:var(--green)">—</div></div>
         <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statDone30">Terminées (30j)</div><div class="stat-card-value" id="s-done">—</div></div>
-        <div class="stat-card"><div class="stat-card-label" data-i18n="ord.statRevenue">CA (30j)</div><div class="stat-card-value" id="s-revenue" style="color:var(--accent)">—</div></div>
       </div>
 
       <!-- FILTERS + SEARCH -->
@@ -488,12 +487,6 @@ function updateStats() {
   document.getElementById('s-ready').textContent = allOrders.filter(o => o.status === 'ready').length;
   const doneLike = (s) => ['completed', 'done', 'delivered'].includes(s);
   document.getElementById('s-done').textContent = recent.filter(o => doneLike(o.status)).length;
-  const revenue = recent.filter(o => doneLike(o.status)).reduce((s, o) => s + (o.total_amount || 0), 0);
-  document.getElementById('s-revenue').textContent = fmtCurrency(
-    revenue,
-    getRestaurantCurrency(restaurant),
-    getRestaurantLocale(restaurant),
-  );
 }
 
 function getFiltered() {

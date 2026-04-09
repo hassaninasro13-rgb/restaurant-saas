@@ -155,6 +155,81 @@
     gap: 12px;
     margin-bottom: 24px;
   }
+  .finance-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ops-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .finance-card {
+    border-radius: var(--radius-lg);
+    padding: 18px 16px;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 10px 22px rgba(10,10,10,.12);
+  }
+  .finance-card--today { background: linear-gradient(135deg, #C8392B 0%, #A72D21 100%); }
+  .finance-card--month { background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%); }
+  .finance-card--year { background: linear-gradient(135deg, #2b2420 0%, #1a1512 100%); }
+  .finance-card--yoy { background: linear-gradient(135deg, #6B2018 0%, #3E1612 100%); }
+  .ops-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 16px;
+  }
+  .kpi-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .kpi-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: rgba(255,255,255,.16);
+  }
+  .ops-card .kpi-icon {
+    background: var(--cream2);
+  }
+  .kpi-label {
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+  }
+  .kpi-value {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 4px;
+  }
+  .finance-card .kpi-sub {
+    font-size: .72rem;
+    color: rgba(255,255,255,.78);
+  }
+  .ops-card .kpi-sub {
+    font-size: .72rem;
+    color: var(--ink3);
+  }
+  @media (max-width: 1100px) {
+    .finance-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 760px) {
+    .finance-stats-grid,
+    .ops-stats-grid { grid-template-columns: 1fr; }
+  }
   .quick-action-card {
     background: #fff;
     border: 1.5px solid var(--border);
@@ -497,58 +572,66 @@
       </div>
 
       <!-- FINANCIAL STATS -->
-      <div class="stats-grid" id="financial-stats-grid" style="margin-bottom:16px;">
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--green-lt);color:var(--green)">🗓️</div>
-          <div class="stat-card-label">دخل اليوم</div>
-          <div class="stat-card-value" id="stat-revenue-today">—</div>
-          <div class="stat-card-sub">الطلبات المكتملة اليوم</div>
+      <div class="finance-stats-grid" id="financial-stats-grid">
+        <div class="finance-card finance-card--today">
+          <div class="kpi-head">
+            <span class="kpi-icon">💰</span>
+            <div class="kpi-label">دخل اليوم</div>
+          </div>
+          <div class="kpi-value" id="stat-revenue-today">—</div>
+          <div class="kpi-sub">الطلبات المكتملة اليوم</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--blue-lt);color:var(--blue)">📆</div>
-          <div class="stat-card-label">دخل هذا الشهر</div>
-          <div class="stat-card-value" id="stat-revenue-month">—</div>
-          <div class="stat-card-sub">الطلبات المكتملة هذا الشهر</div>
+        <div class="finance-card finance-card--month">
+          <div class="kpi-head">
+            <span class="kpi-icon">📅</span>
+            <div class="kpi-label">دخل هذا الشهر</div>
+          </div>
+          <div class="kpi-value" id="stat-revenue-month">—</div>
+          <div class="kpi-sub">الطلبات المكتملة هذا الشهر</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--accent-lt);color:var(--accent)">📈</div>
-          <div class="stat-card-label">دخل هذه السنة</div>
-          <div class="stat-card-value" id="stat-revenue-year">—</div>
-          <div class="stat-card-sub">الطلبات المكتملة هذه السنة</div>
+        <div class="finance-card finance-card--year">
+          <div class="kpi-head">
+            <span class="kpi-icon">📆</span>
+            <div class="kpi-label">دخل هذه السنة</div>
+          </div>
+          <div class="kpi-value" id="stat-revenue-year">—</div>
+          <div class="kpi-sub">الطلبات المكتملة هذه السنة</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--amber-lt);color:var(--amber)">↕️</div>
-          <div class="stat-card-label">مقارنة مع السنة الماضية</div>
-          <div class="stat-card-value" id="stat-revenue-yoy">—</div>
-          <div class="stat-card-sub" id="stat-revenue-yoy-sub">—</div>
+        <div class="finance-card finance-card--yoy">
+          <div class="kpi-head">
+            <span class="kpi-icon">📊</span>
+            <div class="kpi-label">مقارنة مع السنة الماضية %</div>
+          </div>
+          <div class="kpi-value" id="stat-revenue-yoy">—</div>
+          <div class="kpi-sub" id="stat-revenue-yoy-sub">—</div>
         </div>
       </div>
 
-      <!-- STATS -->
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--accent-lt);color:var(--accent)">📋</div>
-          <div class="stat-card-label" data-i18n="dash.statOrdersToday">Commandes aujourd'hui</div>
-          <div class="stat-card-value" id="stat-orders-today">—</div>
-          <div class="stat-card-sub" id="stat-orders-sub" data-i18n="dash.statLoading">Chargement...</div>
+      <!-- OPERATIONAL STATS -->
+      <div class="ops-stats-grid" id="stats-grid">
+        <div class="ops-card">
+          <div class="kpi-head">
+            <span class="kpi-icon">🛒</span>
+            <div class="kpi-label" data-i18n="dash.statOrdersToday">طلبات اليوم</div>
+          </div>
+          <div class="kpi-value" id="stat-orders-today">—</div>
+          <div class="kpi-sub" id="stat-orders-sub" data-i18n="dash.statLoading">Chargement...</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--green-lt);color:var(--green)">💰</div>
-          <div class="stat-card-label" data-i18n="dash.statRevenue">Chiffre d'affaires (30j)</div>
-          <div class="stat-card-value" id="stat-revenue">—</div>
-          <div class="stat-card-sub" data-i18n="dash.statRevenueSub">Commandes terminées</div>
+        <div class="ops-card">
+          <div class="kpi-head">
+            <span class="kpi-icon">🍽️</span>
+            <div class="kpi-label" data-i18n="dash.statProducts">Produits actifs</div>
+          </div>
+          <div class="kpi-value" id="stat-products">—</div>
+          <div class="kpi-sub" id="stat-categories-sub">Dans — catégories</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--blue-lt);color:var(--blue)">🍽️</div>
-          <div class="stat-card-label" data-i18n="dash.statProducts">Produits actifs</div>
-          <div class="stat-card-value" id="stat-products">—</div>
-          <div class="stat-card-sub" id="stat-categories-sub">Dans — catégories</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--amber-lt);color:var(--amber)">⏳</div>
-          <div class="stat-card-label" data-i18n="dash.statPending">En attente</div>
-          <div class="stat-card-value" id="stat-pending">—</div>
-          <div class="stat-card-sub" data-i18n="dash.statPendingSub">Nouvelles commandes</div>
+        <div class="ops-card">
+          <div class="kpi-head">
+            <span class="kpi-icon">⏳</span>
+            <div class="kpi-label" data-i18n="dash.statPending">En attente</div>
+          </div>
+          <div class="kpi-value" id="stat-pending">—</div>
+          <div class="kpi-sub" data-i18n="dash.statPendingSub">Nouvelles commandes</div>
         </div>
       </div>
 
@@ -1033,13 +1116,11 @@ async function loadStats() {
   const prevYearStart = new Date(now.getFullYear() - 1, 0, 1);
   const prevYearEnd = new Date(now.getFullYear(), 0, 1);
 
-  const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const [ordersRes, productsRes, catsRes, pendingRes, revenueRes, revTodayRes, revMonthRes, revYearRes, revPrevYearRes] = await Promise.all([
+  const [ordersRes, productsRes, catsRes, pendingRes, revTodayRes, revMonthRes, revYearRes, revPrevYearRes] = await Promise.all([
     countOrdersSince(restaurant.id, today.toISOString()),
     countAvailableProducts(restaurant.id),
     countCategoriesForRestaurant(restaurant.id),
     countOrdersByStatus(restaurant.id, 'new'),
-    sumDoneOrdersTotalSince(restaurant.id, since30d),
     sumDoneOrdersTotalSince(restaurant.id, today.toISOString()),
     sumDoneOrdersTotalSince(restaurant.id, monthStart.toISOString()),
     sumDoneOrdersTotalSince(restaurant.id, yearStart.toISOString()),
@@ -1050,13 +1131,6 @@ async function loadStats() {
   document.getElementById('stat-products').textContent = productsRes.count ?? 0;
   document.getElementById('stat-categories-sub').textContent = t('dash.statInCategories', { n: catsRes.count ?? 0 });
   document.getElementById('stat-pending').textContent = pendingRes.count ?? 0;
-
-  const revenue = (revenueRes.data || []).reduce((s, o) => s + (o.total_amount || 0), 0);
-  document.getElementById('stat-revenue').textContent = fmtCurrency(
-    revenue,
-    getRestaurantCurrency(restaurant),
-    getRestaurantLocale(restaurant),
-  );
 
   const revToday = (revTodayRes.data || []).reduce((s, o) => s + (o.total_amount || 0), 0);
   const revMonth = (revMonthRes.data || []).reduce((s, o) => s + (o.total_amount || 0), 0);

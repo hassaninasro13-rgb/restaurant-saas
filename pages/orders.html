@@ -265,19 +265,6 @@
   }
   .order-total-summary strong { font-family: var(--font-display); font-size: 1.1rem; }
 
-  .live-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    display: inline-block;
-    animation: pulse 2s infinite;
-    margin-right: 4px;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: .4; }
-  }
-
   @media (max-width: 900px) {
     .order-card-header { grid-template-columns: 1fr 1fr; }
     .order-info-grid { grid-template-columns: 1fr 1fr; }
@@ -354,7 +341,6 @@
     <header class="topbar">
       <div class="topbar-left">
         <h1 class="topbar-title">
-          <span class="live-dot"></span>
           <span data-i18n="ord.title">Commandes</span>
         </h1>
       </div>
@@ -466,8 +452,8 @@ function esc(s) {
   await loadOrders();
   hideLoader();
 
-  // Auto-refresh every 30 seconds
-  refreshInterval = setInterval(loadOrders, 30000);
+  // Polling only (no Realtime): refresh list every 5s; manual refresh via topbar button.
+  refreshInterval = setInterval(loadOrders, 5000);
 })();
 
 window.loadOrders = async function() {

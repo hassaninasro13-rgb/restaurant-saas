@@ -255,7 +255,7 @@
         <h1 class="topbar-title">Produits</h1>
       </div>
       <div class="topbar-right" style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button type="button" class="btn btn-primary btn-sm" id="btn-import-image-topbar">📷 استيراد من صورة</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-import-image-topbar">📷 استيراد منيو من صورة</button>
         <button class="btn btn-secondary btn-sm" onclick="resetForm()">Nouveau produit</button>
       </div>
     </header>
@@ -271,7 +271,7 @@
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
             <input type="file" id="menu-import-image" accept="image/*" style="display:none">
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-import-image">📷 استيراد من صورة</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-import-image">📷 استيراد منيو من صورة</button>
             <button type="button" class="btn btn-primary btn-sm" id="btn-import-add-all" style="display:none;">إضافة الكل</button>
           </div>
           <div id="import-review" class="import-review-card" style="display:none;"></div>
@@ -534,7 +534,6 @@ async function importMenuFromImage(file) {
           .map((x) => ({
             name: String(x?.name || '').trim(),
             price: normalizePrice(x?.price),
-            description: String(x?.description || '').trim(),
           }))
           .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0),
       }))
@@ -551,7 +550,7 @@ async function importMenuFromImage(file) {
     toast('فشل تحليل الصورة', 'error');
   } finally {
     btn.classList.remove('btn-importing');
-    btn.textContent = '📷 استيراد من صورة';
+    btn.textContent = '📷 استيراد منيو من صورة';
   }
 }
 
@@ -608,7 +607,7 @@ async function importMenuFromImage(file) {
           name: item.name,
           price: Math.max(0, Math.round(item.price)),
           compare_price: null,
-          description: item.description || null,
+          description: null,
           position: 0,
           is_visible: true,
           is_available: true,

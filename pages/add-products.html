@@ -254,7 +254,8 @@
       <div class="topbar-left">
         <h1 class="topbar-title">Produits</h1>
       </div>
-      <div class="topbar-right">
+      <div class="topbar-right" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn btn-primary btn-sm" id="btn-import-image-topbar">📷 استيراد من صورة</button>
         <button class="btn btn-secondary btn-sm" onclick="resetForm()">Nouveau produit</button>
       </div>
     </header>
@@ -553,6 +554,9 @@ async function importMenuFromImage(file) {
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;
   await Promise.all([loadCategories(), loadProducts()]);
+  document.getElementById('btn-import-image-topbar')?.addEventListener('click', () => {
+    document.getElementById('menu-import-image')?.click();
+  });
   document.getElementById('btn-import-image')?.addEventListener('click', () => {
     document.getElementById('menu-import-image')?.click();
   });

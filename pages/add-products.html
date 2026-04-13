@@ -403,7 +403,7 @@ import {
   getRoleHomePath,
   isRestaurantRoleAllowed,
 } from '../supabase/restaurant-users.js';
-import { listCategoriesForRestaurant } from '../supabase/categories.js';
+import { listCategoriesForRestaurant, insertCategoryForRestaurant } from '../supabase/categories.js';
 import {
   listProductsWithCategory,
   getProductForRestaurant,
@@ -431,7 +431,7 @@ let selectedFile = null;
 let previewObjectUrl = null;
 let imageRemovedForEdit = false;
 let currentFilter = null;
-let importedMenuItems = [];
+let importedMenuCategories = [];
 
 function setImgOptStatus(text) {
   const el = document.getElementById('img-opt-status');
@@ -461,24 +461,44 @@ function guessCategoryId(categoryName) {
   return categories[0]?.id || '';
 }
 
+async function getOrCreateCategoryIdByName(categoryName) {
+  const name = String(categoryName || '').trim();
+  if (!name) return categories[0]?.id || '';
+  const existing = categories.find((c) => String(c.name || '').trim().toLowerCase() === name.toLowerCase());
+  if (existing) return existing.id;
+  const { error } = await insertCategoryForRestaurant(restaurant.id, {
+    name,
+    description: null,
+    position: categories.length + 1,
+    print_station: 'kitchen_pizza',
+  });
+  if (error) return '';
+  await loadCategories();
+  return guessCategoryId(name);
+}
+
 function renderImportReview() {
   const box = document.getElementById('import-review');
   const addAllBtn = document.getElementById('btn-import-add-all');
   if (!box || !addAllBtn) return;
-  if (!importedMenuItems.length) {
+  if (!importedMenuCategories.length) {
     box.style.display = 'none';
     addAllBtn.style.display = 'none';
     return;
   }
   box.style.display = '';
   addAllBtn.style.display = '';
+  const totalItems = importedMenuCategories.reduce((s, c) => s + (c.products?.length || 0), 0);
   box.innerHTML = `
-    <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${importedMenuItems.length})</div>
-    ${importedMenuItems.map((it, i) => `
-      <div class="import-review-row" data-import-row="${i}">
-        <div class="import-review-name">${it.name}</div>
-        <div class="import-review-price">${fmtCurrency(it.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
-      </div>
+    <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${totalItems})</div>
+    ${importedMenuCategories.map((cat, i) => `
+      <div style="font-weight:700;font-size:.82rem;color:var(--ink2);margin:10px 0 6px;" data-import-cat="${i}">${cat.name}</div>
+      ${(cat.products || []).map((it, j) => `
+        <div class="import-review-row" data-import-row="${i}-${j}">
+          <div class="import-review-name">${it.name}</div>
+          <div class="import-review-price">${fmtCurrency(it.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
+        </div>
+      `).join('')}
     `).join('')}
   `;
 }
@@ -506,18 +526,24 @@ async function importMenuFromImage(file) {
     });
     const payload = await res.json();
     if (!res.ok) throw new Error(payload?.error || 'import_failed');
-    const items = Array.isArray(payload?.items) ? payload.items : [];
-    importedMenuItems = items
-      .map((x) => ({
-        name: String(x?.name || '').trim(),
-        price: normalizePrice(x?.price),
-        category_name: String(x?.category_name || '').trim() || null,
+    const cats = Array.isArray(payload?.categories) ? payload.categories : [];
+    importedMenuCategories = cats
+      .map((cat) => ({
+        name: String(cat?.name || '').trim() || 'Sans catégorie',
+        products: (Array.isArray(cat?.products) ? cat.products : [])
+          .map((x) => ({
+            name: String(x?.name || '').trim(),
+            price: normalizePrice(x?.price),
+            description: String(x?.description || '').trim(),
+          }))
+          .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0),
       }))
-      .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0);
-    if (!importedMenuItems.length) {
+      .filter((cat) => cat.products.length > 0);
+    const totalItems = importedMenuCategories.reduce((s, c) => s + c.products.length, 0);
+    if (!totalItems) {
       toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');
     } else {
-      toast(`تم استخراج ${importedMenuItems.length} منتج`, 'success');
+      toast(`تم استخراج ${totalItems} منتج`, 'success');
     }
     renderImportReview();
   } catch (err) {
@@ -566,30 +592,32 @@ async function importMenuFromImage(file) {
     e.target.value = '';
   });
   document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
-    if (!importedMenuItems.length) return;
+    if (!importedMenuCategories.length) return;
     const btn = document.getElementById('btn-import-add-all');
     if (btn) {
       btn.disabled = true;
       btn.textContent = 'جاري الإضافة...';
     }
     let ok = 0;
-    for (const item of importedMenuItems) {
-      const categoryId = guessCategoryId(item.category_name);
+    for (const cat of importedMenuCategories) {
+      const categoryId = await getOrCreateCategoryIdByName(cat.name);
       if (!categoryId) continue;
-      const { error } = await insertProductForRestaurant(restaurant.id, {
-        category_id: categoryId,
-        name: item.name,
-        price: Math.max(0, Math.round(item.price)),
-        compare_price: null,
-        description: null,
-        position: 0,
-        is_visible: true,
-        is_available: true,
-        image_url: null,
-      });
-      if (!error) ok += 1;
+      for (const item of cat.products) {
+        const { error } = await insertProductForRestaurant(restaurant.id, {
+          category_id: categoryId,
+          name: item.name,
+          price: Math.max(0, Math.round(item.price)),
+          compare_price: null,
+          description: item.description || null,
+          position: 0,
+          is_visible: true,
+          is_available: true,
+          image_url: null,
+        });
+        if (!error) ok += 1;
+      }
     }
-    importedMenuItems = [];
+    importedMenuCategories = [];
     renderImportReview();
     await loadProducts();
     if (btn) {

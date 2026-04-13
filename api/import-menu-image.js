@@ -15,10 +15,11 @@ export default async function handler(req, res) {
     }
 
     const prompt = [
-      'Extract menu items and prices from this image.',
-      'Return strict JSON array only (no markdown, no comments).',
-      'Each item must be: {"name":"string","price":number,"category_name":"string|null"}',
-      'Price should be plain number without currency.',
+      'Extract menu categories and products from this image.',
+      'Return strict JSON object only (no markdown, no comments).',
+      'JSON shape must be exactly: {"categories":[{"name":"string","products":[{"name":"string","price":number,"description":"string"}]}]}',
+      'Keep categories separated correctly, price as plain number only.',
+      'If description is missing, use empty string.',
     ].join(' ');
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -65,19 +66,19 @@ export default async function handler(req, res) {
       .join('\n')
       .trim();
 
-    let parsed = [];
+    let parsed = { categories: [] };
     try {
       parsed = JSON.parse(text);
     } catch {
-      const start = text.indexOf('[');
-      const end = text.lastIndexOf(']');
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
       if (start >= 0 && end > start) {
         parsed = JSON.parse(text.slice(start, end + 1));
       }
     }
 
-    if (!Array.isArray(parsed)) parsed = [];
-    return res.status(200).json({ items: parsed });
+    const categories = Array.isArray(parsed?.categories) ? parsed.categories : [];
+    return res.status(200).json({ categories });
   } catch (err) {
     return res.status(500).json({ error: err?.message || 'server_error' });
   }

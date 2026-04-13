@@ -221,6 +221,15 @@
               <input type="number" id="cat-position" class="input" placeholder="0" min="0" value="0">
               <p style="font-size:.75rem;color:var(--ink3);margin-top:4px;">Ordre d'affichage (0 = premier)</p>
             </div>
+            <div class="field">
+              <label>القسم</label>
+              <select id="cat-print-station" class="input">
+                <option value="kitchen_pizza">Kitchen Pizza</option>
+                <option value="kitchen_sandwich">Kitchen Sandwich</option>
+                <option value="bar">Bar</option>
+                <option value="cashier">Cashier</option>
+              </select>
+            </div>
           </div>
 
           <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
@@ -268,6 +277,12 @@ let restaurant = null;
 let editingId = null;
 let selectedEmoji = '🍽️';
 const panelOpen = { value: true };
+const PRINT_STATION_OPTIONS = [
+  { value: 'kitchen_pizza', label: 'Kitchen Pizza' },
+  { value: 'kitchen_sandwich', label: 'Kitchen Sandwich' },
+  { value: 'bar', label: 'Bar' },
+  { value: 'cashier', label: 'Cashier' },
+];
 
 const FOOD_EMOJIS = ['🍽️','🥗','🍕','🍔','🌮','🍜','🍣','🥩','🍗','🥘','🫕','🍛','🍚','🥙','🌯','🥪','🍱','🫙','🥡','🍤','🍟','🧆','🥚','🍳','🧇','🥞','🧈','🥓','🌭','🫔','🍖','🦴','🍠','🧀','🥦','🥕','🥑','🍅','🫑','🧅','🌽','🥬','🍄','🥜','🫘','🌾','🍞','🥖','🥐','🧁','🎂','🍰','🍫','🍬','🍭','🍮','🧋','☕','🍵','🫖','🥤','🧃','🍶','🍷','🍸','🍹','🍺','🥂','🍾','🫗','🥛','🍼','🧊','💧'];
 
@@ -353,6 +368,8 @@ async function loadCategories() {
           <span>${c.products?.[0]?.count ?? 0} produit(s)</span>
           <span>·</span>
           <span>Position ${c.position}</span>
+          <span>·</span>
+          <span>${(PRINT_STATION_OPTIONS.find((s) => s.value === c.print_station)?.label) || 'Kitchen Pizza'}</span>
         </div>
         ${c.description ? `<p style="font-size:.8rem;color:var(--ink3);margin-bottom:12px;">${c.description}</p>` : ''}
         <div class="cat-card-actions">
@@ -383,6 +400,7 @@ window.saveCategory = async function() {
     name,
     description: document.getElementById('cat-desc').value.trim() || null,
     position: parseInt(document.getElementById('cat-position').value) || 0,
+    print_station: document.getElementById('cat-print-station').value || 'kitchen_pizza',
   };
 
   let error;
@@ -408,6 +426,7 @@ window.editCategory = async function(id) {
   document.getElementById('cat-name').value = c.name;
   document.getElementById('cat-desc').value = c.description || '';
   document.getElementById('cat-position').value = c.position;
+  document.getElementById('cat-print-station').value = c.print_station || 'kitchen_pizza';
   document.getElementById('panel-title').textContent = '✏️ Modifier la catégorie';
   document.getElementById('btn-save').textContent = 'Mettre à jour';
   if (!panelOpen.value) toggleAddPanel();
@@ -419,6 +438,7 @@ window.resetForm = function() {
   document.getElementById('cat-name').value = '';
   document.getElementById('cat-desc').value = '';
   document.getElementById('cat-position').value = '0';
+  document.getElementById('cat-print-station').value = 'kitchen_pizza';
   document.getElementById('panel-title').textContent = '➕ Ajouter une catégorie';
   document.getElementById('btn-save').textContent = 'Enregistrer la catégorie';
   selectedEmoji = '🍽️';

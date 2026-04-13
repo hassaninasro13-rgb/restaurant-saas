@@ -159,6 +159,24 @@
     margin: 8px 0 0;
     min-height: 1.2em;
   }
+  .import-review-card {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+  }
+  .import-review-row {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .import-review-row:last-child { border-bottom: none; }
+  .import-review-name { font-weight: 600; font-size: .86rem; }
+  .import-review-price { text-align: right; font-weight: 700; font-size: .86rem; color: var(--accent); }
+  .btn-importing { opacity: .65; pointer-events: none; }
 
   @media (max-width: 1000px) {
     .products-layout { grid-template-columns: 1fr; }
@@ -250,6 +268,12 @@
             <span id="form-title">➕ Nouveau produit</span>
             <button class="btn btn-ghost btn-sm" onclick="resetForm()" id="btn-cancel-edit" style="display:none">Annuler</button>
           </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+            <input type="file" id="menu-import-image" accept="image/*" style="display:none">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-import-image">📷 استيراد من صورة</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-import-add-all" style="display:none;">إضافة الكل</button>
+          </div>
+          <div id="import-review" class="import-review-card" style="display:none;"></div>
 
           <!-- Image Upload -->
           <div class="field">
@@ -406,6 +430,7 @@ let selectedFile = null;
 let previewObjectUrl = null;
 let imageRemovedForEdit = false;
 let currentFilter = null;
+let importedMenuItems = [];
 
 function setImgOptStatus(text) {
   const el = document.getElementById('img-opt-status');
@@ -416,6 +441,90 @@ function revokePreviewObjectUrl() {
   if (previewObjectUrl) {
     URL.revokeObjectURL(previewObjectUrl);
     previewObjectUrl = null;
+  }
+}
+
+function normalizePrice(raw) {
+  const n = Number(String(raw ?? '').replace(',', '.').replace(/[^\d.]/g, ''));
+  return Number.isFinite(n) ? Math.round(n) : 0;
+}
+
+function guessCategoryId(categoryName) {
+  const selected = document.getElementById('prod-category')?.value;
+  if (selected && categories.some((c) => c.id === selected)) return selected;
+  if (categoryName) {
+    const needle = String(categoryName).trim().toLowerCase();
+    const hit = categories.find((c) => String(c.name || '').trim().toLowerCase() === needle);
+    if (hit) return hit.id;
+  }
+  return categories[0]?.id || '';
+}
+
+function renderImportReview() {
+  const box = document.getElementById('import-review');
+  const addAllBtn = document.getElementById('btn-import-add-all');
+  if (!box || !addAllBtn) return;
+  if (!importedMenuItems.length) {
+    box.style.display = 'none';
+    addAllBtn.style.display = 'none';
+    return;
+  }
+  box.style.display = '';
+  addAllBtn.style.display = '';
+  box.innerHTML = `
+    <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${importedMenuItems.length})</div>
+    ${importedMenuItems.map((it, i) => `
+      <div class="import-review-row" data-import-row="${i}">
+        <div class="import-review-name">${it.name}</div>
+        <div class="import-review-price">${fmtCurrency(it.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+async function importMenuFromImage(file) {
+  const btn = document.getElementById('btn-import-image');
+  if (!btn) return;
+  if (!file) return;
+  btn.classList.add('btn-importing');
+  btn.textContent = 'جاري القراءة...';
+  try {
+    const toBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || '').split(',')[1] || '');
+      reader.onerror = () => reject(new Error('file_read_failed'));
+      reader.readAsDataURL(file);
+    });
+    const res = await fetch('/api/import-menu-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_base64: toBase64,
+        image_mime_type: file.type || 'image/jpeg',
+      }),
+    });
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload?.error || 'import_failed');
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    importedMenuItems = items
+      .map((x) => ({
+        name: String(x?.name || '').trim(),
+        price: normalizePrice(x?.price),
+        category_name: String(x?.category_name || '').trim() || null,
+      }))
+      .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0);
+    if (!importedMenuItems.length) {
+      toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');
+    } else {
+      toast(`تم استخراج ${importedMenuItems.length} منتج`, 'success');
+    }
+    renderImportReview();
+  } catch (err) {
+    console.error('[menu image import]', err);
+    toast('فشل تحليل الصورة', 'error');
+  } finally {
+    btn.classList.remove('btn-importing');
+    btn.textContent = '📷 استيراد من صورة';
   }
 }
 
@@ -444,6 +553,47 @@ function revokePreviewObjectUrl() {
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;
   await Promise.all([loadCategories(), loadProducts()]);
+  document.getElementById('btn-import-image')?.addEventListener('click', () => {
+    document.getElementById('menu-import-image')?.click();
+  });
+  document.getElementById('menu-import-image')?.addEventListener('change', async (e) => {
+    const file = e.target?.files?.[0];
+    await importMenuFromImage(file);
+    e.target.value = '';
+  });
+  document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
+    if (!importedMenuItems.length) return;
+    const btn = document.getElementById('btn-import-add-all');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'جاري الإضافة...';
+    }
+    let ok = 0;
+    for (const item of importedMenuItems) {
+      const categoryId = guessCategoryId(item.category_name);
+      if (!categoryId) continue;
+      const { error } = await insertProductForRestaurant(restaurant.id, {
+        category_id: categoryId,
+        name: item.name,
+        price: Math.max(0, Math.round(item.price)),
+        compare_price: null,
+        description: null,
+        position: 0,
+        is_visible: true,
+        is_available: true,
+        image_url: null,
+      });
+      if (!error) ok += 1;
+    }
+    importedMenuItems = [];
+    renderImportReview();
+    await loadProducts();
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'إضافة الكل';
+    }
+    toast(`تمت إضافة ${ok} منتج`, ok ? 'success' : 'warning');
+  });
   const editId = new URLSearchParams(location.search).get('edit');
   if (editId) await window.editProduct(editId);
   hideLoader();

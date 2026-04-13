@@ -399,17 +399,46 @@
 
   .order-success-panel { display: none; text-align: center; padding: 8px 0 16px; }
   .order-success-panel.is-visible { display: block; }
+  .order-success-card {
+    max-width: 420px;
+    margin: 8px auto 0;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 26px rgba(0,0,0,.08);
+    padding: 24px 18px 18px;
+  }
   .order-success-icon {
-    width: 56px; height: 56px;
+    width: 74px; height: 74px;
     margin: 0 auto 12px;
     border-radius: 50%;
     background: var(--green-lt);
     color: var(--green);
-    font-size: 1.75rem;
+    font-size: 2rem;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800;
+    font-weight: 900;
   }
-  .order-success-panel h3 { font-size: 1.05rem; margin: 0 0 8px; font-family: var(--font-display); }
+  .order-success-panel h3 { font-size: 1.5rem; margin: 0 0 8px; font-family: var(--font-display); }
+  .order-success-qr-wrap {
+    margin: 14px auto 10px;
+    width: fit-content;
+    padding: 12px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .order-success-order-no {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 8px 0 6px;
+  }
+  .order-success-track-note {
+    font-size: .88rem;
+    color: var(--ink2);
+    margin: 0 0 14px;
+  }
   .order-success-lead { font-size: .88rem; color: var(--ink2); margin: 0 0 16px; line-height: 1.45; }
   .wa-msg-label { text-align: left; font-size: .78rem; font-weight: 600; color: var(--ink3); margin-bottom: 6px; }
   #wa-order-msg-preview {
@@ -637,12 +666,22 @@
 
   .cart-page-order-success { padding: 24px 0 40px; text-align: center; }
   .cart-page-order-success[hidden] { display: none !important; }
+  .cart-page-order-success .order-success-card { margin-top: 2px; }
   .cart-page-order-success .order-success-icon {
-    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
-    background: var(--green-lt); color: var(--green); font-size: 1.6rem;
-    display: flex; align-items: center; justify-content: center; font-weight: 800;
+    width: 74px; height: 74px; margin: 0 auto 14px; border-radius: 50%;
+    background: var(--green-lt); color: var(--green); font-size: 2rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 900;
   }
-  .cart-page-order-success h3 { font-size: 1.08rem; margin: 0 0 10px; font-family: var(--font-display); }
+  .cart-page-order-success h3 { font-size: 1.5rem; margin: 0 0 10px; font-family: var(--font-display); }
+  .cart-page-order-success .order-success-qr-wrap { margin: 14px auto 10px; }
+  .cart-page-order-success .order-success-order-no { font-size: 1.9rem; }
+  .cart-page-order-success .order-success-track-note { margin: 0 0 14px; }
+  .btn-back-menu-red {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-back-menu-red:hover { filter: brightness(.95); }
   .cart-page-order-success .cart-order-success-lead {
     font-size: .88rem; color: var(--ink2); line-height: 1.45; margin: 0 0 16px; text-align: left;
   }
@@ -795,14 +834,15 @@
   </div>
 
   <div class="cart-page-order-success" id="cart-page-order-success" hidden>
-    <div class="order-success-icon">✓</div>
-    <h3 data-i18n="pub.orderSaved">Commande enregistrée</h3>
-    <p class="cart-order-success-lead" id="cart-order-success-lead"></p>
-    <textarea id="cart-wa-order-msg-preview" readonly rows="7" data-i18n-aria="pub.msgForRestaurant"></textarea>
-    <div class="cart-success-actions">
-      <a class="btn-whatsapp-send" id="cart-btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;" data-i18n="pub.openWhatsapp">Ouvrir WhatsApp</a>
-      <button type="button" class="btn-copy-msg" id="cart-btn-wa-copy" data-i18n="pub.copyMessage">Copier le message</button>
-      <button type="button" class="cart-page-checkout-btn" id="cart-order-success-done" data-i18n="pub.backToMenu">Retour au menu</button>
+    <div class="order-success-card">
+      <div class="order-success-icon">✅</div>
+      <h3>تم استلام طلبك!</h3>
+      <div class="order-success-order-no" id="cart-order-success-no">CMD-0000</div>
+      <div class="order-success-qr-wrap"><div id="cart-order-success-qr"></div></div>
+      <p class="order-success-track-note">احتفظ بهذا الرقم لتتبع طلبك</p>
+      <div class="cart-success-actions">
+        <button type="button" class="cart-page-checkout-btn btn-back-menu-red" id="cart-order-success-done">العودة للقائمة</button>
+      </div>
     </div>
   </div>
 </div>
@@ -874,20 +914,15 @@
     </div>
 
     <div class="order-success-panel" id="order-success-panel">
-      <div class="order-success-icon">✓</div>
-      <h3 data-i18n="pub.orderSaved">Commande enregistrée</h3>
-      <p class="order-success-lead" id="order-success-lead" data-i18n="pub.successLeadDefault">
-        Si WhatsApp ne s’est pas ouvert automatiquement, utilisez le bouton vert. Vous pouvez aussi copier le texte ci-dessous.
-      </p>
-      <div class="wa-msg-label" data-i18n="pub.waMsgLabel">Texte du message</div>
-      <textarea id="wa-order-msg-preview" class="textarea" readonly rows="8" data-i18n-aria="pub.msgForRestaurant"></textarea>
-      <div class="order-success-actions">
-        <a class="btn-whatsapp-send" id="btn-wa-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          <span data-i18n="pub.openWhatsapp">Ouvrir WhatsApp</span>
-        </a>
-        <button type="button" class="btn-copy-msg" id="btn-wa-copy" data-i18n="pub.copyMessage">Copier le message</button>
-        <button type="button" class="wa-order-btn" id="btn-order-done" style="margin-top:4px;" data-i18n="pub.done">Terminer</button>
+      <div class="order-success-card">
+        <div class="order-success-icon">✅</div>
+        <h3>تم استلام طلبك!</h3>
+        <div class="order-success-order-no" id="order-success-no">CMD-0000</div>
+        <div class="order-success-qr-wrap"><div id="order-success-qr"></div></div>
+        <p class="order-success-track-note">احتفظ بهذا الرقم لتتبع طلبك</p>
+        <div class="order-success-actions">
+          <button type="button" class="wa-order-btn btn-back-menu-red" id="btn-order-done" style="margin-top:4px;">العودة للقائمة</button>
+        </div>
       </div>
     </div>
   </div>
@@ -902,6 +937,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 /**
  * Page menu public — sans authentification.
@@ -1513,6 +1549,28 @@ function resetOrderModalView() {
   if (footer) footer.style.display = '';
 }
 
+function renderOrderSuccessQr(orderNoText) {
+  const qrTargets = ['order-success-qr', 'cart-order-success-qr'];
+  const labelTargets = ['order-success-no', 'cart-order-success-no'];
+  labelTargets.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = orderNoText;
+  });
+  qrTargets.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    if (typeof QRCode !== 'function') return;
+    // QR payload must match shown order number exactly.
+    new QRCode(el, {
+      text: orderNoText,
+      width: 180,
+      height: 180,
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+  });
+}
+
 window.openOrderModal = function() {
   resetOrderModalView();
   const items = Object.values(cart);
@@ -1645,10 +1703,11 @@ window.placeOrder = async function() {
     sourceLabel: resolvedSource?.name || null,
     sourceType: resolvedSource?.type || null,
   });
+  const orderNoForDisplay = `${savedOrder.order_number || orderNum}`;
+  renderOrderSuccessQr(orderNoForDisplay);
 
   const waNumber = (restaurant.whatsapp || restaurant.phone || '').replace(/\D/g, '');
   const waBtn = document.getElementById('btn-wa-open');
-  const lead = document.getElementById('order-success-lead');
   const waPreviewModal = document.getElementById('wa-order-msg-preview');
   if (waPreviewModal) waPreviewModal.value = msg;
   const cartWaPrev = document.getElementById('cart-wa-order-msg-preview');
@@ -1722,10 +1781,7 @@ window.placeOrder = async function() {
     if (mb) mb.hidden = true;
     const cs = document.getElementById('cart-page-order-success');
     if (cs) cs.hidden = false;
-    const cartLead = document.getElementById('cart-order-success-lead');
-    if (cartLead) cartLead.textContent = leadText;
   } else {
-    if (lead) lead.textContent = leadText;
     const checkoutPanel = document.getElementById('order-checkout-panel');
     const modalFooter = document.getElementById('order-modal-footer');
     if (checkoutPanel) checkoutPanel.style.display = 'none';
@@ -1798,8 +1854,9 @@ function buildWhatsappOrderMessage({
   return msg;
 }
 
-document.getElementById('btn-wa-copy').addEventListener('click', async () => {
-  const clip = document.getElementById('wa-order-msg-preview').value;
+document.getElementById('btn-wa-copy')?.addEventListener('click', async () => {
+  const clip = document.getElementById('wa-order-msg-preview')?.value;
+  if (!clip) return;
   try {
     await navigator.clipboard.writeText(clip);
     toast(t('pub.copyOk'), 'success');

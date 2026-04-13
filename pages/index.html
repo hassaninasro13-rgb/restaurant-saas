@@ -848,6 +848,10 @@
             <div class="otype-btn-icon">🏪</div>
             <span data-i18n="pub.pickup">À emporter</span>
           </button>
+          <button class="otype-btn" data-type="dine_in" onclick="selectOrderType('dine_in', this)">
+            <div class="otype-btn-icon">🪑</div>
+            <span data-i18n="pub.onTable">Sur place</span>
+          </button>
         </div>
 
         <div class="field">
@@ -1207,7 +1211,8 @@ function applyRestaurantOrderTypeUi(rest) {
   } else {
     orderType = 'delivery';
     const bothHtml = `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>${esc(t('pub.delivery'))}</button>
-          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>`;
+          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>
+          <button type="button" class="otype-btn" data-type="dine_in" onclick="selectOrderType('dine_in',this)"><div class="otype-btn-icon">🪑</div>${esc(t('pub.onTable'))}</button>`;
     setBoth(bothHtml, true);
   }
 }

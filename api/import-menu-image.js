@@ -17,9 +17,8 @@ export default async function handler(req, res) {
     const prompt = [
       'Extract menu categories and products from this image.',
       'Return strict JSON object only (no markdown, no comments).',
-      'JSON shape must be exactly: {"categories":[{"name":"string","products":[{"name":"string","price":number,"description":"string"}]}]}',
+      'JSON shape must be exactly: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
       'Keep categories separated correctly, price as plain number only.',
-      'If description is missing, use empty string.',
     ].join(' ');
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {

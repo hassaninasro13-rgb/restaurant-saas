@@ -407,6 +407,8 @@ import {
   setLang,
 } from '../js/shared.js';
 import { listOrdersWithItems, updateOrderStatus } from '../supabase/orders.js';
+import { listCategoriesForRestaurant } from '../supabase/categories.js';
+import { supabase } from '../supabase/client.js';
 import {
   getMyRestaurantAccess,
   getRoleHomePath,
@@ -421,12 +423,98 @@ let allOrders = [];
 let currentStatus = 'all';
 let searchQuery = '';
 let refreshInterval = null;
+let productStationById = new Map();
+let knownOrderIds = new Set();
+let hasBootstrappedOrders = false;
 
 function esc(s) {
   return String(s ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
+}
+
+const KITCHEN_STATIONS = ['kitchen_pizza', 'kitchen_sandwich'];
+
+function stationTitle(station) {
+  if (station === 'kitchen_sandwich') return 'KITCHEN SANDWICH';
+  if (station === 'bar') return 'BAR';
+  if (station === 'cashier') return 'CASHIER';
+  return 'KITCHEN PIZZA';
+}
+
+async function loadProductStations() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, category_id')
+    .eq('restaurant_id', restaurant.id);
+  if (error) return;
+  const { data: categories, error: catError } = await listCategoriesForRestaurant(restaurant.id);
+  if (catError) return;
+  const stationByCategory = new Map((categories || []).map((c) => [c.id, c.print_station || 'kitchen_pizza']));
+  productStationById = new Map((data || []).map((p) => [p.id, stationByCategory.get(p.category_id) || 'kitchen_pizza']));
+}
+
+function tableLine(order) {
+  return order.table_name || order.table_number || '—';
+}
+
+function thermalTicketHtml(title, order, lines, withPrice = false) {
+  const loc = getRestaurantLocale(restaurant);
+  const itemsHtml = lines.map((line) => {
+    const qty = Number(line.quantity || 0);
+    const name = esc(line.product_name || '—');
+    if (!withPrice) return `<div class="item"><span class="qty">${qty}x</span><span class="name">${name}</span></div>`;
+    const sub = fmtCurrency(line.subtotal || 0, getRestaurantCurrency(restaurant), loc);
+    return `<div class="item"><span class="qty">${qty}x</span><span class="name">${name}</span><span class="price">${esc(sub)}</span></div>`;
+  }).join('');
+
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
+    @page { size: 80mm auto; margin: 4mm; }
+    body { font-family: Arial, sans-serif; font-size: 16px; margin: 0; }
+    .title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+    .meta { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 10px; }
+    .item { display: flex; align-items: baseline; gap: 6px; font-size: 20px; font-weight: 700; margin: 4px 0; }
+    .qty { min-width: 44px; }
+    .name { flex: 1; }
+    .price { font-size: 18px; min-width: 95px; text-align: right; }
+    .total { margin-top: 10px; border-top: 1px dashed #000; padding-top: 8px; font-size: 22px; font-weight: 800; text-align: right; }
+  </style></head><body>
+    <div class="title">${esc(title)}</div>
+    <div class="meta">#${esc(order.order_number)}<br>${esc(fmtDate(order.created_at, loc))}<br>Table: ${esc(tableLine(order))}</div>
+    ${itemsHtml || '<div class="item"><span class="name">—</span></div>'}
+    ${withPrice ? `<div class="total">TOTAL: ${esc(fmtCurrency(order.total_amount || 0, getRestaurantCurrency(restaurant), loc))} DA</div>` : ''}
+    <script>window.onload=()=>{window.print();setTimeout(()=>window.close(),120);};<\/script>
+  </body></html>`;
+}
+
+function printTicket(html) {
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '-9999px';
+  iframe.style.width = '1px';
+  iframe.style.height = '1px';
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow?.document;
+  if (!doc) return;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  setTimeout(() => iframe.remove(), 1500);
+}
+
+function printKitchenTickets(order) {
+  const items = order.order_items || [];
+  for (const station of KITCHEN_STATIONS) {
+    const stationItems = items.filter((i) => (productStationById.get(i.product_id) || 'kitchen_pizza') === station);
+    if (!stationItems.length) continue;
+    printTicket(thermalTicketHtml(stationTitle(station), order, stationItems, false));
+  }
+}
+
+function printCashierTicket(order) {
+  const items = order.order_items || [];
+  printTicket(thermalTicketHtml('CASHIER', order, items, true));
 }
 
 (async () => {
@@ -453,6 +541,7 @@ function esc(s) {
   restaurant = rest;
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;
+  await loadProductStations();
   await loadOrders();
   hideLoader();
 
@@ -464,6 +553,15 @@ window.loadOrders = async function() {
   const { data } = await listOrdersWithItems(restaurant.id, 200);
 
   allOrders = data || [];
+  const idsNow = new Set(allOrders.map((o) => o.id));
+  if (!hasBootstrappedOrders) {
+    knownOrderIds = idsNow;
+    hasBootstrappedOrders = true;
+  } else {
+    const newOrders = allOrders.filter((o) => !knownOrderIds.has(o.id));
+    for (const o of newOrders) printKitchenTickets(o);
+    knownOrderIds = idsNow;
+  }
   updateStats();
   renderOrders();
 };
@@ -661,10 +759,13 @@ function buildOrderCard(o) {
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <a href="${waLink}" target="_blank" class="order-wa-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          ${esc(t('ord.waContact'))}
-        </a>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a href="${waLink}" target="_blank" class="order-wa-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            ${esc(t('ord.waContact'))}
+          </a>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); printOrderTickets('${o.id}')">طباعة</button>
+        </div>
         <div class="order-total-summary">
           ${o.delivery_fee ? `<span>${esc(t('ord.delivery'))}: ${fmtCurrency(o.delivery_fee, getRestaurantCurrency(restaurant), loc)}</span>` : ''}
           ${o.discount_amount ? `<span style="color:var(--green)">${esc(t('ord.discount'))}: -${fmtCurrency(o.discount_amount, getRestaurantCurrency(restaurant), loc)}</span>` : ''}
@@ -694,13 +795,24 @@ window.handleSearch = function(q) {
 
 window.updateStatus = async function(id, status) {
   if (status === 'cancelled' && !confirm(t('ord.confirmCancelOrder'))) return;
+  const before = allOrders.find((o) => o.id === id);
   const { error } = await updateOrderStatus(id, status);
   if (error) {
     toast(t('ord.updateErr') + ': ' + error.message, 'error');
     return;
   }
+  if (before && ['completed', 'done', 'delivered'].includes(status)) {
+    printCashierTicket({ ...before, status });
+  }
   toast(t('ord.updateOk'), 'success');
   await loadOrders();
+};
+
+window.printOrderTickets = function(id) {
+  const order = allOrders.find((o) => o.id === id);
+  if (!order) return;
+  printKitchenTickets(order);
+  printCashierTicket(order);
 };
 
 window.handleSignOut = async () => { await signOut(); };

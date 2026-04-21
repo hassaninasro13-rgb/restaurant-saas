@@ -169,6 +169,15 @@
     align-items: center;
     gap: 8px;
   }
+  .menu-section-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: #D4521A;
+    text-transform: uppercase;
+    padding: 12px 0 4px;
+    border-bottom: 1px solid #f0e8e4;
+    margin-bottom: 8px;
+  }
 
   /* PRODUCT ITEMS */
   .product-row {
@@ -1864,10 +1873,32 @@ function buildMenu() {
   body.innerHTML = menuCategories.map(c => {
     const catProds = products.filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name));
     if (catProds.length === 0) return '';
+    const isPizzaCategory = String(c.name || '').toLowerCase().includes('pizza');
+    const sectionedRows = [];
+    if (isPizzaCategory) {
+      const grouped = new Map();
+      const plain = [];
+      for (const p of catProds) {
+        const m = String(p.name || '').match(/\(([^()]+)\)\s*$/);
+        const sec = m?.[1]?.trim();
+        if (!sec) {
+          plain.push(p);
+          continue;
+        }
+        if (!grouped.has(sec)) grouped.set(sec, []);
+        grouped.get(sec).push(p);
+      }
+      const sortedSections = Array.from(grouped.keys()).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+      for (const sec of sortedSections) {
+        sectionedRows.push(`<div class="menu-section-header">${esc(sec)}</div>`);
+        sectionedRows.push(grouped.get(sec).map((p) => buildProductRow(p)).join(''));
+      }
+      sectionedRows.push(plain.map((p) => buildProductRow(p)).join(''));
+    }
     return `
     <div class="cat-section" id="section-${c.id}">
       <div class="cat-section-title">${esc(c.name)}</div>
-      ${catProds.map(p => buildProductRow(p)).join('')}
+      ${isPizzaCategory ? sectionedRows.join('') : catProds.map(p => buildProductRow(p)).join('')}
     </div>`;
   }).join('');
 }

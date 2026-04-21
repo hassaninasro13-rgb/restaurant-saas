@@ -544,7 +544,7 @@ async function importMenuFromImage(file) {
           .filter(p => p.name && p.price >= 0),
       })).filter(sec => sec.products.length > 0),
     })).filter(cat => cat.sections && cat.sections.length > 0);
-    const totalItems = importedMenuCategories.reduce((s, c) => s + c.products.length, 0);
+    const totalItems = importedMenuCategories.reduce((s, c) => s + (c.sections || []).reduce((s2, sec) => s2 + sec.products.length, 0), 0);
     if (!totalItems) {
       toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');
     } else {

@@ -15,20 +15,12 @@ export default async function handler(req, res) {
     }
 
     const prompt = [
-      'You are a menu parser. Extract ALL categories and products from this menu image.',
-      'Return ONLY a strict JSON object. No markdown, no comments.',
-      'JSON shape: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
-      'CRITICAL RULES FOR CATEGORIES:',
-      '- Group products by their FOOD TYPE only.',
-      '- If the product is any kind of pizza → category = "Pizza"',
-      '- If the product is any kind of sandwich or burger → category = "Sandwich"',
-      '- If the product is a main dish (plat) → category = "Plats"',
-      '- If the product is a box or meal deal → category = "Box"',
-      '- If the product is a dessert or pastry → category = "Desserts"',
-      '- If the product is a drink → category = "Boissons"',
-      '- NEVER create a category based on size (Medium, Large, Family)',
-      '- price must be a number only, no currency',
-    ].join(" ");
+      'Extract menu categories and their items from this image.',
+      'Return strict JSON only (no markdown, no comments).',
+      'Use this exact shape: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
+      'Price must be a plain number without currency symbol.',
+      'If an item has no category, group it under a category named "Other".',
+    ].join(' ');
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -38,8 +30,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        system: 'You are a menu parser. IGNORE all section headers and titles in the image. Your job is to identify the FOOD TYPE of each product and group them. RULES: If a product is pizza (any size, any section) → put it in ONE category called exactly "Pizza" and include the size in the product name. Example: product "3 Saison" from section "Pizza Medium" becomes name: "3 Saison Medium", category: "Pizza". Product "3 Saison" from "Miga Pizza" becomes name: "3 Saison Miga", category: "Pizza". Apply same logic for all food types. Output ONE category per food type only.',
+        model: 'claude-opus-4-6',
         max_tokens: 1800,
         temperature: 0,
         messages: [
@@ -75,19 +66,18 @@ export default async function handler(req, res) {
       .join('\n')
       .trim();
 
-    let parsed = { categories: [] };
+    let parsed = null;
     try {
       parsed = JSON.parse(text);
     } catch {
       const start = text.indexOf('{');
       const end = text.lastIndexOf('}');
       if (start >= 0 && end > start) {
-        parsed = JSON.parse(text.slice(start, end + 1));
+        try { parsed = JSON.parse(text.slice(start, end + 1)); } catch { /* ignore */ }
       }
     }
 
-    const categories = Array.isArray(parsed?.categories) ? parsed.categories : [];
-    // --- Merge similar categories by food type ---
+    const rawCategories = Array.isArray(parsed?.categories) ? parsed.categories : [];
     const mergeMap = {
       'pizza': 'Pizza',
       'sandwich': 'Sandwich',
@@ -99,20 +89,18 @@ export default async function handler(req, res) {
       'gratin': 'Gratins',
     };
     const merged = {};
-    for (const cat of categories) {
-      const key = Object.keys(mergeMap).find(k => cat.name.toLowerCase().includes(k)) || cat.name.toLowerCase();
-      const finalName = mergeMap[key] || cat.name;
+    for (const cat of rawCategories) {
+      const lowerName = cat.name.toLowerCase();
+      const matchedKey = Object.keys(mergeMap).find(k => lowerName.includes(k));
+      const finalName = matchedKey ? mergeMap[matchedKey] : cat.name;
       if (!merged[finalName]) merged[finalName] = { name: finalName, products: [] };
       for (const p of (cat.products || [])) {
-        merged[finalName].products.push({
-          ...p,
-          name: cat.name !== finalName ? `${p.name} (${cat.name})` : p.name
-        });
+        const productName = finalName !== cat.name ? `${p.name} (${cat.name})` : p.name;
+        merged[finalName].products.push({ ...p, name: productName });
       }
     }
-    const mergedCategories = Object.values(merged);
-    // --- End merge ---
-    return res.status(200).json({ categories: mergedCategories });
+    const categories = Object.values(merged);
+    return res.status(200).json({ categories });
   } catch (err) {
     return res.status(500).json({ error: err?.message || 'server_error' });
   }

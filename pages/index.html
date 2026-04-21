@@ -1197,6 +1197,7 @@ let restaurant = null;
 let categories = [];
 let menuCategories = [];
 let products = [];
+let orderedPizzaByCategory = new Map();
 let supplementProducts = [];
 /** @type {Record<string, { product: object, qty: number, customization: object }>} */
 let cart = {};
@@ -1249,6 +1250,10 @@ function parseIngredientsFromDescription(desc) {
   const s = String(desc || '').trim();
   if (!s) return [];
   return s.split(/[,،]/g).map((x) => x.trim()).filter(Boolean);
+}
+
+function isPizzaCategoryName(name) {
+  return String(name || '').toLowerCase().includes('pizza');
 }
 
 function isDrinkDessertLikeCategory(name) {
@@ -1545,6 +1550,22 @@ async function loadRestaurantSupplements(restaurantId) {
   restaurant = rest;
   categories = cats;
   products = prods;
+  orderedPizzaByCategory = new Map();
+  const pizzaCategoryIds = (cats || []).filter((c) => isPizzaCategoryName(c.name)).map((c) => c.id);
+  if (pizzaCategoryIds.length) {
+    const { data: pizzaRows } = await supabase
+      .from('products')
+      .select('*')
+      .eq('restaurant_id', rest.id)
+      .eq('is_available', true)
+      .eq('is_visible', true)
+      .in('category_id', pizzaCategoryIds)
+      .order('sort_order', { ascending: true });
+    for (const p of (pizzaRows || [])) {
+      if (!orderedPizzaByCategory.has(p.category_id)) orderedPizzaByCategory.set(p.category_id, []);
+      orderedPizzaByCategory.get(p.category_id).push(p);
+    }
+  }
   menuCategories = (cats || []).filter((c) => !isSupplementsCategory(c.name));
   await loadRestaurantSupplements(rest.id);
   orderCurrency = getRestaurantCurrency(rest);
@@ -1887,14 +1908,14 @@ function buildMenu() {
   }
 
   body.innerHTML = menuCategories.map(c => {
-    const catProds = products
+    const fallbackProds = products
       .filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name))
       .sort((a, b) => {
         const sa = Number.isFinite(Number(a?.sort_order)) ? Number(a.sort_order) : Number.MAX_SAFE_INTEGER;
         const sb = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
-        if (sa !== sb) return sa - sb;
-        return String(a?.name || '').localeCompare(String(b?.name || ''), 'fr', { sensitivity: 'base' });
+        return sa - sb;
       });
+    const catProds = isPizzaCategoryName(c.name) ? (orderedPizzaByCategory.get(c.id) || fallbackProds) : fallbackProds;
     if (catProds.length === 0) return '';
     const isPizzaCategory = String(c.name || '').toLowerCase().includes('pizza');
     const sectionedRows = [];

@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-opus-4-5',
         max_tokens: 1800,
-        system: 'You are a menu parser. Extract all products from this menu image. Group them by food type only: all pizza types → category "Pizza", all sandwiches → "Sandwich", all main dishes → "Plats", all boxes → "Box", all drinks → "Boissons". Return ONLY JSON: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}. No markdown. Price must be a number.',
+        system: 'You are a menu parser. Extract the menu exactly as structured in the image. Preserve all section headers and their order. Return ONLY this JSON: {"categories":[{"name":"string","sections":[{"title":"string","products":[{"name":"string","price":number,"ingredients":"string"}]}]}]}. Rules: 1) category name = food type (Pizza, Sandwich, Plats, etc.) 2) sections = the headers found in the image (Pizza Medium, Miga Pizza, etc.) 3) ingredients = comma-separated string of all ingredients listed under the product, empty string if none 4) preserve original order of sections and products 5) price = number only, no currency',
         messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: image_mime_type, data: image_base64 } }, { type: 'text', text: prompt }] }]
       })
     });
@@ -31,11 +31,12 @@ export default async function handler(req, res) {
       const lower = cat.name.toLowerCase();
       const key = Object.keys(map).find(k => lower.includes(k));
       const name = key ? map[key] : cat.name;
-      if (!merged[name]) merged[name] = { name, products: [] };
-      for (const p of (cat.products || [])) {
-        merged[name].products.push({ ...p, name: key ? `${p.name} (${cat.name})` : p.name });
+      if (!merged[name]) merged[name] = { name, sections: [] };
+      for (const sec of (cat.sections || [])) {
+        merged[name].sections.push(sec);
       }
     }
-    return res.status(200).json({ categories: Object.values(merged) });
+    const categories = Object.values(merged);
+    return res.status(200).json({ categories });
   } catch (err) { return res.status(500).json({ error: err?.message || 'server_error' }); }
 }

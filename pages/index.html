@@ -734,8 +734,125 @@
     color: var(--ink2);
   }
 
+  /* Product customization modal */
+  .customize-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 450;
+    background: rgba(20, 14, 10, 0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .customize-sheet {
+    background: #fff;
+    width: 100%;
+    max-width: 640px;
+    max-height: 92vh;
+    overflow: auto;
+    border-radius: 20px 20px 0 0;
+    padding: 16px 18px 24px;
+    box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+    position: relative;
+  }
+  .customize-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--cream2);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .customize-img {
+    width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--cream2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+  .customize-img img { width: 100%; height: 100%; object-fit: cover; max-height: 200px; }
+  .customize-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; margin: 0 0 4px; padding-right: 40px; }
+  .customize-base { font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
+  .customize-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink3);
+    margin: 12px 0 8px;
+  }
+  .ing-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin: 4px 6px 4px 0;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background .12s, color .12s, text-decoration .12s;
+  }
+  .ing-toggle.is-removed {
+    color: var(--ink3);
+    text-decoration: line-through;
+    background: var(--cream2);
+    border-color: var(--border);
+  }
+  .supp-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .supp-row:last-child { border-bottom: none; }
+  .supp-name { flex: 1; min-width: 0; font-weight: 600; }
+  .supp-price { color: var(--ink3); font-size: 0.82rem; }
+  .supp-qty { display: flex; align-items: center; gap: 8px; }
+  .customize-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1.5px solid var(--border);
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+  .customize-add-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .customize-add-btn:hover { filter: brightness(1.05); }
+  .customize-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
   @media (min-width: 640px) {
     body { box-shadow: 0 0 40px rgba(0,0,0,.1); }
+    .customize-backdrop { align-items: center; padding: 24px; }
+    .customize-sheet { border-radius: var(--radius-lg); max-height: 85vh; }
   }
 </style>
 </head>
@@ -937,6 +1054,25 @@
   </div>
 </div>
 
+<!-- Product customization (ingredients + supplements) -->
+<div id="product-customize-backdrop" class="customize-backdrop" style="display:none;" aria-hidden="true">
+  <div class="customize-sheet" role="dialog" aria-modal="true" aria-labelledby="customize-title" onclick="event.stopPropagation()">
+    <button type="button" class="customize-close" onclick="closeProductCustomizeModal()" aria-label="Close">✕</button>
+    <div id="customize-img" class="customize-img"></div>
+    <h3 id="customize-title" class="customize-title"></h3>
+    <div id="customize-base" class="customize-base"></div>
+    <div class="customize-section-title">المكونات</div>
+    <div id="customize-ingredients"></div>
+    <div class="customize-section-title" id="customize-supp-title">Suppléments</div>
+    <div id="customize-supplements"></div>
+    <div class="customize-total-row">
+      <span>الإجمالي</span>
+      <span id="customize-total"></span>
+    </div>
+    <button type="button" class="customize-add-btn" id="customize-add-btn">إضافة للطلب</button>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 /**
@@ -966,8 +1102,17 @@ setLang(getLang());
 
 let restaurant = null;
 let categories = [];
+let menuCategories = [];
 let products = [];
-let cart = {}; // { productId: { product, qty } }
+let supplementProducts = [];
+/** @type {Record<string, { product: object, qty: number, customization: object }>} */
+let cart = {};
+let customizeDraftProduct = null;
+let customizeIngredientList = [];
+/** @type {Set<string>} */
+let customizeRemoved = new Set();
+/** @type {Record<string, number>} */
+let customizeSuppQty = {};
 let orderCurrency = 'DZD';
 let orderLocale = 'fr-DZ';
 function cur(amount) {
@@ -983,6 +1128,38 @@ function esc(s) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
+}
+
+function isSupplementsCategory(name) {
+  const n = String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  return n.includes('supplement') || n.includes('suppl');
+}
+
+function parseIngredientsFromDescription(desc) {
+  const s = String(desc || '').trim();
+  if (!s) return [];
+  return s.split(/[,،]/g).map((x) => x.trim()).filter(Boolean);
+}
+
+function getLineUnitPrice(line) {
+  return line?.customization?.total_price ?? line?.product?.price ?? 0;
+}
+
+function formatOrderLineName(line) {
+  const base = line?.customization?.name ?? line?.product?.name ?? '';
+  const rem = line?.customization?.removed_ingredients || [];
+  const supp = line?.customization?.supplements || [];
+  let out = base;
+  if (rem.length) out += ` (− ${rem.join(', ')})`;
+  const supStr = supp
+    .filter((s) => (s.qty ?? 1) > 0)
+    .map((s) => `${s.name}${(s.qty ?? 1) > 1 ? ` ×${s.qty}` : ''}`)
+    .join(', ');
+  if (supStr) out += ` (+ ${supStr})`;
+  return out;
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -1108,6 +1285,11 @@ async function tryRestoreResolvedSourceSession(rest) {
   restaurant = rest;
   categories = cats;
   products = prods;
+  menuCategories = (cats || []).filter((c) => !isSupplementsCategory(c.name));
+  supplementProducts = (prods || []).filter((p) => {
+    const c = (cats || []).find((x) => x.id === p.category_id);
+    return c && isSupplementsCategory(c.name);
+  });
   orderCurrency = getRestaurantCurrency(rest);
   orderLocale = getRestaurantLocale(rest);
   applyRestaurantClientPrefs(rest);
@@ -1265,7 +1447,7 @@ function readCheckoutFields() {
 function updateCartPageTotals() {
   if (!restaurant) return;
   const items = Object.values(cart);
-  const subtotal = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+  const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
   const deliveryFee = orderType === 'delivery' && restaurant.delivery_fee ? restaurant.delivery_fee : 0;
   const total = subtotal + deliveryFee;
   const subRow = document.getElementById('cart-page-subtotal-row');
@@ -1330,29 +1512,30 @@ function renderCartPage() {
   emptyEl.hidden = true;
   footEl.hidden = false;
 
-  listEl.innerHTML = items
-    .map((i) => {
+  listEl.innerHTML = Object.entries(cart)
+    .map(([lineId, i]) => {
       const p = i.product;
+      const unit = getLineUnitPrice(i);
       const imgUrl = safeHttpUrl(p.image_url);
       const img = imgUrl
         ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy">`
         : '';
-      const pid = p.id;
+      const displayName = formatOrderLineName(i);
       return `
     <div class="cart-page-row">
       <div class="cart-page-img">${img || '🍽️'}</div>
       <div class="cart-page-main">
-        <div class="cart-page-name">${esc(p.name)}</div>
-        <div class="cart-page-unit">${cur(p.price)} ${esc(t('pub.perUnit'))}</div>
+        <div class="cart-page-name">${esc(displayName)}</div>
+        <div class="cart-page-unit">${cur(unit)} ${esc(t('pub.perUnit'))}</div>
         <div class="qty-controls">
-          <button type="button" class="qty-btn" onclick="removeFromCart('${pid}')">−</button>
+          <button type="button" class="qty-btn" onclick="decrementCartLine('${lineId}')">−</button>
           <span class="qty-num">${i.qty}</span>
-          <button type="button" class="qty-btn add" onclick="addToCart('${pid}')">+</button>
+          <button type="button" class="qty-btn add" onclick="incrementCartLine('${lineId}')">+</button>
         </div>
       </div>
       <div class="cart-page-side">
-        <div class="cart-page-line-total">${cur(p.price * i.qty)}</div>
-        <button type="button" class="btn-cart-remove" onclick="cartRemoveLine('${pid}')">${esc(t('pub.removeLine'))}</button>
+        <div class="cart-page-line-total">${cur(unit * i.qty)}</div>
+        <button type="button" class="btn-cart-remove" onclick="cartRemoveLine('${lineId}')">${esc(t('pub.removeLine'))}</button>
       </div>
     </div>`;
     })
@@ -1361,12 +1544,35 @@ function renderCartPage() {
   updateCartPageTotals();
 }
 
-window.cartRemoveLine = function (productId) {
-  delete cart[productId];
+window.incrementCartLine = function (lineId) {
+  const line = cart[lineId];
+  if (!line) return;
+  line.qty = Math.min(999, (line.qty || 0) + 1);
   persistCart();
   renderCartPage();
   updateCartFAB();
-  buildMenu();
+  refreshProductRow(line.product.id);
+};
+
+window.decrementCartLine = function (lineId) {
+  const line = cart[lineId];
+  if (!line) return;
+  const pid = line.product.id;
+  line.qty--;
+  if (line.qty <= 0) delete cart[lineId];
+  persistCart();
+  renderCartPage();
+  updateCartFAB();
+  refreshProductRow(pid);
+};
+
+window.cartRemoveLine = function (lineId) {
+  const pid = cart[lineId]?.product?.id;
+  delete cart[lineId];
+  persistCart();
+  renderCartPage();
+  updateCartFAB();
+  if (pid) refreshProductRow(pid);
 };
 
 document.getElementById('cart-page-back')?.addEventListener('click', (e) => {
@@ -1398,20 +1604,20 @@ document.getElementById('cart-order-success-done')?.addEventListener('click', ()
 });
 
 function buildMenu() {
-  // Category tabs
+  // Category tabs (hide Suppléments category from browse)
   const tabsEl = document.getElementById('cat-tabs');
-  tabsEl.innerHTML = categories.map((c, i) =>
+  tabsEl.innerHTML = menuCategories.map((c, i) =>
     `<button type="button" class="cat-tab-btn ${i === 0 ? 'active' : ''}" onclick="scrollToSection('${c.id}', this)">${esc(c.name)}</button>`
   ).join('');
 
   // Menu body
   const body = document.getElementById('menu-body');
-  if (categories.length === 0) {
+  if (menuCategories.length === 0) {
     body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
     return;
   }
 
-  body.innerHTML = categories.map(c => {
+  body.innerHTML = menuCategories.map(c => {
     const catProds = products.filter(p => p.category_id === c.id);
     if (catProds.length === 0) return '';
     return `
@@ -1431,14 +1637,20 @@ function attrEncode(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 
+function qtyForProduct(productId) {
+  return Object.values(cart)
+    .filter((l) => l.product && l.product.id === productId)
+    .reduce((s, l) => s + (l.qty || 0), 0);
+}
+
 function buildProductRow(p) {
-  const qty = cart[p.id]?.qty || 0;
+  const qty = qtyForProduct(p.id);
   const imgUrl = safeHttpUrl(p.image_url);
   const img = imgUrl
     ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : '';
   return `
-  <div class="product-row" id="prow-${p.id}">
+  <div class="product-row" id="prow-${p.id}" role="button" tabindex="0" onclick="openProductCustomizeModal('${p.id}')">
     <div class="product-row-img">
       ${img || '🍽️'}
     </div>
@@ -1450,32 +1662,32 @@ function buildProductRow(p) {
         ${p.compare_price ? `<s>${cur(p.compare_price)}</s>` : ''}
       </div>
     </div>
-    <div class="qty-controls" id="qty-${p.id}">
+    <div class="qty-controls" id="qty-${p.id}" onclick="event.stopPropagation();">
       ${qty === 0
-        ? `<button type="button" class="btn-add-cart" onclick="addToCart('${p.id}')">${esc(t('pub.addToCart'))}</button>`
+        ? `<button type="button" class="btn-add-cart" onclick="openProductCustomizeModal('${p.id}')">${esc(t('pub.addToCart'))}</button>`
         : `<button type="button" class="qty-btn" onclick="removeFromCart('${p.id}')">−</button>
            <span class="qty-num">${qty}</span>
-           <button type="button" class="qty-btn add" onclick="addToCart('${p.id}')">+</button>`}
+           <button type="button" class="qty-btn add" onclick="openProductCustomizeModal('${p.id}')">+</button>`}
     </div>
   </div>`;
 }
 
 window.addToCart = function(productId) {
-  const p = products.find(x => x.id === productId);
-  if (!p) return;
-  if (!cart[productId]) cart[productId] = { product: p, qty: 0 };
-  cart[productId].qty++;
-  cart[productId].product = p;
-  refreshProductRow(productId);
-  updateCartFAB();
-  persistCart();
-  if (isCartPageMode()) renderCartPage();
+  openProductCustomizeModal(productId);
 };
 
 window.removeFromCart = function(productId) {
-  if (!cart[productId]) return;
-  cart[productId].qty--;
-  if (cart[productId].qty <= 0) delete cart[productId];
+  const lineEntries = Object.entries(cart).filter(([, v]) => v?.product?.id === productId);
+  if (lineEntries.length === 0) return;
+  for (let i = lineEntries.length - 1; i >= 0; i--) {
+    const [lineId, line] = lineEntries[i];
+    if (line.qty > 1) {
+      cart[lineId].qty--;
+      break;
+    }
+    delete cart[lineId];
+    break;
+  }
   refreshProductRow(productId);
   updateCartFAB();
   persistCart();
@@ -1492,12 +1704,150 @@ function refreshProductRow(productId) {
 function updateCartFAB() {
   const items = Object.values(cart);
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+  const total = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
   const fab = document.getElementById('cart-fab');
   document.getElementById('cart-count').textContent = count;
   document.getElementById('cart-fab-text').textContent = `${t('pub.cartFab')} · ${cur(total)}`;
   fab.classList.toggle('hidden', count === 0);
 }
+
+function computeCustomizeTotal() {
+  if (!customizeDraftProduct) return 0;
+  let t = customizeDraftProduct.price;
+  for (const s of supplementProducts) {
+    const q = customizeSuppQty[s.id] || 0;
+    t += q * (s.price || 0);
+  }
+  return Math.round(t);
+}
+
+function updateCustomizeModalTotal() {
+  const el = document.getElementById('customize-total');
+  if (el) el.textContent = cur(computeCustomizeTotal());
+}
+
+window.toggleCustomizeIngredient = function (idx) {
+  const name = customizeIngredientList[idx];
+  if (!name) return;
+  const btns = document.querySelectorAll('#customize-ingredients .ing-toggle');
+  const btn = btns[idx];
+  if (customizeRemoved.has(name)) {
+    customizeRemoved.delete(name);
+    btn?.classList.remove('is-removed');
+  } else {
+    customizeRemoved.add(name);
+    btn?.classList.add('is-removed');
+  }
+  updateCustomizeModalTotal();
+};
+
+window.changeSuppQty = function (suppId, delta) {
+  const v = (customizeSuppQty[suppId] || 0) + delta;
+  customizeSuppQty[suppId] = Math.max(0, Math.min(99, v));
+  const el = document.getElementById(`supp-qty-${suppId}`);
+  if (el) el.textContent = String(customizeSuppQty[suppId]);
+  updateCustomizeModalTotal();
+};
+
+window.openProductCustomizeModal = function (productId) {
+  const p = products.find((x) => x.id === productId);
+  if (!p) return;
+  customizeDraftProduct = p;
+  customizeIngredientList = parseIngredientsFromDescription(p.description);
+  customizeRemoved = new Set();
+  customizeSuppQty = Object.fromEntries(supplementProducts.map((s) => [s.id, 0]));
+
+  document.getElementById('customize-title').textContent = p.name;
+  document.getElementById('customize-base').textContent = cur(p.price);
+
+  const imgEl = document.getElementById('customize-img');
+  const imgUrl = safeHttpUrl(p.image_url);
+  imgEl.innerHTML = imgUrl ? `<img src="${attrEncode(imgUrl)}" alt="">` : '🍽️';
+
+  const ingBox = document.getElementById('customize-ingredients');
+  if (!customizeIngredientList.length) {
+    ingBox.innerHTML = '<span style="font-size:.82rem;color:var(--ink3);">—</span>';
+  } else {
+    ingBox.innerHTML = customizeIngredientList
+      .map(
+        (_name, i) =>
+          `<button type="button" class="ing-toggle" onclick="toggleCustomizeIngredient(${i})">${esc(_name)}</button>`,
+      )
+      .join('');
+  }
+
+  const suppEl = document.getElementById('customize-supplements');
+  const suppTitle = document.getElementById('customize-supp-title');
+  if (!supplementProducts.length) {
+    if (suppTitle) suppTitle.style.display = 'none';
+    suppEl.innerHTML = '<span style="font-size:.82rem;color:var(--ink3);">—</span>';
+  } else {
+    if (suppTitle) suppTitle.style.display = '';
+    suppEl.innerHTML = supplementProducts
+      .map((s) => {
+        const sid = s.id;
+        return `<div class="supp-row">
+        <div class="supp-name">${esc(s.name)}</div>
+        <div class="supp-price">${cur(s.price)}</div>
+        <div class="supp-qty">
+          <button type="button" class="qty-btn" onclick="changeSuppQty('${sid}', -1)">−</button>
+          <span class="qty-num" id="supp-qty-${sid}">0</span>
+          <button type="button" class="qty-btn add" onclick="changeSuppQty('${sid}', 1)">+</button>
+        </div>
+      </div>`;
+      })
+      .join('');
+  }
+
+  const bd = document.getElementById('product-customize-backdrop');
+  bd.style.display = 'flex';
+  bd.setAttribute('aria-hidden', 'false');
+  updateCustomizeModalTotal();
+};
+
+window.closeProductCustomizeModal = function () {
+  const bd = document.getElementById('product-customize-backdrop');
+  if (bd) {
+    bd.style.display = 'none';
+    bd.setAttribute('aria-hidden', 'true');
+  }
+  customizeDraftProduct = null;
+};
+
+document.getElementById('product-customize-backdrop')?.addEventListener('click', () => closeProductCustomizeModal());
+
+document.getElementById('customize-add-btn')?.addEventListener('click', () => {
+  if (!customizeDraftProduct) return;
+  const p = customizeDraftProduct;
+  const ingredients = parseIngredientsFromDescription(p.description);
+  const removed = ingredients.filter((x) => customizeRemoved.has(x));
+  const supplementsDetailed = supplementProducts
+    .filter((s) => (customizeSuppQty[s.id] || 0) > 0)
+    .map((s) => ({
+      name: s.name,
+      price: s.price,
+      qty: customizeSuppQty[s.id],
+    }));
+  const unitTotal = computeCustomizeTotal();
+  const lineId = crypto.randomUUID();
+  cart[lineId] = {
+    product: p,
+    qty: 1,
+    customization: {
+      product_id: p.id,
+      name: p.name,
+      base_price: p.price,
+      removed_ingredients: removed,
+      supplements: supplementsDetailed,
+      total_price: unitTotal,
+    },
+  };
+  persistCart();
+  closeProductCustomizeModal();
+  refreshProductRow(p.id);
+  updateCartFAB();
+  if (isCartPageMode()) renderCartPage();
+});
 
 window.scrollToSection = function(catId, btn) {
   document.querySelectorAll('.cat-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1522,7 +1872,7 @@ window.selectOrderType = function(type, btn) {
 
 function updateCartTotals() {
   const items = Object.values(cart);
-  const subtotal = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+  const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
   const deliveryFee = (orderType === 'delivery' && restaurant.delivery_fee) ? restaurant.delivery_fee : 0;
   const total = subtotal + deliveryFee;
 
@@ -1579,19 +1929,23 @@ window.openOrderModal = function() {
   modal.style.flexDirection = 'column';
 
   // Build cart items list
-  document.getElementById('cart-items-list').innerHTML = items.map((i) => `
+  document.getElementById('cart-items-list').innerHTML = Object.entries(cart).map(([lineId, i]) => {
+    const unit = getLineUnitPrice(i);
+    const nm = formatOrderLineName(i);
+    return `
     <div class="cart-item-row">
       <div class="cart-item-info">
-        <div class="cart-item-name">${esc(i.product.name)}</div>
-        <div class="cart-item-price">${cur(i.product.price)} × ${i.qty}</div>
+        <div class="cart-item-name">${esc(nm)}</div>
+        <div class="cart-item-price">${cur(unit)} × ${i.qty}</div>
       </div>
       <div class="qty-controls">
-        <button type="button" class="qty-btn" onclick="removeFromCart('${i.product.id}');openOrderModal()">−</button>
+        <button type="button" class="qty-btn" onclick="decrementCartLine('${lineId}');openOrderModal()">−</button>
         <span class="qty-num">${i.qty}</span>
-        <button type="button" class="qty-btn add" onclick="addToCart('${i.product.id}');openOrderModal()">+</button>
+        <button type="button" class="qty-btn add" onclick="incrementCartLine('${lineId}');openOrderModal()">+</button>
       </div>
-      <div class="cart-item-subtotal">${cur(i.product.price * i.qty)}</div>
-    </div>`).join('');
+      <div class="cart-item-subtotal">${cur(unit * i.qty)}</div>
+    </div>`;
+  }).join('');
 
   updateCartTotals();
 };
@@ -1622,7 +1976,7 @@ window.placeOrder = async function() {
     waPrep = null;
   }
 
-  const subtotal = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+  const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
   const deliveryFee = (orderType === 'delivery' && restaurant.delivery_fee) ? restaurant.delivery_fee : 0;
   const total = subtotal + deliveryFee;
   const orderNum = `CMD-${String(orderCounter).padStart(4, '0')}`;
@@ -1643,10 +1997,10 @@ window.placeOrder = async function() {
     source_name: resolvedSource?.name ?? null,
     source_type: resolvedSource?.type ?? null,
   };
-  const itemRows = items.map(i => ({
+  const itemRows = items.map((i) => ({
     product_id: i.product.id,
-    product_name: i.product.name,
-    unit_price: i.product.price,
+    product_name: formatOrderLineName(i),
+    unit_price: getLineUnitPrice(i),
     quantity: i.qty,
   }));
 
@@ -1836,8 +2190,9 @@ function buildWhatsappOrderMessage({
   msg += `_${t('wa.saved')}_\n\n`;
   msg += `*${t('wa.items')}*\n`;
   items.forEach((i) => {
-    const line = i.product.price * i.qty;
-    msg += `• ${i.product.name}\n   ${t('wa.qtyLine', { qty: i.qty, unit: cur(i.product.price), line: cur(line) })}\n`;
+    const unit = getLineUnitPrice(i);
+    const line = unit * i.qty;
+    msg += `• ${formatOrderLineName(i)}\n   ${t('wa.qtyLine', { qty: i.qty, unit: cur(unit), line: cur(line) })}\n`;
   });
   msg += `\n💰 *${t('wa.subtotal')} : ${cur(subtotal)}*`;
   if (deliveryFee > 0) msg += `\n🚚 *${t('wa.delivery')} : ${cur(deliveryFee)}*`;

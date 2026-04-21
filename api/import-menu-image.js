@@ -18,11 +18,16 @@ export default async function handler(req, res) {
       'You are a menu parser. Extract ALL categories and products from this menu image.',
       'Return ONLY a strict JSON object. No markdown, no comments.',
       'JSON shape: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
-      'CRITICAL RULES:',
-      '- Merge similar categories into ONE. Pizza Medium + Miga Pizza = Pizza',
-      '- Category names must be short: Pizza, Burger, Plats, Sandwichs',
-      '- price must be a number only, no currency symbols',
-      '- Keep ALL products, do not skip any',
+      'CRITICAL RULES FOR CATEGORIES:',
+      '- Group products by their FOOD TYPE only.',
+      '- If the product is any kind of pizza → category = "Pizza"',
+      '- If the product is any kind of sandwich or burger → category = "Sandwich"',
+      '- If the product is a main dish (plat) → category = "Plats"',
+      '- If the product is a box or meal deal → category = "Box"',
+      '- If the product is a dessert or pastry → category = "Desserts"',
+      '- If the product is a drink → category = "Boissons"',
+      '- NEVER create a category based on size (Medium, Large, Family)',
+      '- price must be a number only, no currency',
     ].join(" ");
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {

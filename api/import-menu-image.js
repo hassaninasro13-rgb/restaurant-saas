@@ -86,17 +86,15 @@ export default async function handler(req, res) {
       'box': 'Box',
       'boisson': 'Boissons',
       'dessert': 'Desserts',
-      'gratin': 'Gratins',
     };
     const merged = {};
     for (const cat of rawCategories) {
-      const lowerName = cat.name.toLowerCase();
-      const matchedKey = Object.keys(mergeMap).find(k => lowerName.includes(k));
-      const finalName = matchedKey ? mergeMap[matchedKey] : cat.name;
+      const lower = cat.name.toLowerCase();
+      const key = Object.keys(mergeMap).find(k => lower.includes(k));
+      const finalName = key ? mergeMap[key] : cat.name;
       if (!merged[finalName]) merged[finalName] = { name: finalName, products: [] };
       for (const p of (cat.products || [])) {
-        const productName = finalName !== cat.name ? `${p.name} (${cat.name})` : p.name;
-        merged[finalName].products.push({ ...p, name: productName });
+        merged[finalName].products.push({ ...p, name: key && finalName !== cat.name ? `${p.name} (${cat.name})` : p.name });
       }
     }
     const categories = Object.values(merged);

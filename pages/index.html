@@ -1894,53 +1894,28 @@ document.getElementById('cart-order-success-done')?.addEventListener('click', ()
 });
 
 function buildMenu() {
-  // Category tabs (hide Suppléments category from browse)
   const tabsEl = document.getElementById('cat-tabs');
   tabsEl.innerHTML = menuCategories.map((c, i) =>
     `<button type="button" class="cat-tab-btn ${i === 0 ? 'active' : ''}" onclick="scrollToSection('${c.id}', this)">${esc(c.name)}</button>`
   ).join('');
-
-  // Menu body
   const body = document.getElementById('menu-body');
   if (menuCategories.length === 0) {
     body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
     return;
   }
-
   body.innerHTML = menuCategories.map(c => {
-    const fallbackProds = products
-      .filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name))
+    const catProds = products
+      .filter(p => p.category_id === c.id)
       .sort((a, b) => {
         const sa = Number.isFinite(Number(a?.sort_order)) ? Number(a.sort_order) : Number.MAX_SAFE_INTEGER;
         const sb = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
         return sa - sb;
       });
-    const catProds = isPizzaCategoryName(c.name) ? (orderedPizzaByCategory.get(c.id) || fallbackProds) : fallbackProds;
     if (catProds.length === 0) return '';
-    const isPizzaCategory = String(c.name || '').toLowerCase().includes('pizza');
-    const sectionedRows = [];
-    if (isPizzaCategory) {
-      let lastSection = null;
-      for (const p of catProds) {
-        const m = String(p.name || '').match(/^(.*)\(([^()]+)\)\s*$/);
-        const sec = (m?.[2] || '').trim();
-        const displayName = (m?.[1] || p.name).trim();
-        if (sec) {
-          if (sec !== lastSection) {
-            sectionedRows.push(`<div class="menu-section-header">${esc(sec)}</div>`);
-            lastSection = sec;
-          }
-          sectionedRows.push(buildProductRow(p, displayName));
-        } else {
-          sectionedRows.push(buildProductRow(p));
-          lastSection = null;
-        }
-      }
-    }
     return `
     <div class="cat-section" id="section-${c.id}">
       <div class="cat-section-title">${esc(c.name)}</div>
-      ${isPizzaCategory ? sectionedRows.join('') : catProds.map(p => buildProductRow(p)).join('')}
+      ${catProds.map(p => buildProductRow(p)).join('')}
     </div>`;
   }).join('');
 }

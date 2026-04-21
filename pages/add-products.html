@@ -610,68 +610,47 @@ async function importMenuFromImage(file) {
   document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
     if (!importedMenuCategories.length) return;
     const btn = document.getElementById('btn-import-add-all');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'جاري الإضافة...';
-    }
+    if (btn) { btn.disabled = true; btn.textContent = 'جاري الإضافة...'; }
     let ok = 0;
     for (const cat of importedMenuCategories) {
-      const standardRows = [];
-      const supplementsRows = [];
-      for (const sec of (cat.sections || [])) {
-        for (const p of (sec.products || [])) {
-          if (isSupplementSectionName(sec.title)) {
-            supplementsRows.push({
-              restaurant_id: restaurant.id,
-              name: p.name,
-              price: Math.max(0, Math.round(p.price)),
-            });
-          } else {
-            standardRows.push({ sectionTitle: sec.title, sectionOrder: Number(sec.section_order) || 0, product: p });
-          }
+      const products = cat.products || [];
+      const isSupp = isSupplementSectionName(cat.name);
+      if (isSupp) {
+        const rows = products.map(p => ({
+          restaurant_id: restaurant.id,
+          name: p.name,
+          price: Math.max(0, Math.round(p.price)),
+        }));
+        if (rows.length) {
+          await supabase.from('restaurant_supplements').insert(rows);
+          ok += rows.length;
         }
+        continue;
       }
-
-      if (supplementsRows.length) {
-        const { error: suppErr } = await supabase
-          .from('restaurant_supplements')
-          .insert(supplementsRows)
-          .then(({ error }) => {
-            if (error && error.code !== '23505') console.error(error);
-            return { error };
-          });
-        if (!suppErr || suppErr.code === '23505') ok += supplementsRows.length;
-      }
-
-      if (standardRows.length) {
-        const categoryId = await getOrCreateCategoryIdByName(cat.name);
-        if (!categoryId) continue;
-        const results = await Promise.all(
-          standardRows.map(({ sectionTitle, sectionOrder, product: p }) =>
-            insertProductForRestaurant(restaurant.id, {
-              category_id: categoryId,
-              name: `${p.name} (${sectionTitle})`,
-              price: Math.max(0, Math.round(p.price)),
-              compare_price: null,
-              description: p.ingredients || '',
-              position: 0,
-              sort_order: (Math.max(0, Math.floor(sectionOrder)) * 100) + Math.max(0, Math.floor(Number(p.product_order) || 0)),
-              is_visible: true,
-              is_available: true,
-              image_url: null,
-            })
-          )
-        );
-        ok += results.filter((r) => !r.error).length;
-      }
+      const categoryId = await getOrCreateCategoryIdByName(cat.name);
+      if (!categoryId) continue;
+      const results = await Promise.all(
+        products.map((p, index) =>
+          insertProductForRestaurant(restaurant.id, {
+            category_id: categoryId,
+            name: p.name,
+            price: Math.max(0, Math.round(p.price)),
+            compare_price: null,
+            description: p.ingredients || '',
+            position: 0,
+            sort_order: (cat.category_order || 0) * 100 + (p.product_order ?? index),
+            is_visible: true,
+            is_available: true,
+            image_url: null,
+          })
+        )
+      );
+      ok += results.filter(r => !r.error).length;
     }
     importedMenuCategories = [];
     renderImportReview();
     await loadProducts();
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = 'إضافة الكل';
-    }
+    if (btn) { btn.disabled = false; btn.textContent = 'إضافة الكل'; }
     toast(`تمت إضافة ${ok} منتج`, ok ? 'success' : 'warning');
   });
   const editId = new URLSearchParams(location.search).get('edit');

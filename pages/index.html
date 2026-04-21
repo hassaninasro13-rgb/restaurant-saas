@@ -1837,7 +1837,7 @@ function buildMenu() {
   }
 
   body.innerHTML = menuCategories.map(c => {
-    const catProds = products.filter(p => p.category_id === c.id);
+    const catProds = products.filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name));
     if (catProds.length === 0) return '';
     return `
     <div class="cat-section" id="section-${c.id}">

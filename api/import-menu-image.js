@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-opus-4-5',
         max_tokens: 1800,
-        system: 'You are a menu parser. RULE: All pizza types regardless of size or name (Pizza Medium, Miga Pizza, etc.) must go into ONE single category named exactly "Pizza". Apply same logic for other food types.',
+        system: 'You are a menu parser. Extract all products from this menu image. Group them by food type only: all pizza types → category "Pizza", all sandwiches → "Sandwich", all main dishes → "Plats", all boxes → "Box", all drinks → "Boissons". Return ONLY JSON: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}. No markdown. Price must be a number.',
         messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: image_mime_type, data: image_base64 } }, { type: 'text', text: prompt }] }]
       })
     });

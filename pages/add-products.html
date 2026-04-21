@@ -635,8 +635,12 @@ async function importMenuFromImage(file) {
       if (supplementsRows.length) {
         const { error: suppErr } = await supabase
           .from('restaurant_supplements')
-          .upsert(supplementsRows, { onConflict: 'restaurant_id,name' });
-        if (!suppErr) ok += supplementsRows.length;
+          .insert(supplementsRows)
+          .then(({ error }) => {
+            if (error && error.code !== '23505') console.error(error);
+            return { error };
+          });
+        if (!suppErr || suppErr.code === '23505') ok += supplementsRows.length;
       }
 
       if (standardRows.length) {

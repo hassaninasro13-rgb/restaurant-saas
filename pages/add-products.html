@@ -607,20 +607,21 @@ async function importMenuFromImage(file) {
     for (const cat of importedMenuCategories) {
       const categoryId = await getOrCreateCategoryIdByName(cat.name);
       if (!categoryId) continue;
-      const allProducts = (cat.sections || []).flatMap((sec) => sec.products || []);
       const results = await Promise.all(
-        allProducts.map((item) =>
-          insertProductForRestaurant(restaurant.id, {
-            category_id: categoryId,
-            name: item.name,
-            price: Math.max(0, Math.round(item.price)),
-            compare_price: null,
-            description: null,
-            position: 0,
-            is_visible: true,
-            is_available: true,
-            image_url: null,
-          })
+        (cat.sections || []).flatMap((sec) =>
+          (sec.products || []).map((p) =>
+            insertProductForRestaurant(restaurant.id, {
+              category_id: categoryId,
+              name: `${p.name} (${sec.title})`,
+              price: Math.max(0, Math.round(p.price)),
+              compare_price: null,
+              description: p.ingredients || '',
+              position: 0,
+              is_visible: true,
+              is_available: true,
+              image_url: null,
+            })
+          )
         )
       );
       ok += results.filter((r) => !r.error).length;

@@ -19,6 +19,7 @@ export default async function handler(req, res) {
       'Return strict JSON object only (no markdown, no comments).',
       'JSON shape must be exactly: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
       'Keep categories separated correctly, price as plain number only.',
+      'IMPORTANT: Group similar items under ONE category.\nExample: Pizza Medium, Miga Pizza, Pizza Family → all under one category called Pizza.\nDo NOT create separate categories for sizes or variations of the same dish type.\nCategory names must be short and general.',
     ].join(' ');
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {

@@ -1230,6 +1230,20 @@ function isSupplementsCategory(name) {
   return n.includes('supplement') || n.includes('suppl');
 }
 
+function applyMenuDesignSettings(settings) {
+  const primary = settings?.primary_color || '#D4521A';
+  const bg = settings?.background_color || '#ffffff';
+  const text = settings?.text_color || '#1a1a1a';
+  const font = settings?.font_family || 'Poppins';
+  document.documentElement.style.setProperty('--primary', primary);
+  document.documentElement.style.setProperty('--bg', bg);
+  document.documentElement.style.setProperty('--text', text);
+  document.documentElement.style.setProperty('--accent', primary);
+  document.body.style.background = bg;
+  document.body.style.color = text;
+  document.body.style.fontFamily = font;
+}
+
 function parseIngredientsFromDescription(desc) {
   const s = String(desc || '').trim();
   if (!s) return [];
@@ -1535,6 +1549,7 @@ async function loadRestaurantSupplements(restaurantId) {
   orderCurrency = getRestaurantCurrency(rest);
   orderLocale = getRestaurantLocale(rest);
   applyRestaurantClientPrefs(rest);
+  applyMenuDesignSettings(rest.settings || {});
   cart = hydrateCart(slug, products);
 
   await resolveSourceFromUrlParam(rest);

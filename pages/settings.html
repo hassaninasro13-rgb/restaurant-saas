@@ -52,6 +52,30 @@
   .users-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
   .users-table th, .users-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
   .users-table th { font-size: .7rem; text-transform: uppercase; color: var(--ink3); }
+  .design-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; }
+  .design-grid .field { margin: 0; }
+  .theme-presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .theme-chip {
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    padding: 7px 12px;
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .theme-chip.active { border-color: var(--accent); color: var(--accent); }
+  .menu-preview {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+    margin-top: 8px;
+  }
+  .menu-preview-head { padding: 10px 12px; font-weight: 800; font-size: .86rem; }
+  .menu-preview-body { padding: 10px 12px; font-size: .8rem; }
+  .menu-preview-item { display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.08); }
+  .menu-preview-item:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -212,6 +236,47 @@
       </div>
 
       <div class="settings-card">
+        <h3>تصميم المنيو</h3>
+        <div class="design-grid">
+          <div class="field">
+            <label for="menu-primary-color">اللون الرئيسي</label>
+            <input type="color" id="menu-primary-color" value="#D4521A">
+          </div>
+          <div class="field">
+            <label for="menu-bg-color">لون الخلفية</label>
+            <input type="color" id="menu-bg-color" value="#ffffff">
+          </div>
+          <div class="field">
+            <label for="menu-text-color">لون النص</label>
+            <input type="color" id="menu-text-color" value="#1a1a1a">
+          </div>
+          <div class="field">
+            <label for="menu-font-family">الخط</label>
+            <select id="menu-font-family" class="input">
+              <option value="Cairo">Cairo</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Tajawal">Tajawal</option>
+            </select>
+          </div>
+        </div>
+        <div class="theme-presets" id="menu-theme-presets">
+          <button type="button" class="theme-chip" data-theme="Classic">Classic</button>
+          <button type="button" class="theme-chip" data-theme="Dark">Dark</button>
+          <button type="button" class="theme-chip" data-theme="Fresh">Fresh</button>
+          <button type="button" class="theme-chip" data-theme="Elegant">Elegant</button>
+          <button type="button" class="theme-chip" data-theme="Ocean">Ocean</button>
+        </div>
+        <div class="menu-preview" id="menu-design-preview">
+          <div class="menu-preview-head">🍽️ Aperçu menu</div>
+          <div class="menu-preview-body">
+            <div class="menu-preview-item"><span>Pizza Margherita</span><strong>1200 DA</strong></div>
+            <div class="menu-preview-item"><span>Sandwich Poulet</span><strong>850 DA</strong></div>
+            <div class="menu-preview-item"><span>Boisson Fraîche</span><strong>250 DA</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
         <h3>Horaires (par jour)</h3>
         <p style="font-size:.8rem;color:var(--ink2);margin:-8px 0 12px;">Utilisés pour le badge « ouvert / fermé » sur le menu public.</p>
         <div style="overflow-x:auto;">
@@ -293,6 +358,13 @@ import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
 setLang(getLang());
 
 const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const MENU_THEMES = {
+  Classic: { primary_color: '#D4521A', background_color: '#ffffff', text_color: '#1a1a1a', font_family: 'Poppins' },
+  Dark: { primary_color: '#d4af37', background_color: '#181818', text_color: '#f3f0e8', font_family: 'Poppins' },
+  Fresh: { primary_color: '#2f9e44', background_color: '#ffffff', text_color: '#1b4332', font_family: 'Cairo' },
+  Elegant: { primary_color: '#c4a44d', background_color: '#111111', text_color: '#f7f3ea', font_family: 'Tajawal' },
+  Ocean: { primary_color: '#1c7ed6', background_color: '#ffffff', text_color: '#0b3d62', font_family: 'Poppins' },
+};
 
 let session = null;
 let restaurant = null;
@@ -376,6 +448,35 @@ function syncThemeInputs(fromColorPicker) {
   }
 }
 
+function readMenuDesignInputs() {
+  return {
+    primary_color: document.getElementById('menu-primary-color').value || '#D4521A',
+    background_color: document.getElementById('menu-bg-color').value || '#ffffff',
+    text_color: document.getElementById('menu-text-color').value || '#1a1a1a',
+    font_family: document.getElementById('menu-font-family').value || 'Poppins',
+  };
+}
+
+function applyMenuPreview() {
+  const preview = document.getElementById('menu-design-preview');
+  if (!preview) return;
+  const d = readMenuDesignInputs();
+  preview.style.background = d.background_color;
+  preview.style.color = d.text_color;
+  preview.style.fontFamily = d.font_family;
+  const head = preview.querySelector('.menu-preview-head');
+  if (head) {
+    head.style.background = d.primary_color;
+    head.style.color = '#fff';
+  }
+}
+
+function setActiveThemeChip(themeName) {
+  document.querySelectorAll('#menu-theme-presets .theme-chip').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-theme') === themeName);
+  });
+}
+
 async function reloadRestaurant() {
   const { data: access } = await getMyRestaurantAccess(session.user);
   if (!access?.restaurant_id) return;
@@ -453,6 +554,22 @@ async function loadRestaurantUsers() {
 
 document.getElementById('field-theme')?.addEventListener('input', () => syncThemeInputs(true));
 document.getElementById('field-theme-text')?.addEventListener('change', () => syncThemeInputs(false));
+['menu-primary-color', 'menu-bg-color', 'menu-text-color', 'menu-font-family'].forEach((id) => {
+  document.getElementById(id)?.addEventListener('input', applyMenuPreview);
+  document.getElementById(id)?.addEventListener('change', applyMenuPreview);
+});
+document.querySelectorAll('#menu-theme-presets .theme-chip').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const name = btn.getAttribute('data-theme');
+    const preset = MENU_THEMES[name] || MENU_THEMES.Classic;
+    document.getElementById('menu-primary-color').value = preset.primary_color;
+    document.getElementById('menu-bg-color').value = preset.background_color;
+    document.getElementById('menu-text-color').value = preset.text_color;
+    document.getElementById('menu-font-family').value = preset.font_family;
+    setActiveThemeChip(name);
+    applyMenuPreview();
+  });
+});
 
 document.getElementById('btn-pick-logo')?.addEventListener('click', () => {
   document.getElementById('logo-input').click();
@@ -510,6 +627,11 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
     currency: document.getElementById('field-currency').value,
     language: document.getElementById('field-language').value,
     theme_color: /^#[0-9A-Fa-f]{6}$/.test(themeHex) ? themeHex : null,
+    primary_color: document.getElementById('menu-primary-color').value,
+    background_color: document.getElementById('menu-bg-color').value,
+    text_color: document.getElementById('menu-text-color').value,
+    font_family: document.getElementById('menu-font-family').value,
+    theme_name: document.querySelector('#menu-theme-presets .theme-chip.active')?.getAttribute('data-theme') || 'Classic',
   });
   if (e2) {
     toast(e2.message || 'Erreur préférences', 'error');
@@ -583,6 +705,12 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   const tc = rest.settings?.theme_color || '#e85c2c';
   document.getElementById('field-theme').value = /^#[0-9A-Fa-f]{6}$/.test(tc) ? tc : '#e85c2c';
   document.getElementById('field-theme-text').value = document.getElementById('field-theme').value.toUpperCase();
+  document.getElementById('menu-primary-color').value = rest.settings?.primary_color || '#D4521A';
+  document.getElementById('menu-bg-color').value = rest.settings?.background_color || '#ffffff';
+  document.getElementById('menu-text-color').value = rest.settings?.text_color || '#1a1a1a';
+  document.getElementById('menu-font-family').value = rest.settings?.font_family || 'Poppins';
+  setActiveThemeChip(rest.settings?.theme_name || 'Classic');
+  applyMenuPreview();
 
   renderLogoPreview();
 

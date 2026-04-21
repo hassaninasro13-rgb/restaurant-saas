@@ -16,6 +16,11 @@ export function mergeRestaurantSettings(restaurantRow) {
       currency: row?.currency || 'DZD',
       language: row?.language || 'fr',
       theme_color: row?.theme_color || null,
+      primary_color: row?.primary_color || '#D4521A',
+      background_color: row?.background_color || '#ffffff',
+      text_color: row?.text_color || '#1a1a1a',
+      font_family: row?.font_family || 'Poppins',
+      theme_name: row?.theme_name || 'Classic',
     },
   };
 }
@@ -51,6 +56,11 @@ export async function upsertRestaurantSettings(restaurantId, patch) {
     const c = String(patch.theme_color || '').trim();
     payload.theme_color = c === '' ? null : c.slice(0, 16);
   }
+  if (patch.primary_color !== undefined) payload.primary_color = String(patch.primary_color || '').trim() || '#D4521A';
+  if (patch.background_color !== undefined) payload.background_color = String(patch.background_color || '').trim() || '#ffffff';
+  if (patch.text_color !== undefined) payload.text_color = String(patch.text_color || '').trim() || '#1a1a1a';
+  if (patch.font_family !== undefined) payload.font_family = String(patch.font_family || '').trim() || 'Poppins';
+  if (patch.theme_name !== undefined) payload.theme_name = String(patch.theme_name || '').trim() || 'Classic';
   return supabase.from('restaurant_settings').upsert(payload, { onConflict: 'restaurant_id' }).select().single();
 }
 

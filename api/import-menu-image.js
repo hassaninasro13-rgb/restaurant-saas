@@ -15,12 +15,15 @@ export default async function handler(req, res) {
     }
 
     const prompt = [
-      'Extract menu categories and products from this image.',
-      'Return strict JSON object only (no markdown, no comments).',
-      'JSON shape must be exactly: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
-      'Keep categories separated correctly, price as plain number only.',
-      'IMPORTANT: Group similar items under ONE category.\nExample: Pizza Medium, Miga Pizza, Pizza Family → all under one category called Pizza.\nDo NOT create separate categories for sizes or variations of the same dish type.\nCategory names must be short and general.',
-    ].join(' ');
+      'You are a menu parser. Extract ALL categories and products from this menu image.',
+      'Return ONLY a strict JSON object. No markdown, no comments.',
+      'JSON shape: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}',
+      'CRITICAL RULES:',
+      '- Merge similar categories into ONE. Pizza Medium + Miga Pizza = Pizza',
+      '- Category names must be short: Pizza, Burger, Plats, Sandwichs',
+      '- price must be a number only, no currency symbols',
+      '- Keep ALL products, do not skip any',
+    ].join(" ");
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -30,7 +33,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-6',
+        model: 'claude-opus-4-5',
         max_tokens: 1800,
         temperature: 0,
         messages: [

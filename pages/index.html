@@ -1871,7 +1871,14 @@ function buildMenu() {
   }
 
   body.innerHTML = menuCategories.map(c => {
-    const catProds = products.filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name));
+    const catProds = products
+      .filter((p) => p.category_id === c.id && !isSupplementsCategory(c.name))
+      .sort((a, b) => {
+        const sa = Number.isFinite(Number(a?.sort_order)) ? Number(a.sort_order) : Number.MAX_SAFE_INTEGER;
+        const sb = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
+        if (sa !== sb) return sa - sb;
+        return String(a?.name || '').localeCompare(String(b?.name || ''), 'fr', { sensitivity: 'base' });
+      });
     if (catProds.length === 0) return '';
     const isPizzaCategory = String(c.name || '').toLowerCase().includes('pizza');
     const sectionedRows = [];

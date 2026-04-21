@@ -14,6 +14,7 @@ const PRODUCT_WRITE_KEYS = new Set([
   'compare_price',
   'image_url',
   'position',
+  'sort_order',
   'is_available',
   'is_visible',
 ]);

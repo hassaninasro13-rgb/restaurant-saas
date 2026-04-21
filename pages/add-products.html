@@ -542,13 +542,15 @@ async function importMenuFromImage(file) {
     const cats = Array.isArray(payload?.categories) ? payload.categories : [];
     importedMenuCategories = cats.map((cat) => ({
       name: String(cat?.name || '').trim() || 'Other',
-      sections: (cat.sections || []).map(sec => ({
+      sections: (cat.sections || []).map((sec, secIdx) => ({
         title: String(sec?.title || '').trim(),
+        section_order: Number.isFinite(Number(sec?.section_order)) ? Number(sec.section_order) : secIdx,
         products: (Array.isArray(sec?.products) ? sec.products : [])
-          .map(p => ({
+          .map((p, prodIdx) => ({
             name: String(p?.name || '').trim(),
             price: normalizePrice(p?.price),
             ingredients: String(p?.ingredients || '').trim(),
+            product_order: Number.isFinite(Number(p?.product_order)) ? Number(p.product_order) : prodIdx,
           }))
           .filter(p => p.name && p.price >= 0),
       })).filter(sec => sec.products.length > 0),
@@ -625,10 +627,7 @@ async function importMenuFromImage(file) {
               price: Math.max(0, Math.round(p.price)),
             });
           } else {
-            standardRows.push({
-              sectionTitle: sec.title,
-              product: p,
-            });
+            standardRows.push({ sectionTitle: sec.title, sectionOrder: Number(sec.section_order) || 0, product: p });
           }
         }
       }
@@ -644,7 +643,7 @@ async function importMenuFromImage(file) {
         const categoryId = await getOrCreateCategoryIdByName(cat.name);
         if (!categoryId) continue;
         const results = await Promise.all(
-          standardRows.map(({ sectionTitle, product: p }) =>
+          standardRows.map(({ sectionTitle, sectionOrder, product: p }) =>
             insertProductForRestaurant(restaurant.id, {
               category_id: categoryId,
               name: `${p.name} (${sectionTitle})`,
@@ -652,6 +651,7 @@ async function importMenuFromImage(file) {
               compare_price: null,
               description: p.ingredients || '',
               position: 0,
+              sort_order: (Math.max(0, Math.floor(sectionOrder)) * 100) + Math.max(0, Math.floor(Number(p.product_order) || 0)),
               is_visible: true,
               is_available: true,
               image_url: null,

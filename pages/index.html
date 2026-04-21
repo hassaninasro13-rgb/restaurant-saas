@@ -95,7 +95,7 @@
   }
   .menu-rest-name {
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.55rem;
     font-weight: 800;
     margin-bottom: 3px;
   }
@@ -142,8 +142,8 @@
     border: none;
     background: transparent;
     font-family: var(--font-body);
-    font-size: .85rem;
-    font-weight: 600;
+    font-size: .95rem;
+    font-weight: 700;
     color: var(--ink3);
     cursor: pointer;
     border-bottom: 2.5px solid transparent;
@@ -185,13 +185,21 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
     cursor: pointer;
-    transition: background .1s;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    margin-bottom: 10px;
   }
-  .product-row:last-child { border-bottom: none; }
-  .product-row:hover { background: var(--cream); margin: 0 -16px; padding: 14px 16px; }
+  .product-row:last-child { margin-bottom: 0; }
+  .product-row:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--accent-rgb), .25);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  }
   .product-row-img {
     width: 80px; height: 80px;
     border-radius: var(--radius);
@@ -202,9 +210,13 @@
     font-size: 1.8rem;
     overflow: hidden;
   }
+  .product-row-img.placeholder {
+    background: linear-gradient(135deg, var(--accent), #f08a4b);
+    color: #fff;
+  }
   .product-row-img img { width: 100%; height: 100%; object-fit: cover; }
   .product-row-info { flex: 1; min-width: 0; }
-  .product-row-name { font-weight: 600; font-size: .93rem; margin-bottom: 3px; }
+  .product-row-name { font-weight: 700; font-size: 1.02rem; margin-bottom: 3px; }
   .product-row-desc {
     font-size: .78rem; color: var(--ink3);
     display: -webkit-box;
@@ -247,16 +259,17 @@
 
   .btn-add-cart {
     flex-shrink: 0;
-    padding: 8px 12px;
+    padding: 9px 14px;
     border-radius: 999px;
     border: none;
     background: var(--accent);
     color: #fff;
-    font-size: .75rem;
+    font-size: .8rem;
     font-weight: 700;
     cursor: pointer;
     font-family: var(--font-body);
     white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(var(--accent-rgb), .25);
     transition: transform .12s, filter .12s;
   }
   .btn-add-cart:hover { filter: brightness(1.05); transform: scale(1.02); }
@@ -1270,6 +1283,18 @@ function isDrinkDessertLikeCategory(name) {
   );
 }
 
+function productPlaceholderEmoji(categoryName) {
+  const n = String(categoryName || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  if (n.includes('pizza')) return '🍕';
+  if (n.includes('sandwich') || n.includes('burger')) return '🥪';
+  if (n.includes('boisson') || n.includes('drink') || n.includes('cafe')) return '🥤';
+  if (n.includes('dessert') || n.includes('glace')) return '🍰';
+  return '🍽️';
+}
+
 function getLineUnitPrice(line) {
   return line?.customization?.total_price ?? line?.product?.price ?? 0;
 }
@@ -1938,14 +1963,16 @@ function qtyForProduct(productId) {
 function buildProductRow(p, displayName = null) {
   const qty = qtyForProduct(p.id);
   const imgUrl = safeHttpUrl(p.image_url);
+  const categoryName = categories.find((c) => c.id === p.category_id)?.name || '';
+  const placeholderEmoji = productPlaceholderEmoji(categoryName);
   const img = imgUrl
     ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : '';
   const shownName = displayName || p.name;
   return `
   <div class="product-row" id="prow-${p.id}" role="button" tabindex="0" onclick="openProductCustomizeModal('${p.id}')">
-    <div class="product-row-img">
-      ${img || '🍽️'}
+    <div class="product-row-img ${img ? '' : 'placeholder'}">
+      ${img || placeholderEmoji}
     </div>
     <div class="product-row-info">
       <div class="product-row-name">${esc(shownName)}</div>

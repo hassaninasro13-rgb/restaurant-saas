@@ -9,11 +9,10 @@
       "memory": 1024
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/import-menu-image",
-      "dest": "/api/import-menu-image.js",
-      "methods": ["POST"]
+      "source": "/api/import-menu-image",
+      "destination": "/api/import-menu-image.js"
     }
   ],
   "headers": [

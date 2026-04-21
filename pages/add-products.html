@@ -177,6 +177,17 @@
   .import-review-name { font-weight: 600; font-size: .86rem; }
   .import-review-price { text-align: right; font-weight: 700; font-size: .86rem; color: var(--accent); }
   .btn-importing { opacity: .65; pointer-events: none; }
+  .import-review-cat-header {
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ink3);
+    padding: 10px 0 4px;
+    margin-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .import-review-cat-header:first-of-type { border-top: none; margin-top: 0; padding-top: 2px; }
 
   @media (max-width: 1000px) {
     .products-layout { grid-template-columns: 1fr; }
@@ -402,7 +413,7 @@ import {
   getRoleHomePath,
   isRestaurantRoleAllowed,
 } from '../supabase/restaurant-users.js';
-import { listCategoriesForRestaurant } from '../supabase/categories.js';
+import { listCategoriesForRestaurant, insertCategoryForRestaurant } from '../supabase/categories.js';
 import {
   listProductsWithCategory,
   getProductForRestaurant,
@@ -449,17 +460,6 @@ function normalizePrice(raw) {
   return Number.isFinite(n) ? Math.round(n) : 0;
 }
 
-function guessCategoryId(categoryName) {
-  const selected = document.getElementById('prod-category')?.value;
-  if (selected && categories.some((c) => c.id === selected)) return selected;
-  if (categoryName) {
-    const needle = String(categoryName).trim().toLowerCase();
-    const hit = categories.find((c) => String(c.name || '').trim().toLowerCase() === needle);
-    if (hit) return hit.id;
-  }
-  return categories[0]?.id || '';
-}
-
 function renderImportReview() {
   const box = document.getElementById('import-review');
   const addAllBtn = document.getElementById('btn-import-add-all');
@@ -469,15 +469,19 @@ function renderImportReview() {
     addAllBtn.style.display = 'none';
     return;
   }
+  const totalProducts = importedMenuItems.reduce((s, c) => s + c.products.length, 0);
   box.style.display = '';
   addAllBtn.style.display = '';
   box.innerHTML = `
-    <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${importedMenuItems.length})</div>
-    ${importedMenuItems.map((it, i) => `
-      <div class="import-review-row" data-import-row="${i}">
-        <div class="import-review-name">${it.name}</div>
-        <div class="import-review-price">${fmtCurrency(it.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
-      </div>
+    <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${importedMenuItems.length} تصنيف، ${totalProducts} منتج)</div>
+    ${importedMenuItems.map((cat) => `
+      <div class="import-review-cat-header">${cat.name}</div>
+      ${cat.products.map((p) => `
+        <div class="import-review-row">
+          <div class="import-review-name">${p.name}</div>
+          <div class="import-review-price">${fmtCurrency(p.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
+        </div>
+      `).join('')}
     `).join('')}
   `;
 }
@@ -505,18 +509,23 @@ async function importMenuFromImage(file) {
     });
     const payload = await res.json();
     if (!res.ok) throw new Error(payload?.error || 'import_failed');
-    const items = Array.isArray(payload?.items) ? payload.items : [];
-    importedMenuItems = items
-      .map((x) => ({
-        name: String(x?.name || '').trim(),
-        price: normalizePrice(x?.price),
-        category_name: String(x?.category_name || '').trim() || null,
+    const cats = Array.isArray(payload?.categories) ? payload.categories : [];
+    importedMenuItems = cats
+      .map((cat) => ({
+        name: String(cat?.name || '').trim() || 'Other',
+        products: (Array.isArray(cat?.products) ? cat.products : [])
+          .map((p) => ({
+            name: String(p?.name || '').trim(),
+            price: normalizePrice(p?.price),
+          }))
+          .filter((p) => p.name && p.price >= 0),
       }))
-      .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0);
-    if (!importedMenuItems.length) {
+      .filter((cat) => cat.products.length > 0);
+    const totalProducts = importedMenuItems.reduce((s, c) => s + c.products.length, 0);
+    if (!totalProducts) {
       toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');
     } else {
-      toast(`تم استخراج ${importedMenuItems.length} منتج`, 'success');
+      toast(`تم استخراج ${importedMenuItems.length} تصنيف و${totalProducts} منتج`, 'success');
     }
     renderImportReview();
   } catch (err) {
@@ -564,34 +573,48 @@ async function importMenuFromImage(file) {
   document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
     if (!importedMenuItems.length) return;
     const btn = document.getElementById('btn-import-add-all');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'جاري الإضافة...';
+    if (btn) { btn.disabled = true; btn.textContent = 'جاري الإضافة...'; }
+
+    // Build a name→id map from already-loaded categories
+    const catNameMap = new Map(categories.map((c) => [c.name.trim().toLowerCase(), c.id]));
+
+    // Insert categories that don't exist yet
+    const newCatNames = importedMenuItems
+      .map((cat) => cat.name)
+      .filter((name) => !catNameMap.has(name.trim().toLowerCase()));
+    for (const name of newCatNames) {
+      await insertCategoryForRestaurant(restaurant.id, { name, position: 0, is_visible: true });
     }
+
+    // Reload categories so newly created ones appear in the map
+    if (newCatNames.length) await loadCategories();
+    const freshMap = new Map(categories.map((c) => [c.name.trim().toLowerCase(), c.id]));
+
+    // Insert products under their resolved category_id
     let ok = 0;
-    for (const item of importedMenuItems) {
-      const categoryId = guessCategoryId(item.category_name);
+    for (const cat of importedMenuItems) {
+      const categoryId = freshMap.get(cat.name.trim().toLowerCase());
       if (!categoryId) continue;
-      const { error } = await insertProductForRestaurant(restaurant.id, {
-        category_id: categoryId,
-        name: item.name,
-        price: Math.max(0, Math.round(item.price)),
-        compare_price: null,
-        description: null,
-        position: 0,
-        is_visible: true,
-        is_available: true,
-        image_url: null,
-      });
-      if (!error) ok += 1;
+      for (const prod of cat.products) {
+        const { error } = await insertProductForRestaurant(restaurant.id, {
+          category_id: categoryId,
+          name: prod.name,
+          price: Math.max(0, Math.round(prod.price)),
+          compare_price: null,
+          description: null,
+          position: 0,
+          is_visible: true,
+          is_available: true,
+          image_url: null,
+        });
+        if (!error) ok += 1;
+      }
     }
+
     importedMenuItems = [];
     renderImportReview();
     await loadProducts();
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = 'إضافة الكل';
-    }
+    if (btn) { btn.disabled = false; btn.textContent = 'إضافة الكل'; }
     toast(`تمت إضافة ${ok} منتج`, ok ? 'success' : 'warning');
   });
   const editId = new URLSearchParams(location.search).get('edit');

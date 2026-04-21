@@ -8,6 +8,7 @@
 <meta name="description" content="Menu digital du restaurant — aucune connexion requise.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="../css/shared.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
   body {
     background: var(--cream);
@@ -849,6 +850,64 @@
   .customize-add-btn:hover { filter: brightness(1.05); }
   .customize-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  .btn-map-picker {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-map-picker:hover { background: var(--cream2); border-color: var(--accent); }
+  .map-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 460;
+    background: rgba(20, 14, 10, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .map-picker-backdrop.is-open { display: flex; }
+  .map-picker-sheet {
+    background: #fff;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .map-picker-sheet h3 { margin: 0; font-size: 1rem; font-family: var(--font-display); }
+  #map-picker-leaflet { height: 280px; width: 100%; border-radius: var(--radius); z-index: 0; }
+  .map-picker-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .map-picker-actions button {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    border: none;
+  }
+  .btn-map-my-loc { background: var(--cream2); border: 1.5px solid var(--border) !important; }
+  .btn-map-confirm { background: var(--accent); color: #fff; }
+  .btn-map-cancel { background: var(--cream2); color: var(--ink); }
+
   @media (min-width: 640px) {
     body { box-shadow: 0 0 40px rgba(0,0,0,.1); }
     .customize-backdrop { align-items: center; padding: 24px; }
@@ -921,7 +980,10 @@
         </div>
         <div class="field" id="cart-address-field">
           <label for="cart-order-address" data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
+          <button type="button" class="btn-map-picker" id="btn-map-picker-cart" onclick="openMapPicker('cart')">📍 حدد موقعك على الخريطة</button>
           <textarea id="cart-order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier…"></textarea>
+          <input type="hidden" id="delivery-lat-cart" value="">
+          <input type="hidden" id="delivery-lng-cart" value="">
         </div>
         <div class="field">
           <label for="cart-order-notes"><span data-i18n="pub.notes">Notes</span> <span style="color:var(--ink3);font-weight:400" data-i18n="pub.optional">(facultatif)</span></label>
@@ -1021,7 +1083,10 @@
         </div>
         <div id="address-field" class="field">
           <label data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
+          <button type="button" class="btn-map-picker" id="btn-map-picker-modal" onclick="openMapPicker('modal')">📍 حدد موقعك على الخريطة</button>
           <textarea id="order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier, indicatifs..."></textarea>
+          <input type="hidden" id="delivery-lat-modal" value="">
+          <input type="hidden" id="delivery-lng-modal" value="">
         </div>
         <div class="field">
           <label><span data-i18n="pub.notes">Notes</span> <span style="color:var(--ink3);font-weight:400" data-i18n="pub.optional">(facultatif)</span></label>
@@ -1054,6 +1119,22 @@
   </div>
 </div>
 
+<!-- Map picker (Leaflet + OSM) -->
+<div id="map-picker-backdrop" class="map-picker-backdrop" aria-hidden="true">
+  <div class="map-picker-sheet" role="dialog" aria-modal="true" aria-labelledby="map-picker-title" onclick="event.stopPropagation()">
+    <h3 id="map-picker-title">📍 موقع التوصيل</h3>
+    <p style="margin:0;font-size:.82rem;color:var(--ink3);line-height:1.4;">انقر على الخريطة أو اسحب الدبوس لتحديد موقعك بدقة.</p>
+    <div id="map-picker-leaflet"></div>
+    <div class="map-picker-actions">
+      <button type="button" class="btn-map-my-loc" id="btn-map-use-my-location">📍 موقعي الحالي</button>
+    </div>
+    <div class="map-picker-actions">
+      <button type="button" class="btn-map-cancel" onclick="closeMapPicker()">إلغاء</button>
+      <button type="button" class="btn-map-confirm" id="btn-map-confirm" onclick="confirmMapPicker()">تأكيد الموقع</button>
+    </div>
+  </div>
+</div>
+
 <!-- Product customization (ingredients + supplements) -->
 <div id="product-customize-backdrop" class="customize-backdrop" style="display:none;" aria-hidden="true">
   <div class="customize-sheet" role="dialog" aria-modal="true" aria-labelledby="customize-title" onclick="event.stopPropagation()">
@@ -1073,6 +1154,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 /**
@@ -1161,6 +1243,132 @@ function formatOrderLineName(line) {
   if (supStr) out += ` (+ ${supStr})`;
   return out;
 }
+
+/** Leaflet map picker (delivery address) */
+let mapPickerContext = 'modal';
+let mapLeafletInstance = null;
+let mapMarker = null;
+
+async function reverseGeocodeAddress(lat, lng) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`;
+  const r = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!r.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  const d = await r.json();
+  return d.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+}
+
+function initLeafletMapIfNeeded() {
+  if (typeof L === 'undefined') return false;
+  const el = document.getElementById('map-picker-leaflet');
+  if (!el) return false;
+  if (mapLeafletInstance) return true;
+  const start = [36.7538, 3.0588];
+  mapLeafletInstance = L.map('map-picker-leaflet').setView(start, 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(mapLeafletInstance);
+  mapMarker = L.marker(start, { draggable: true }).addTo(mapLeafletInstance);
+  mapLeafletInstance.on('click', (e) => {
+    mapMarker.setLatLng(e.latlng);
+  });
+  return true;
+}
+
+function getMapPickerLatLng() {
+  if (!mapMarker) return { lat: 36.7538, lng: 3.0588 };
+  const ll = mapMarker.getLatLng();
+  return { lat: ll.lat, lng: ll.lng };
+}
+
+window.openMapPicker = function (ctx) {
+  if (typeof L === 'undefined') {
+    toast('الخريطة غير متاحة', 'error');
+    return;
+  }
+  mapPickerContext = ctx === 'cart' ? 'cart' : 'modal';
+  const bd = document.getElementById('map-picker-backdrop');
+  if (!bd) return;
+  bd.classList.add('is-open');
+  bd.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => {
+    if (!initLeafletMapIfNeeded()) {
+      toast('تعذر تحميل الخريطة', 'error');
+      return;
+    }
+    setTimeout(() => {
+      if (mapLeafletInstance) mapLeafletInstance.invalidateSize();
+    }, 250);
+  });
+};
+
+window.closeMapPicker = function () {
+  const bd = document.getElementById('map-picker-backdrop');
+  if (bd) {
+    bd.classList.remove('is-open');
+    bd.setAttribute('aria-hidden', 'true');
+  }
+};
+
+window.confirmMapPicker = async function () {
+  const { lat, lng } = getMapPickerLatLng();
+  const btn = document.getElementById('btn-map-confirm');
+  const prev = btn?.textContent;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'جاري التحميل...';
+  }
+  let addrText;
+  try {
+    addrText = await reverseGeocodeAddress(lat, lng);
+  } catch {
+    addrText = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = prev || 'تأكيد الموقع';
+  }
+  if (mapPickerContext === 'cart') {
+    const ta = document.getElementById('cart-order-address');
+    if (ta) ta.value = addrText;
+    const la = document.getElementById('delivery-lat-cart');
+    const ln = document.getElementById('delivery-lng-cart');
+    if (la) la.value = String(lat);
+    if (ln) ln.value = String(lng);
+  } else {
+    const ta = document.getElementById('order-address');
+    if (ta) ta.value = addrText;
+    const la = document.getElementById('delivery-lat-modal');
+    const ln = document.getElementById('delivery-lng-modal');
+    if (la) la.value = String(lat);
+    if (ln) ln.value = String(lng);
+  }
+  closeMapPicker();
+};
+
+document.getElementById('map-picker-backdrop')?.addEventListener('click', (e) => {
+  if (e.target?.id === 'map-picker-backdrop') closeMapPicker();
+});
+
+document.getElementById('btn-map-use-my-location')?.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    toast('تحديد الموقع غير مدعوم', 'warning');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      initLeafletMapIfNeeded();
+      if (mapLeafletInstance && mapMarker) {
+        mapMarker.setLatLng([latitude, longitude]);
+        mapLeafletInstance.setView([latitude, longitude], 16);
+        mapLeafletInstance.invalidateSize();
+      }
+    },
+    () => toast('تعذر الوصول لموقعك', 'error'),
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+  );
+});
 
 const urlParams = new URLSearchParams(window.location.search);
 const slug = urlParams.get('slug');
@@ -1441,7 +1649,18 @@ function readCheckoutFields() {
   const phone = (c ? document.getElementById('cart-order-phone') : document.getElementById('order-phone'))?.value?.trim() ?? '';
   const address = (c ? document.getElementById('cart-order-address') : document.getElementById('order-address'))?.value?.trim() ?? '';
   const notes = (c ? document.getElementById('cart-order-notes') : document.getElementById('order-notes'))?.value?.trim() ?? '';
-  return { name, phone, address, notes };
+  const latEl = c ? document.getElementById('delivery-lat-cart') : document.getElementById('delivery-lat-modal');
+  const lngEl = c ? document.getElementById('delivery-lng-cart') : document.getElementById('delivery-lng-modal');
+  const deliveryLat = parseFloat(latEl?.value || '');
+  const deliveryLng = parseFloat(lngEl?.value || '');
+  return {
+    name,
+    phone,
+    address,
+    notes,
+    deliveryLat: Number.isFinite(deliveryLat) ? deliveryLat : null,
+    deliveryLng: Number.isFinite(deliveryLng) ? deliveryLng : null,
+  };
 }
 
 function updateCartPageTotals() {
@@ -1956,7 +2175,7 @@ window.closeOrderModal = function() {
 };
 
 window.placeOrder = async function() {
-  const { name, phone, address, notes } = readCheckoutFields();
+  const { name, phone, address, notes, deliveryLat, deliveryLng } = readCheckoutFields();
 
   if (!name) { toast(t('pub.errName'), 'error'); return; }
   if (!phone) { toast(t('pub.errPhone'), 'error'); return; }
@@ -1981,6 +2200,12 @@ window.placeOrder = async function() {
   const total = subtotal + deliveryFee;
   const orderNum = `CMD-${String(orderCounter).padStart(4, '0')}`;
 
+  let customerNotes = notes || null;
+  if (orderType === 'delivery' && deliveryLat != null && deliveryLng != null) {
+    const gpsLine = `📍 GPS: ${deliveryLat.toFixed(6)}, ${deliveryLng.toFixed(6)}`;
+    customerNotes = customerNotes ? `${customerNotes}\n${gpsLine}` : gpsLine;
+  }
+
   const orderRow = {
     restaurant_id: restaurant.id,
     order_number: orderNum,
@@ -1989,7 +2214,7 @@ window.placeOrder = async function() {
     customer_name: name,
     customer_phone: phone,
     customer_address: address || null,
-    customer_notes: notes || null,
+    customer_notes: customerNotes,
     subtotal,
     delivery_fee: deliveryFee,
     total_amount: total,
@@ -2053,7 +2278,7 @@ window.placeOrder = async function() {
     customerName: name,
     customerPhone: phone,
     customerAddress: address,
-    customerNotes: notes,
+    customerNotes: customerNotes,
     sourceLabel: resolvedSource?.name || null,
     sourceType: resolvedSource?.type || null,
   });

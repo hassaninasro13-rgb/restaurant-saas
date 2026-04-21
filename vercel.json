@@ -13,12 +13,7 @@
     {
       "src": "/api/import-menu-image",
       "dest": "/api/import-menu-image.js",
-      "methods": ["POST"],
-      "config": {
-        "bodyParser": {
-          "sizeLimit": "10mb"
-        }
-      }
+      "methods": ["POST"]
     }
   ],
   "headers": [

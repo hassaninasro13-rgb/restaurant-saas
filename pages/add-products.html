@@ -420,6 +420,7 @@ import {
   fileLooksLikeImage,
 } from '../js/image-optimize.js';
 import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
+import { supabase } from '../supabase/client.js';
 
 setLang(getLang());
 
@@ -448,6 +449,14 @@ function revokePreviewObjectUrl() {
 function normalizePrice(raw) {
   const n = Number(String(raw ?? '').replace(',', '.').replace(/[^\d.]/g, ''));
   return Number.isFinite(n) ? Math.round(n) : 0;
+}
+
+function isSupplementSectionName(name) {
+  const n = String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  return n.includes('supplement') || n.includes('suppl');
 }
 
 function guessCategoryId(categoryName) {
@@ -605,14 +614,40 @@ async function importMenuFromImage(file) {
     }
     let ok = 0;
     for (const cat of importedMenuCategories) {
-      const categoryId = await getOrCreateCategoryIdByName(cat.name);
-      if (!categoryId) continue;
-      const results = await Promise.all(
-        (cat.sections || []).flatMap((sec) =>
-          (sec.products || []).map((p) =>
+      const standardRows = [];
+      const supplementsRows = [];
+      for (const sec of (cat.sections || [])) {
+        for (const p of (sec.products || [])) {
+          if (isSupplementSectionName(sec.title)) {
+            supplementsRows.push({
+              restaurant_id: restaurant.id,
+              name: p.name,
+              price: Math.max(0, Math.round(p.price)),
+            });
+          } else {
+            standardRows.push({
+              sectionTitle: sec.title,
+              product: p,
+            });
+          }
+        }
+      }
+
+      if (supplementsRows.length) {
+        const { error: suppErr } = await supabase
+          .from('restaurant_supplements')
+          .upsert(supplementsRows, { onConflict: 'restaurant_id,name' });
+        if (!suppErr) ok += supplementsRows.length;
+      }
+
+      if (standardRows.length) {
+        const categoryId = await getOrCreateCategoryIdByName(cat.name);
+        if (!categoryId) continue;
+        const results = await Promise.all(
+          standardRows.map(({ sectionTitle, product: p }) =>
             insertProductForRestaurant(restaurant.id, {
               category_id: categoryId,
-              name: `${p.name} (${sec.title})`,
+              name: `${p.name} (${sectionTitle})`,
               price: Math.max(0, Math.round(p.price)),
               compare_price: null,
               description: p.ingredients || '',
@@ -622,9 +657,9 @@ async function importMenuFromImage(file) {
               image_url: null,
             })
           )
-        )
-      );
-      ok += results.filter((r) => !r.error).length;
+        );
+        ok += results.filter((r) => !r.error).length;
+      }
     }
     importedMenuCategories = [];
     renderImportReview();

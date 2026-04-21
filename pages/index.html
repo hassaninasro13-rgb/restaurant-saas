@@ -1179,6 +1179,7 @@ import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orde
 import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
 import { notifyNewOrderCreated } from '../supabase/email.js';
 import { hydrateCart, persistCart as persistCartLs, clearCartStorage as clearCartStorageLs } from '../js/onetap-cart.js';
+import { supabase } from '../supabase/client.js';
 
 setLang(getLang());
 
@@ -1224,6 +1225,20 @@ function parseIngredientsFromDescription(desc) {
   const s = String(desc || '').trim();
   if (!s) return [];
   return s.split(/[,،]/g).map((x) => x.trim()).filter(Boolean);
+}
+
+function isDrinkDessertLikeCategory(name) {
+  const n = String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  return (
+    n.includes('boisson') ||
+    n.includes('drink') ||
+    n.includes('cafe') ||
+    n.includes('dessert') ||
+    n.includes('glace')
+  );
 }
 
 function getLineUnitPrice(line) {
@@ -1452,6 +1467,19 @@ async function tryRestoreResolvedSourceSession(rest) {
   } catch (_) {}
 }
 
+async function loadRestaurantSupplements(restaurantId) {
+  const { data } = await supabase
+    .from('restaurant_supplements')
+    .select('id,name,price')
+    .eq('restaurant_id', restaurantId)
+    .order('name', { ascending: true });
+  supplementProducts = (data || []).map((r) => ({
+    id: r.id,
+    name: String(r.name || '').trim(),
+    price: Number(r.price) || 0,
+  })).filter((r) => r.name);
+}
+
 (async () => {
   if (!slug || !slug.trim()) {
     document.getElementById('rest-name').textContent = t('pub.menu');
@@ -1494,10 +1522,7 @@ async function tryRestoreResolvedSourceSession(rest) {
   categories = cats;
   products = prods;
   menuCategories = (cats || []).filter((c) => !isSupplementsCategory(c.name));
-  supplementProducts = (prods || []).filter((p) => {
-    const c = (cats || []).find((x) => x.id === p.category_id);
-    return c && isSupplementsCategory(c.name);
-  });
+  await loadRestaurantSupplements(rest.id);
   orderCurrency = getRestaurantCurrency(rest);
   orderLocale = getRestaurantLocale(rest);
   applyRestaurantClientPrefs(rest);
@@ -1971,10 +1996,13 @@ window.changeSuppQty = function (suppId, delta) {
 window.openProductCustomizeModal = function (productId) {
   const p = products.find((x) => x.id === productId);
   if (!p) return;
+  const productCategoryName = categories.find((c) => c.id === p.category_id)?.name || '';
+  const allowSupplements = !isDrinkDessertLikeCategory(productCategoryName);
   customizeDraftProduct = p;
   customizeIngredientList = parseIngredientsFromDescription(p.description);
   customizeRemoved = new Set();
-  customizeSuppQty = Object.fromEntries(supplementProducts.map((s) => [s.id, 0]));
+  const modalSupplements = allowSupplements ? supplementProducts : [];
+  customizeSuppQty = Object.fromEntries(modalSupplements.map((s) => [s.id, 0]));
 
   document.getElementById('customize-title').textContent = p.name;
   document.getElementById('customize-base').textContent = cur(p.price);
@@ -1997,12 +2025,12 @@ window.openProductCustomizeModal = function (productId) {
 
   const suppEl = document.getElementById('customize-supplements');
   const suppTitle = document.getElementById('customize-supp-title');
-  if (!supplementProducts.length) {
+  if (!modalSupplements.length) {
     if (suppTitle) suppTitle.style.display = 'none';
     suppEl.innerHTML = '<span style="font-size:.82rem;color:var(--ink3);">—</span>';
   } else {
     if (suppTitle) suppTitle.style.display = '';
-    suppEl.innerHTML = supplementProducts
+    suppEl.innerHTML = modalSupplements
       .map((s) => {
         const sid = s.id;
         return `<div class="supp-row">

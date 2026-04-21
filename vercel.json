@@ -3,6 +3,24 @@
   "framework": null,
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm install",
+  "functions": {
+    "api/import-menu-image.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/import-menu-image",
+      "dest": "/api/import-menu-image.js",
+      "methods": ["POST"],
+      "config": {
+        "bodyParser": {
+          "sizeLimit": "10mb"
+        }
+      }
+    }
+  ],
   "headers": [
     {
       "source": "/pages/supabase-env.js",

@@ -488,16 +488,20 @@ function renderImportReview() {
   }
   box.style.display = '';
   addAllBtn.style.display = '';
-  const totalItems = importedMenuCategories.reduce((s, c) => s + (c.products?.length || 0), 0);
+  const totalItems = importedMenuCategories.reduce((s, c) => s + (c.sections || []).reduce((n, sec) => n + (sec.products?.length || 0), 0), 0);
   box.innerHTML = `
     <div style="font-weight:700;margin-bottom:8px;">المنتجات المستخرجة للمراجعة (${totalItems})</div>
     ${importedMenuCategories.map((cat, i) => `
       <div style="font-weight:700;font-size:.82rem;color:var(--ink2);margin:10px 0 6px;" data-import-cat="${i}">${cat.name}</div>
-      ${(cat.products || []).map((it, j) => `
-        <div class="import-review-row" data-import-row="${i}-${j}">
-          <div class="import-review-name">${it.name}</div>
-          <div class="import-review-price">${fmtCurrency(it.price, getRestaurantCurrency(restaurant), getRestaurantLocale(restaurant))}</div>
-        </div>
+      ${(cat.sections || []).map(sec => `
+        <div style="font-weight:600;color:#666;padding:6px 0 2px;font-size:12px;text-transform:uppercase;">${sec.title}</div>
+        ${sec.products.map(p => `
+          <div class="import-review-row">
+            <div class="import-review-name">${p.name}</div>
+            <div class="import-review-price">${fmtCurrency(p.price, getRestaurantCurrency(restaurant))}</div>
+          </div>
+          ${p.ingredients ? `<div style="font-size:11px;color:#999;padding:2px 0 6px;">${p.ingredients}</div>` : ''}
+        `).join('')}
       `).join('')}
     `).join('')}
   `;
@@ -527,17 +531,19 @@ async function importMenuFromImage(file) {
     const payload = await res.json();
     if (!res.ok) throw new Error(payload?.error || 'import_failed');
     const cats = Array.isArray(payload?.categories) ? payload.categories : [];
-    importedMenuCategories = cats
-      .map((cat) => ({
-        name: String(cat?.name || '').trim() || 'Sans catégorie',
-        products: (Array.isArray(cat?.products) ? cat.products : [])
-          .map((x) => ({
-            name: String(x?.name || '').trim(),
-            price: normalizePrice(x?.price),
+    importedMenuCategories = cats.map((cat) => ({
+      name: String(cat?.name || '').trim() || 'Other',
+      sections: (cat.sections || []).map(sec => ({
+        title: String(sec?.title || '').trim(),
+        products: (Array.isArray(sec?.products) ? sec.products : [])
+          .map(p => ({
+            name: String(p?.name || '').trim(),
+            price: normalizePrice(p?.price),
+            ingredients: String(p?.ingredients || '').trim(),
           }))
-          .filter((x) => x.name && Number.isFinite(x.price) && x.price >= 0),
-      }))
-      .filter((cat) => cat.products.length > 0);
+          .filter(p => p.name && p.price >= 0),
+      })).filter(sec => sec.products.length > 0),
+    })).filter(cat => cat.sections && cat.sections.length > 0);
     const totalItems = importedMenuCategories.reduce((s, c) => s + c.products.length, 0);
     if (!totalItems) {
       toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');

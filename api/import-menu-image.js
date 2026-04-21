@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-opus-4-5',
+        system: 'You are a menu categorization expert. Your only job is to group food items by their FOOD TYPE. Rules: All pizza varieties (any size, any name) → "Pizza". All sandwiches/burgers → "Sandwich". All main dishes → "Plats". All boxes/meals → "Box". All drinks → "Boissons". NEVER use size or brand as a category name.',
         max_tokens: 1800,
         temperature: 0,
         messages: [

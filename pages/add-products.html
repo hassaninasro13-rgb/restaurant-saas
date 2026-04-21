@@ -638,18 +638,13 @@ async function importMenuFromImage(file) {
   btn.classList.add('btn-importing');
   btn.innerHTML = '<span class="spinner"></span> جاري التحليل...';
   try {
-    const toBase64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || '').split(',')[1] || '');
-      reader.onerror = () => reject(new Error('file_read_failed'));
-      reader.readAsDataURL(file);
-    });
+    const { base64: toBase64, mimeType: compressedMimeType } = await compressMenuImage(file);
     const res = await fetch('/api/import-menu-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         image_base64: toBase64,
-        image_mime_type: file.type || 'image/jpeg',
+        image_mime_type: compressedMimeType,
       }),
     });
     const payload = await res.json();
@@ -875,6 +870,36 @@ function renderProducts() {
     menuBtn.textContent = vis ? 'Retirer du menu' : 'Mettre sur le menu';
     menuBtn.onclick = () => toggleMenuVis(p.id, vis);
     row.querySelector('[data-action="delete"]').onclick = () => deleteProduct(p.id);
+  });
+}
+
+/* ── MENU IMAGE COMPRESSION ── */
+function compressMenuImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 1200;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        if (width >= height) {
+          height = Math.round(height * MAX / width);
+          width = MAX;
+        } else {
+          width = Math.round(width * MAX / height);
+          height = MAX;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg' });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image_load_failed')); };
+    img.src = url;
   });
 }
 

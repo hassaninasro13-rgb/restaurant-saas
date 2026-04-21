@@ -189,9 +189,108 @@
   }
   .import-review-cat-header:first-of-type { border-top: none; margin-top: 0; padding-top: 2px; }
 
+  /* ── AI Import Section ── */
+  .ai-import-section {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .ai-import-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .ai-import-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .ai-import-sub {
+    font-size: .78rem;
+    color: var(--ink3);
+    margin-top: 2px;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background: linear-gradient(135deg, #7c3aed22, #2563eb18);
+    border: 1px solid #7c3aed44;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #7c3aed;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ai-import-body {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .menu-import-upload-area {
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all .15s;
+    background: var(--cream);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .menu-import-upload-area:hover,
+  .menu-import-upload-area.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-lt);
+  }
+  .menu-import-placeholder {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+    color: var(--ink3);
+    padding: 16px;
+    text-align: center;
+  }
+  .menu-import-placeholder span { font-size: .83rem; font-weight: 500; }
+  .menu-import-placeholder small { font-size: .75rem; }
+  .menu-import-img-preview {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  .ai-import-review-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+  .ai-import-empty-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 120px;
+    color: var(--ink3);
+    font-size: .83rem;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+  }
+
   @media (max-width: 1000px) {
     .products-layout { grid-template-columns: 1fr; }
     .form-panel { position: static; }
+    .ai-import-body { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -271,6 +370,53 @@
     </header>
 
     <div class="page-content">
+
+      <!-- AI MENU IMPORT SECTION -->
+      <div class="ai-import-section">
+        <div class="ai-import-header">
+          <div style="flex:1">
+            <div class="ai-import-title">استيراد القائمة من صورة</div>
+            <div class="ai-import-sub">ارفع صورة قائمتك الكاملة وسيستخرج الذكاء الاصطناعي الأصناف والمنتجات تلقائياً</div>
+          </div>
+          <span class="ai-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            AI
+          </span>
+        </div>
+        <div class="ai-import-body">
+          <!-- Left: upload area + analyze button -->
+          <div>
+            <input type="file" id="menu-import-image" accept="image/*" style="display:none">
+            <div class="menu-import-upload-area" id="menu-import-drop-area"
+              onclick="document.getElementById('menu-import-image').click()"
+              ondragover="handleMenuDragOver(event)"
+              ondrop="handleMenuDrop(event)"
+              ondragleave="handleMenuDragLeave(event)">
+              <div class="menu-import-placeholder" id="menu-import-placeholder">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>انقر أو اسحب صورة القائمة</span>
+                <small>JPG، PNG، WebP، HEIC…</small>
+              </div>
+              <img id="menu-import-preview" class="menu-import-img-preview" src="" alt="">
+              <button class="img-remove-btn" id="menu-import-remove-btn" onclick="removeMenuImportImage(event)" style="display:none">✕</button>
+            </div>
+            <button type="button" class="btn btn-primary btn-full" id="btn-import-image">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              تحليل واستخراج المنتجات
+            </button>
+          </div>
+          <!-- Right: review + add-all -->
+          <div class="ai-import-review-wrap">
+            <div id="ai-import-empty-hint" class="ai-import-empty-hint">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>ستظهر هنا الأصناف والمنتجات المستخرجة بعد التحليل</span>
+            </div>
+            <div id="import-review" class="import-review-card" style="display:none;"></div>
+            <button type="button" class="btn btn-primary btn-full" id="btn-import-add-all" style="display:none;margin-top:12px;">إضافة الكل إلى القائمة</button>
+          </div>
+        </div>
+      </div>
+
       <div class="products-layout">
 
         <!-- FORM PANEL -->
@@ -279,12 +425,6 @@
             <span id="form-title">➕ Nouveau produit</span>
             <button class="btn btn-ghost btn-sm" onclick="resetForm()" id="btn-cancel-edit" style="display:none">Annuler</button>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-            <input type="file" id="menu-import-image" accept="image/*" style="display:none">
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-import-image">📷 استيراد من صورة</button>
-            <button type="button" class="btn btn-primary btn-sm" id="btn-import-add-all" style="display:none;">إضافة الكل</button>
-          </div>
-          <div id="import-review" class="import-review-card" style="display:none;"></div>
 
           <!-- Image Upload -->
           <div class="field">
@@ -442,6 +582,7 @@ let previewObjectUrl = null;
 let imageRemovedForEdit = false;
 let currentFilter = null;
 let importedMenuItems = [];
+let menuImportFile = null;
 
 function setImgOptStatus(text) {
   const el = document.getElementById('img-opt-status');
@@ -463,13 +604,16 @@ function normalizePrice(raw) {
 function renderImportReview() {
   const box = document.getElementById('import-review');
   const addAllBtn = document.getElementById('btn-import-add-all');
+  const emptyHint = document.getElementById('ai-import-empty-hint');
   if (!box || !addAllBtn) return;
   if (!importedMenuItems.length) {
     box.style.display = 'none';
     addAllBtn.style.display = 'none';
+    if (emptyHint) emptyHint.style.display = '';
     return;
   }
   const totalProducts = importedMenuItems.reduce((s, c) => s + c.products.length, 0);
+  if (emptyHint) emptyHint.style.display = 'none';
   box.style.display = '';
   addAllBtn.style.display = '';
   box.innerHTML = `
@@ -489,9 +633,10 @@ function renderImportReview() {
 async function importMenuFromImage(file) {
   const btn = document.getElementById('btn-import-image');
   if (!btn) return;
-  if (!file) return;
+  if (!file) { toast('اختر صورة القائمة أولاً', 'warning'); return; }
+  btn.disabled = true;
   btn.classList.add('btn-importing');
-  btn.textContent = 'جاري القراءة...';
+  btn.innerHTML = '<span class="spinner"></span> جاري التحليل...';
   try {
     const toBase64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -532,8 +677,9 @@ async function importMenuFromImage(file) {
     console.error('[menu image import]', err);
     toast('فشل تحليل الصورة', 'error');
   } finally {
+    btn.disabled = false;
     btn.classList.remove('btn-importing');
-    btn.textContent = '📷 استيراد من صورة';
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> تحليل واستخراج المنتجات';
   }
 }
 
@@ -562,13 +708,14 @@ async function importMenuFromImage(file) {
   applyStaffShellBranding(rest);
   document.getElementById('sb-rest-name').textContent = rest.name;
   await Promise.all([loadCategories(), loadProducts()]);
-  document.getElementById('btn-import-image')?.addEventListener('click', () => {
-    document.getElementById('menu-import-image')?.click();
-  });
-  document.getElementById('menu-import-image')?.addEventListener('change', async (e) => {
+  // Menu import: file picker → preview only (analysis triggered by button)
+  document.getElementById('menu-import-image')?.addEventListener('change', (e) => {
     const file = e.target?.files?.[0];
-    await importMenuFromImage(file);
+    if (file) setMenuImportFile(file);
     e.target.value = '';
+  });
+  document.getElementById('btn-import-image')?.addEventListener('click', async () => {
+    await importMenuFromImage(menuImportFile);
   });
   document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
     if (!importedMenuItems.length) return;
@@ -730,6 +877,45 @@ function renderProducts() {
     row.querySelector('[data-action="delete"]').onclick = () => deleteProduct(p.id);
   });
 }
+
+/* ── MENU IMPORT UPLOAD ── */
+function setMenuImportFile(file) {
+  menuImportFile = file;
+  const preview = document.getElementById('menu-import-preview');
+  const placeholder = document.getElementById('menu-import-placeholder');
+  const removeBtn = document.getElementById('menu-import-remove-btn');
+  if (!preview || !placeholder) return;
+  const url = URL.createObjectURL(file);
+  preview.src = url;
+  preview.style.display = '';
+  placeholder.style.display = 'none';
+  if (removeBtn) removeBtn.style.display = 'flex';
+}
+
+window.removeMenuImportImage = function(e) {
+  e.stopPropagation();
+  menuImportFile = null;
+  const preview = document.getElementById('menu-import-preview');
+  const placeholder = document.getElementById('menu-import-placeholder');
+  const removeBtn = document.getElementById('menu-import-remove-btn');
+  if (preview) { preview.src = ''; preview.style.display = 'none'; }
+  if (placeholder) placeholder.style.display = '';
+  if (removeBtn) removeBtn.style.display = 'none';
+};
+
+window.handleMenuDragOver = function(e) {
+  e.preventDefault();
+  document.getElementById('menu-import-drop-area')?.classList.add('drag-over');
+};
+window.handleMenuDragLeave = function() {
+  document.getElementById('menu-import-drop-area')?.classList.remove('drag-over');
+};
+window.handleMenuDrop = function(e) {
+  e.preventDefault();
+  document.getElementById('menu-import-drop-area')?.classList.remove('drag-over');
+  const file = e.dataTransfer?.files?.[0];
+  if (file) setMenuImportFile(file);
+};
 
 /* ── IMAGE UPLOAD ── */
 window.handleDragOver = function(e) {

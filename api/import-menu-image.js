@@ -5,14 +5,14 @@ export default async function handler(req, res) {
   try {
     const { image_base64, image_mime_type } = req.body || {};
     if (!image_base64 || !image_mime_type) return res.status(400).json({ error: 'missing_image_payload' });
-    const prompt = 'Extract ALL products from this menu image and return ONLY a JSON object. Shape: {"categories":[{"name":"string","products":[{"name":"string","price":number}]}]}. No markdown, no comments, numbers only for price.';
+    const prompt = 'Extract all categories and products from the menu image.';
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-opus-4-5',
-        max_tokens: 1800,
-        system: 'You are a menu parser. Extract the menu exactly as structured in the image. Preserve all section headers and their order. Return ONLY this JSON: {"categories":[{"name":"string","sections":[{"title":"string","section_order":number,"products":[{"name":"string","price":number,"ingredients":"string","product_order":number}]}]}]}. Rules: 1) category name = food type (Pizza, Sandwich, Plats, etc.) 2) sections = the headers found in the image (Pizza Medium, Miga Pizza, etc.) 3) ingredients = comma-separated string of all ingredients listed under the product, empty string if none 4) preserve original order of sections and products 5) each section must include section_order starting at 0 and increasing by 1 6) each product must include product_order starting at 0 within its section 7) price = number only, no currency - If you find a "Supplément" or "Supplement" section, create a separate category named "Suppléments" for it, NOT inside Pizza.',
+        max_tokens: 2500,
+        system: 'You are a menu parser. Extract all categories and products from the menu image.\nSTRICT RULES:\n1. Every visual section header = ONE separate category (e.g. Pizza Medium, Miga Pizza, Pizza L are THREE separate categories, NOT subcategories)\n2. Every item listed under a section header = one product inside that category\n3. Clean ALL names: remove any parentheses and content inside them, trim extra spaces\n4. ingredients = comma-separated string of all ingredients listed, empty string if none\n5. price = number only, no currency symbol\n6. category_order starts at 0 and increases by 1\n7. product_order starts at 0 within each category\n8. If you find Supplément section, create separate category named Suppléments\nReturn ONLY valid JSON, no markdown, no backticks:\n{categories:[{name:string,category_order:number,products:[{name:string,price:number,ingredients:string,product_order:number}]}]}',
         messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: image_mime_type, data: image_base64 } }, { type: 'text', text: prompt }] }]
       })
     });
@@ -25,18 +25,17 @@ export default async function handler(req, res) {
       if (s >= 0 && e > s) parsed = JSON.parse(text.slice(s, e + 1));
     }
     const raw = Array.isArray(parsed?.categories) ? parsed.categories : [];
-    const map = { pizza: 'Pizza', sandwich: 'Sandwich', burger: 'Burger', plat: 'Plats', box: 'Box', boisson: 'Boissons', dessert: 'Desserts' };
-    const merged = {};
-    for (const cat of raw) {
-      const lower = cat.name.toLowerCase();
-      const key = Object.keys(map).find(k => lower.includes(k));
-      const name = key ? map[key] : cat.name;
-      if (!merged[name]) merged[name] = { name, sections: [] };
-      for (const sec of (cat.sections || [])) {
-        merged[name].sections.push(sec);
-      }
-    }
-    const categories = Object.values(merged);
+    const cleanName = (name = '') => name.replace(/\s*\(.*?\)\s*/g, '').trim();
+    const categories = raw.map((cat, i) => ({
+      name: cleanName(cat.name),
+      category_order: cat.category_order ?? i,
+      products: (cat.products || []).map((p, j) => ({
+        name: cleanName(p.name),
+        price: typeof p.price === 'number' ? p.price : parseFloat(p.price) || 0,
+        ingredients: p.ingredients || '',
+        product_order: p.product_order ?? j
+      }))
+    }));
     return res.status(200).json({ categories });
   } catch (err) { return res.status(500).json({ error: err?.message || 'server_error' }); }
 }

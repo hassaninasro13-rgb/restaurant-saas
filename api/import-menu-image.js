@@ -87,7 +87,32 @@ export default async function handler(req, res) {
     }
 
     const categories = Array.isArray(parsed?.categories) ? parsed.categories : [];
-    return res.status(200).json({ categories });
+    // --- Merge similar categories by food type ---
+    const mergeMap = {
+      'pizza': 'Pizza',
+      'sandwich': 'Sandwich',
+      'burger': 'Burger',
+      'plat': 'Plats',
+      'box': 'Box',
+      'boisson': 'Boissons',
+      'dessert': 'Desserts',
+      'gratin': 'Gratins',
+    };
+    const merged = {};
+    for (const cat of categories) {
+      const key = Object.keys(mergeMap).find(k => cat.name.toLowerCase().includes(k)) || cat.name.toLowerCase();
+      const finalName = mergeMap[key] || cat.name;
+      if (!merged[finalName]) merged[finalName] = { name: finalName, products: [] };
+      for (const p of (cat.products || [])) {
+        merged[finalName].products.push({
+          ...p,
+          name: cat.name !== finalName ? `${p.name} (${cat.name})` : p.name
+        });
+      }
+    }
+    const mergedCategories = Object.values(merged);
+    // --- End merge ---
+    return res.status(200).json({ categories: mergedCategories });
   } catch (err) {
     return res.status(500).json({ error: err?.message || 'server_error' });
   }

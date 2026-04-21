@@ -170,13 +170,14 @@
     gap: 8px;
   }
   .menu-section-header {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    color: #D4521A;
+    color: var(--primary, #D4521A);
     text-transform: uppercase;
-    padding: 12px 0 4px;
-    border-bottom: 1px solid #f0e8e4;
-    margin-bottom: 8px;
+    letter-spacing: 1px;
+    padding: 16px 0 6px;
+    border-bottom: 2px solid var(--primary, #D4521A);
+    margin: 8px 0;
   }
 
   /* PRODUCT ITEMS */
@@ -1898,24 +1899,22 @@ function buildMenu() {
     const isPizzaCategory = String(c.name || '').toLowerCase().includes('pizza');
     const sectionedRows = [];
     if (isPizzaCategory) {
-      const grouped = new Map();
-      const plain = [];
+      let lastSection = null;
       for (const p of catProds) {
-        const m = String(p.name || '').match(/\(([^()]+)\)\s*$/);
-        const sec = m?.[1]?.trim();
-        if (!sec) {
-          plain.push(p);
-          continue;
+        const m = String(p.name || '').match(/^(.*)\(([^()]+)\)\s*$/);
+        const sec = (m?.[2] || '').trim();
+        const displayName = (m?.[1] || p.name).trim();
+        if (sec) {
+          if (sec !== lastSection) {
+            sectionedRows.push(`<div class="menu-section-header">${esc(sec)}</div>`);
+            lastSection = sec;
+          }
+          sectionedRows.push(buildProductRow(p, displayName));
+        } else {
+          sectionedRows.push(buildProductRow(p));
+          lastSection = null;
         }
-        if (!grouped.has(sec)) grouped.set(sec, []);
-        grouped.get(sec).push(p);
       }
-      const sortedSections = Array.from(grouped.keys()).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
-      for (const sec of sortedSections) {
-        sectionedRows.push(`<div class="menu-section-header">${esc(sec)}</div>`);
-        sectionedRows.push(grouped.get(sec).map((p) => buildProductRow(p)).join(''));
-      }
-      sectionedRows.push(plain.map((p) => buildProductRow(p)).join(''));
     }
     return `
     <div class="cat-section" id="section-${c.id}">
@@ -1940,19 +1939,20 @@ function qtyForProduct(productId) {
     .reduce((s, l) => s + (l.qty || 0), 0);
 }
 
-function buildProductRow(p) {
+function buildProductRow(p, displayName = null) {
   const qty = qtyForProduct(p.id);
   const imgUrl = safeHttpUrl(p.image_url);
   const img = imgUrl
     ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : '';
+  const shownName = displayName || p.name;
   return `
   <div class="product-row" id="prow-${p.id}" role="button" tabindex="0" onclick="openProductCustomizeModal('${p.id}')">
     <div class="product-row-img">
       ${img || '🍽️'}
     </div>
     <div class="product-row-info">
-      <div class="product-row-name">${esc(p.name)}</div>
+      <div class="product-row-name">${esc(shownName)}</div>
       ${p.description ? `<div class="product-row-desc">${esc(p.description)}</div>` : ''}
       <div class="product-row-price">
         ${cur(p.price)}

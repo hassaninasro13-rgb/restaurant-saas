@@ -233,6 +233,7 @@ function cardHtml(o, col) {
   } else if (col === 'ready') {
     actions = `<button type="button" class="k-btn" onclick="kitchenAdvance('${o.id}','completed')">${esc(t('kitchen.complete'))}</button>`;
   }
+  actions += `<button type="button" class="k-btn" onclick="printKitchenTicket('${o.id}')">طباعة</button>`;
   return `
     <div class="k-card">
       <div class="k-card-num">${esc(o.order_number)}</div>
@@ -259,6 +260,93 @@ function renderKitchen() {
     }
   }
 }
+
+function orderTypeLabelAr(type) {
+  if (type === 'delivery') return 'توصيل';
+  if (type === 'pickup') return 'استلام';
+  if (type === 'dine_in' || type === 'qr_table') return 'طاولة';
+  return type || '—';
+}
+
+function thermalTicketHtml(order) {
+  const loc = getRestaurantLocale(restaurant);
+  const items = order.order_items || [];
+  const itemsHtml = items.map((i) => {
+    const removed = Array.isArray(i.removed_ingredients) ? i.removed_ingredients : [];
+    const supplements = Array.isArray(i.supplements) ? i.supplements : [];
+    return `
+      <div class="line-item">
+        <div class="line-head">
+          <span class="line-name">${esc(i.product_name || '—')}</span>
+          <span class="line-qty">x${Number(i.quantity || 0)}</span>
+        </div>
+        ${removed.length ? `<div class="line-removed">بدون: ${esc(removed.join(', '))}</div>` : ''}
+        ${supplements.length ? `<div class="line-supp">+ ${esc(supplements.map((s) => s?.name || '').filter(Boolean).join(', '))}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>Kitchen Ticket</title>
+  <style>
+    @page { size: 80mm auto; margin: 4mm; }
+    html, body { width: 72mm; margin: 0; padding: 0; font-family: Arial, sans-serif; color: #000; background: #fff; }
+    .ticket { width: 100%; }
+    .title { text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .meta { font-size: 14px; line-height: 1.45; margin-bottom: 8px; }
+    .rule { border-top: 2px dashed #000; margin: 8px 0; }
+    .line-item { margin-bottom: 8px; }
+    .line-head { display: flex; justify-content: space-between; gap: 8px; font-size: 16px; font-weight: 800; }
+    .line-name { flex: 1; }
+    .line-qty { min-width: 30px; text-align: left; }
+    .line-removed { font-size: 14px; margin-top: 2px; color: #b00020; font-weight: 700; }
+    .line-supp { font-size: 14px; margin-top: 2px; color: #1b7f3a; font-weight: 700; }
+    .notes { font-size: 14px; line-height: 1.4; margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
+    .notes-label { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #000 !important; background: #fff !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <div class="title">${esc(restaurant?.name || 'Restaurant')}</div>
+    <div class="meta">
+      <div><strong>رقم الطلب:</strong> ${esc(order.order_number || '—')}</div>
+      <div><strong>الوقت:</strong> ${esc(fmtDate(order.created_at, loc))}</div>
+      <div><strong>النوع:</strong> ${esc(orderTypeLabelAr(order.order_type))}</div>
+    </div>
+    <div class="rule"></div>
+    ${itemsHtml || '<div class="line-item"><div class="line-head"><span class="line-name">—</span></div></div>'}
+    <div class="rule"></div>
+    <div class="notes">
+      <div class="notes-label">ملاحظات الزبون:</div>
+      ${esc(order.customer_notes || '—')}
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+window.printKitchenTicket = function (orderId) {
+  const order = allOrders.find((o) => o.id === orderId);
+  if (!order) return;
+  const win = window.open('', '_blank', 'width=420,height=800');
+  if (!win) {
+    toast('تعذر فتح نافذة الطباعة', 'error');
+    return;
+  }
+  win.document.open();
+  win.document.write(thermalTicketHtml(order));
+  win.document.close();
+  win.focus();
+  setTimeout(() => {
+    win.print();
+  }, 250);
+};
 
 window.loadKitchen = async function() {
   const { data } = await listOrdersWithItems(restaurant.id, 200);

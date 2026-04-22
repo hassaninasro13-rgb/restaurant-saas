@@ -311,7 +311,7 @@ const translations = {
     "wa.orderType.pickup": "À emporter",
     "wa.orderType.qr_table": "Table (QR)",
     "wa.orderType.table_general": "Table (sur place)",
-    "wa.removed": "Sans",
+    "wa.removed": "Sans (ingrédients)",
     "wa.qtyLine": "×{qty} {unit} → {line}",
     "wa.restaurant": "Établissement",
     "wa.saved": "enregistrée",

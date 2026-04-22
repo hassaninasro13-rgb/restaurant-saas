@@ -291,11 +291,11 @@ function thermalTicketHtml(order) {
     const qty = Number(item?.quantity || 0);
     return `
       <div class="line-item">
-        <div class="line-head">
-          <span class="line-name">${esc(`${qty}x  ${itemName}`)}</span>
+        <div style="font-size:16px; font-weight:bold; margin-bottom:4px;">
+          ${esc(qty)}x &nbsp; ${esc(itemName)}
         </div>
-        ${removed.length ? `<div class="line-removed">بدون: ${esc(removed.join('، '))}</div>` : ''}
-        ${supplements.length ? `<div class="line-supp">+ إضافة: ${esc(supplements.map((s) => `${s?.name || ''}${Number(s?.qty || 0) > 1 ? ` x${Number(s.qty)}` : ''}`).filter(Boolean).join('، '))}</div>` : ''}
+        ${removed.length ? `<div style="font-size:14px; margin-top:3px; margin-right:16px;">بدون: ${esc(removed.join('، '))}</div>` : ''}
+        ${supplements.length ? `<div style="font-size:14px; margin-top:3px; margin-right:16px;">إضافة: ${esc(supplements.map(s => s.name + (s.qty > 1 ? ' x'+s.qty : '')).join('، '))}</div>` : ''}
       </div>
     `;
   }).join('');

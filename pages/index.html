@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <script src="supabase-env.js"></script>
@@ -8,7 +8,6 @@
 <meta name="description" content="Menu digital du restaurant — aucune connexion requise.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="../css/shared.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
   body {
     background: var(--cream);
@@ -873,64 +872,6 @@
   .customize-add-btn:hover { filter: brightness(1.05); }
   .customize-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-map-picker {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 10px 14px;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    background: #fff;
-    font-family: var(--font-body);
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-map-picker:hover { background: var(--cream2); border-color: var(--accent); }
-  .map-picker-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 460;
-    background: rgba(20, 14, 10, 0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .map-picker-backdrop.is-open { display: flex; }
-  .map-picker-sheet {
-    background: #fff;
-    width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .map-picker-sheet h3 { margin: 0; font-size: 1rem; font-family: var(--font-display); }
-  #map-picker-leaflet { height: 280px; width: 100%; border-radius: var(--radius); z-index: 0; }
-  .map-picker-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-  .map-picker-actions button {
-    flex: 1;
-    min-width: 120px;
-    padding: 12px;
-    border-radius: var(--radius);
-    font-weight: 600;
-    cursor: pointer;
-    font-family: var(--font-body);
-    border: none;
-  }
-  .btn-map-my-loc { background: var(--cream2); border: 1.5px solid var(--border) !important; }
-  .btn-map-confirm { background: var(--accent); color: #fff; }
-  .btn-map-cancel { background: var(--cream2); color: var(--ink); }
-
   @media (min-width: 640px) {
     body { box-shadow: 0 0 40px rgba(0,0,0,.1); }
     .customize-backdrop { align-items: center; padding: 24px; }
@@ -1001,10 +942,8 @@
           <label for="cart-order-phone" data-i18n="pub.phone">Téléphone *</label>
           <input type="tel" id="cart-order-phone" class="input" data-i18n-placeholder="pub.placeholderPhone" placeholder="0551 23 45 67" autocomplete="tel">
         </div>
-        <div class="field" id="cart-address-field">
-          <label for="cart-order-address" data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
-          <button type="button" class="btn-map-picker" id="btn-map-picker-cart" onclick="openMapPicker('cart')">📍 حدد موقعك على الخريطة</button>
-          <textarea id="cart-order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier…"></textarea>
+        <div class="field" id="cart-address-field" style="display:none !important" aria-hidden="true">
+          <textarea id="cart-order-address" class="textarea" style="display:none" tabindex="-1" aria-hidden="true"></textarea>
           <input type="hidden" id="delivery-lat-cart" value="">
           <input type="hidden" id="delivery-lng-cart" value="">
         </div>
@@ -1081,20 +1020,7 @@
 
       <div class="order-form-section">
         <h3 data-i18n="pub.orderType">Type de commande</h3>
-        <div class="order-type-btns" id="order-type-btns">
-          <button class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery', this)">
-            <div class="otype-btn-icon">🛵</div>
-            <span data-i18n="pub.delivery">Livraison</span>
-          </button>
-          <button class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup', this)">
-            <div class="otype-btn-icon">🏪</div>
-            <span data-i18n="pub.pickup">À emporter</span>
-          </button>
-          <button class="otype-btn" data-type="dine_in" onclick="selectOrderType('dine_in', this)">
-            <div class="otype-btn-icon">🪑</div>
-            <span data-i18n="pub.onTable">Sur place</span>
-          </button>
-        </div>
+        <div class="order-type-btns" id="order-type-btns"></div>
 
         <div class="field">
           <label data-i18n="pub.fullName">Nom complet *</label>
@@ -1104,10 +1030,8 @@
           <label data-i18n="pub.phone">Téléphone *</label>
           <input type="tel" id="order-phone" class="input" data-i18n-placeholder="pub.placeholderPhone" placeholder="0551 23 45 67">
         </div>
-        <div id="address-field" class="field">
-          <label data-i18n="pub.deliveryAddress">Adresse de livraison *</label>
-          <button type="button" class="btn-map-picker" id="btn-map-picker-modal" onclick="openMapPicker('modal')">📍 حدد موقعك على الخريطة</button>
-          <textarea id="order-address" class="textarea" data-i18n-placeholder="pub.placeholderAddress" placeholder="Adresse complète, quartier, indicatifs..."></textarea>
+        <div id="address-field" class="field" style="display:none !important" aria-hidden="true">
+          <textarea id="order-address" class="textarea" style="display:none" tabindex="-1" aria-hidden="true"></textarea>
           <input type="hidden" id="delivery-lat-modal" value="">
           <input type="hidden" id="delivery-lng-modal" value="">
         </div>
@@ -1142,23 +1066,7 @@
   </div>
 </div>
 
-<!-- Map picker (Leaflet + OSM) -->
-<div id="map-picker-backdrop" class="map-picker-backdrop" aria-hidden="true">
-  <div class="map-picker-sheet" role="dialog" aria-modal="true" aria-labelledby="map-picker-title" onclick="event.stopPropagation()">
-    <h3 id="map-picker-title">📍 موقع التوصيل</h3>
-    <p style="margin:0;font-size:.82rem;color:var(--ink3);line-height:1.4;">انقر على الخريطة أو اسحب الدبوس لتحديد موقعك بدقة.</p>
-    <div id="map-picker-leaflet"></div>
-    <div class="map-picker-actions">
-      <button type="button" class="btn-map-my-loc" id="btn-map-use-my-location">📍 موقعي الحالي</button>
-    </div>
-    <div class="map-picker-actions">
-      <button type="button" class="btn-map-cancel" onclick="closeMapPicker()">إلغاء</button>
-      <button type="button" class="btn-map-confirm" id="btn-map-confirm" onclick="confirmMapPicker()">تأكيد الموقع</button>
-    </div>
-  </div>
-</div>
-
-<!-- Product customization (ingredients + supplements) -->
+<!-- Product customization (ingredients only) -->
 <div id="product-customize-backdrop" class="customize-backdrop" style="display:none;" aria-hidden="true">
   <div class="customize-sheet" role="dialog" aria-modal="true" aria-labelledby="customize-title" onclick="event.stopPropagation()">
     <button type="button" class="customize-close" onclick="closeProductCustomizeModal()" aria-label="Close">✕</button>
@@ -1167,8 +1075,8 @@
     <div id="customize-base" class="customize-base"></div>
     <div class="customize-section-title">المكونات</div>
     <div id="customize-ingredients"></div>
-    <div class="customize-section-title" id="customize-supp-title">Suppléments</div>
-    <div id="customize-supplements"></div>
+    <div class="customize-section-title" id="customize-supp-title" hidden>Suppléments</div>
+    <div id="customize-supplements" hidden></div>
     <div class="customize-total-row">
       <span>الإجمالي</span>
       <span id="customize-total"></span>
@@ -1177,7 +1085,6 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 /**
@@ -1205,27 +1112,29 @@ import { hydrateCart, persistCart as persistCartLs, clearCartStorage as clearCar
 import { supabase } from '../supabase/client.js';
 
 setLang(getLang());
+(function syncHtmlLangDir() {
+  const lg = getLang();
+  document.documentElement.setAttribute('lang', lg === 'ar' ? 'ar' : lg === 'en' ? 'en' : 'fr');
+  document.documentElement.setAttribute('dir', lg === 'ar' ? 'rtl' : 'ltr');
+})();
 
 let restaurant = null;
 let categories = [];
 let menuCategories = [];
 let products = [];
 let orderedPizzaByCategory = new Map();
-let supplementProducts = [];
 /** @type {Record<string, { product: object, qty: number, customization: object }>} */
 let cart = {};
 let customizeDraftProduct = null;
 let customizeIngredientList = [];
 /** @type {Set<string>} */
 let customizeRemoved = new Set();
-/** @type {Record<string, number>} */
-let customizeSuppQty = {};
 let orderCurrency = 'DZD';
 let orderLocale = 'fr-DZ';
 function cur(amount) {
   return fmtCurrency(amount, orderCurrency, orderLocale);
 }
-let orderType = 'delivery';
+let orderType = 'pickup';
 let orderCounter = 1;
 /** Set after menu load when URL contains ?source=… or legacy ?table=… */
 let resolvedSource = null;
@@ -1269,20 +1178,6 @@ function isPizzaCategoryName(name) {
   return String(name || '').toLowerCase().includes('pizza');
 }
 
-function isDrinkDessertLikeCategory(name) {
-  const n = String(name || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  return (
-    n.includes('boisson') ||
-    n.includes('drink') ||
-    n.includes('cafe') ||
-    n.includes('dessert') ||
-    n.includes('glace')
-  );
-}
-
 function productPlaceholderEmoji(categoryName) {
   const n = String(categoryName || '')
     .toLowerCase()
@@ -1302,142 +1197,10 @@ function getLineUnitPrice(line) {
 function formatOrderLineName(line) {
   const base = line?.customization?.name ?? line?.product?.name ?? '';
   const rem = line?.customization?.removed_ingredients || [];
-  const supp = line?.customization?.supplements || [];
   let out = base;
   if (rem.length) out += ` (− ${rem.join(', ')})`;
-  const supStr = supp
-    .filter((s) => (s.qty ?? 1) > 0)
-    .map((s) => `${s.name}${(s.qty ?? 1) > 1 ? ` ×${s.qty}` : ''}`)
-    .join(', ');
-  if (supStr) out += ` (+ ${supStr})`;
   return out;
 }
-
-/** Leaflet map picker (delivery address) */
-let mapPickerContext = 'modal';
-let mapLeafletInstance = null;
-let mapMarker = null;
-
-async function reverseGeocodeAddress(lat, lng) {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`;
-  const r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!r.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  const d = await r.json();
-  return d.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-}
-
-function initLeafletMapIfNeeded() {
-  if (typeof L === 'undefined') return false;
-  const el = document.getElementById('map-picker-leaflet');
-  if (!el) return false;
-  if (mapLeafletInstance) return true;
-  const start = [36.7538, 3.0588];
-  mapLeafletInstance = L.map('map-picker-leaflet').setView(start, 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(mapLeafletInstance);
-  mapMarker = L.marker(start, { draggable: true }).addTo(mapLeafletInstance);
-  mapLeafletInstance.on('click', (e) => {
-    mapMarker.setLatLng(e.latlng);
-  });
-  return true;
-}
-
-function getMapPickerLatLng() {
-  if (!mapMarker) return { lat: 36.7538, lng: 3.0588 };
-  const ll = mapMarker.getLatLng();
-  return { lat: ll.lat, lng: ll.lng };
-}
-
-window.openMapPicker = function (ctx) {
-  if (typeof L === 'undefined') {
-    toast('الخريطة غير متاحة', 'error');
-    return;
-  }
-  mapPickerContext = ctx === 'cart' ? 'cart' : 'modal';
-  const bd = document.getElementById('map-picker-backdrop');
-  if (!bd) return;
-  bd.classList.add('is-open');
-  bd.setAttribute('aria-hidden', 'false');
-  requestAnimationFrame(() => {
-    if (!initLeafletMapIfNeeded()) {
-      toast('تعذر تحميل الخريطة', 'error');
-      return;
-    }
-    setTimeout(() => {
-      if (mapLeafletInstance) mapLeafletInstance.invalidateSize();
-    }, 250);
-  });
-};
-
-window.closeMapPicker = function () {
-  const bd = document.getElementById('map-picker-backdrop');
-  if (bd) {
-    bd.classList.remove('is-open');
-    bd.setAttribute('aria-hidden', 'true');
-  }
-};
-
-window.confirmMapPicker = async function () {
-  const { lat, lng } = getMapPickerLatLng();
-  const btn = document.getElementById('btn-map-confirm');
-  const prev = btn?.textContent;
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = 'جاري التحميل...';
-  }
-  let addrText;
-  try {
-    addrText = await reverseGeocodeAddress(lat, lng);
-  } catch {
-    addrText = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  }
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = prev || 'تأكيد الموقع';
-  }
-  if (mapPickerContext === 'cart') {
-    const ta = document.getElementById('cart-order-address');
-    if (ta) ta.value = addrText;
-    const la = document.getElementById('delivery-lat-cart');
-    const ln = document.getElementById('delivery-lng-cart');
-    if (la) la.value = String(lat);
-    if (ln) ln.value = String(lng);
-  } else {
-    const ta = document.getElementById('order-address');
-    if (ta) ta.value = addrText;
-    const la = document.getElementById('delivery-lat-modal');
-    const ln = document.getElementById('delivery-lng-modal');
-    if (la) la.value = String(lat);
-    if (ln) ln.value = String(lng);
-  }
-  closeMapPicker();
-};
-
-document.getElementById('map-picker-backdrop')?.addEventListener('click', (e) => {
-  if (e.target?.id === 'map-picker-backdrop') closeMapPicker();
-});
-
-document.getElementById('btn-map-use-my-location')?.addEventListener('click', () => {
-  if (!navigator.geolocation) {
-    toast('تحديد الموقع غير مدعوم', 'warning');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      initLeafletMapIfNeeded();
-      if (mapLeafletInstance && mapMarker) {
-        mapMarker.setLatLng([latitude, longitude]);
-        mapLeafletInstance.setView([latitude, longitude], 16);
-        mapLeafletInstance.invalidateSize();
-      }
-    },
-    () => toast('تعذر الوصول لموقعك', 'error'),
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
-  );
-});
 
 const urlParams = new URLSearchParams(window.location.search);
 const slug = urlParams.get('slug');
@@ -1521,19 +1284,6 @@ async function tryRestoreResolvedSourceSession(rest) {
   } catch (_) {}
 }
 
-async function loadRestaurantSupplements(restaurantId) {
-  const { data } = await supabase
-    .from('restaurant_supplements')
-    .select('id,name,price')
-    .eq('restaurant_id', restaurantId)
-    .order('name', { ascending: true });
-  supplementProducts = (data || []).map((r) => ({
-    id: r.id,
-    name: String(r.name || '').trim(),
-    price: Number(r.price) || 0,
-  })).filter((r) => r.name);
-}
-
 (async () => {
   if (!slug || !slug.trim()) {
     document.getElementById('rest-name').textContent = t('pub.menu');
@@ -1542,9 +1292,8 @@ async function loadRestaurantSupplements(restaurantId) {
         <p><strong>${esc(t('pub.slugHelpTitle'))}</strong></p>
         <p style="font-size:.88rem;color:var(--ink2);">${esc(t('pub.slugHelpBody'))}</p>
         <p style="font-family:monospace;font-size:.8rem;background:var(--cream2);padding:10px;border-radius:8px;word-break:break-all;">
-          index.html?slug=<em>votre-slug</em>&amp;source=<em>takeaway</em>
+          index.html?slug=<em>votre-slug</em>
         </p>
-        <p style="font-size:.82rem;color:var(--ink2);margin-top:8px;">${esc(t('pub.slugHelpSource'))}</p>
       </div>`;
     hideLoader();
     return;
@@ -1592,10 +1341,14 @@ async function loadRestaurantSupplements(restaurantId) {
     }
   }
   menuCategories = (cats || []).filter((c) => !isSupplementsCategory(c.name));
-  await loadRestaurantSupplements(rest.id);
   orderCurrency = getRestaurantCurrency(rest);
   orderLocale = getRestaurantLocale(rest);
   applyRestaurantClientPrefs(rest);
+  {
+    const lg = getLang();
+    document.documentElement.setAttribute('lang', lg === 'ar' ? 'ar' : lg === 'en' ? 'en' : 'fr');
+    document.documentElement.setAttribute('dir', lg === 'ar' ? 'rtl' : 'ltr');
+  }
   applyMenuDesignSettings(rest.settings || {});
   cart = hydrateCart(slug, products);
 
@@ -1678,65 +1431,46 @@ function isCartPageMode() {
   return new URLSearchParams(window.location.search).get('cart') === '1';
 }
 
-/** Sync modal + cart-page order-type buttons and address visibility. */
-function applyRestaurantOrderTypeUi(rest) {
+/** Takeaway vs table (in venue); table QR locks type automatically. */
+function applyRestaurantOrderTypeUi(_rest) {
   const typeBtns = document.getElementById('order-type-btns');
   const cartTypeBtns = document.getElementById('cart-order-type-btns');
-  const setBoth = (html, showAddress) => {
-    if (typeBtns) typeBtns.innerHTML = html;
-    if (cartTypeBtns) cartTypeBtns.innerHTML = html;
-    const vis = showAddress ? '' : 'none';
+  const lockAddr = () => {
     const af = document.getElementById('address-field');
     const caf = document.getElementById('cart-address-field');
-    if (af) af.style.display = vis;
-    if (caf) caf.style.display = vis;
+    if (af) af.style.setProperty('display', 'none', 'important');
+    if (caf) caf.style.setProperty('display', 'none', 'important');
+  };
+  lockAddr();
+  const setBoth = (html) => {
+    if (typeBtns) typeBtns.innerHTML = html;
+    if (cartTypeBtns) cartTypeBtns.innerHTML = html;
   };
   if (resolvedSource) {
     const st = resolvedSource.type || 'table';
-    const icons = { table: '🪑', takeaway: '🥡', counter: '🧾', delivery: '🛵', door: '🚪' };
+    const icons = { table: '🪑', takeaway: '🥡', counter: '🥡', delivery: '🥡', door: '🥡' };
     const labels = {
       table: t('pub.onTable'),
       takeaway: t('pub.pickup'),
-      counter: t('pub.atCounter'),
-      delivery: t('pub.delivery'),
-      door: t('pub.doorPickup'),
+      counter: t('pub.pickup'),
+      delivery: t('pub.pickup'),
+      door: t('pub.pickup'),
     };
     const icon = icons[st] || '📍';
     const lab = labels[st] || t('pub.orderLocked');
     const lockedHtml = `<div class="otype-source-locked" role="status"><span aria-hidden="true">${icon}</span><span>${esc(lab)} — <strong>${esc(resolvedSource.name)}</strong></span></div>`;
-    if (st === 'delivery') {
-      orderType = 'delivery';
-      setBoth(lockedHtml, true);
-    } else if (st === 'takeaway' || st === 'counter' || st === 'door') {
+    if (st === 'takeaway' || st === 'counter' || st === 'door' || st === 'delivery') {
       orderType = 'pickup';
-      setBoth(lockedHtml, false);
     } else {
       orderType = 'qr_table';
-      setBoth(lockedHtml, false);
     }
+    setBoth(lockedHtml);
     return;
   }
-  if (!rest.delivery_enabled || !rest.pickup_enabled) {
-    if (!rest.delivery_enabled && rest.pickup_enabled) {
-      orderType = 'pickup';
-      setBoth(
-        `<button type="button" class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>`,
-        false,
-      );
-    } else if (rest.delivery_enabled && !rest.pickup_enabled) {
-      orderType = 'delivery';
-      setBoth(
-        `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>${esc(t('pub.delivery'))}</button>`,
-        true,
-      );
-    }
-  } else {
-    orderType = 'delivery';
-    const bothHtml = `<button type="button" class="otype-btn active" data-type="delivery" onclick="selectOrderType('delivery',this)"><div class="otype-btn-icon">🛵</div>${esc(t('pub.delivery'))}</button>
-          <button type="button" class="otype-btn" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🏪</div>${esc(t('pub.pickup'))}</button>
-          <button type="button" class="otype-btn" data-type="dine_in" onclick="selectOrderType('dine_in',this)"><div class="otype-btn-icon">🪑</div>${esc(t('pub.onTable'))}</button>`;
-    setBoth(bothHtml, true);
-  }
+  orderType = 'pickup';
+  const bothHtml = `<button type="button" class="otype-btn active" data-type="pickup" onclick="selectOrderType('pickup',this)"><div class="otype-btn-icon">🥡</div><span>${esc(t('pub.pickup'))}</span></button>
+<button type="button" class="otype-btn" data-type="dine_in" onclick="selectOrderType('dine_in',this)"><div class="otype-btn-icon">🪑</div><span>${esc(t('pub.onTable'))}</span></button>`;
+  setBoth(bothHtml);
 }
 
 function readCheckoutFields() {
@@ -1763,7 +1497,7 @@ function updateCartPageTotals() {
   if (!restaurant) return;
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
-  const deliveryFee = orderType === 'delivery' && restaurant.delivery_fee ? restaurant.delivery_fee : 0;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
   const subRow = document.getElementById('cart-page-subtotal-row');
   const feeRow = document.getElementById('cart-page-delivery-row');
@@ -2033,12 +1767,7 @@ function updateCartFAB() {
 
 function computeCustomizeTotal() {
   if (!customizeDraftProduct) return 0;
-  let t = customizeDraftProduct.price;
-  for (const s of supplementProducts) {
-    const q = customizeSuppQty[s.id] || 0;
-    t += q * (s.price || 0);
-  }
-  return Math.round(t);
+  return Math.round(Number(customizeDraftProduct.price) || 0);
 }
 
 function updateCustomizeModalTotal() {
@@ -2061,24 +1790,38 @@ window.toggleCustomizeIngredient = function (idx) {
   updateCustomizeModalTotal();
 };
 
-window.changeSuppQty = function (suppId, delta) {
-  const v = (customizeSuppQty[suppId] || 0) + delta;
-  customizeSuppQty[suppId] = Math.max(0, Math.min(99, v));
-  const el = document.getElementById(`supp-qty-${suppId}`);
-  if (el) el.textContent = String(customizeSuppQty[suppId]);
-  updateCustomizeModalTotal();
-};
+function pushCartLine(product, removedIngredients) {
+  const lineId = crypto.randomUUID();
+  const price = Number(product.price) || 0;
+  cart[lineId] = {
+    product,
+    qty: 1,
+    customization: {
+      product_id: product.id,
+      name: product.name,
+      base_price: price,
+      removed_ingredients: removedIngredients || [],
+      supplements: [],
+      total_price: price,
+    },
+  };
+  persistCart();
+  refreshProductRow(product.id);
+  updateCartFAB();
+  if (isCartPageMode()) renderCartPage();
+}
 
 window.openProductCustomizeModal = function (productId) {
   const p = products.find((x) => x.id === productId);
   if (!p) return;
-  const productCategoryName = categories.find((c) => c.id === p.category_id)?.name || '';
-  const allowSupplements = !isDrinkDessertLikeCategory(productCategoryName);
+  const ings = parseIngredientsFromDescription(p.description);
+  if (!ings.length) {
+    pushCartLine(p, []);
+    return;
+  }
   customizeDraftProduct = p;
-  customizeIngredientList = parseIngredientsFromDescription(p.description);
+  customizeIngredientList = ings;
   customizeRemoved = new Set();
-  const modalSupplements = allowSupplements ? supplementProducts : [];
-  customizeSuppQty = Object.fromEntries(modalSupplements.map((s) => [s.id, 0]));
 
   document.getElementById('customize-title').textContent = p.name;
   document.getElementById('customize-base').textContent = cur(p.price);
@@ -2088,39 +1831,12 @@ window.openProductCustomizeModal = function (productId) {
   imgEl.innerHTML = imgUrl ? `<img src="${attrEncode(imgUrl)}" alt="">` : '🍽️';
 
   const ingBox = document.getElementById('customize-ingredients');
-  if (!customizeIngredientList.length) {
-    ingBox.innerHTML = '<span style="font-size:.82rem;color:var(--ink3);">—</span>';
-  } else {
-    ingBox.innerHTML = customizeIngredientList
-      .map(
-        (_name, i) =>
-          `<button type="button" class="ing-toggle" onclick="toggleCustomizeIngredient(${i})">${esc(_name)}</button>`,
-      )
-      .join('');
-  }
-
-  const suppEl = document.getElementById('customize-supplements');
-  const suppTitle = document.getElementById('customize-supp-title');
-  if (!modalSupplements.length) {
-    if (suppTitle) suppTitle.style.display = 'none';
-    suppEl.innerHTML = '<span style="font-size:.82rem;color:var(--ink3);">—</span>';
-  } else {
-    if (suppTitle) suppTitle.style.display = '';
-    suppEl.innerHTML = modalSupplements
-      .map((s) => {
-        const sid = s.id;
-        return `<div class="supp-row">
-        <div class="supp-name">${esc(s.name)}</div>
-        <div class="supp-price">${cur(s.price)}</div>
-        <div class="supp-qty">
-          <button type="button" class="qty-btn" onclick="changeSuppQty('${sid}', -1)">−</button>
-          <span class="qty-num" id="supp-qty-${sid}">0</span>
-          <button type="button" class="qty-btn add" onclick="changeSuppQty('${sid}', 1)">+</button>
-        </div>
-      </div>`;
-      })
-      .join('');
-  }
+  ingBox.innerHTML = customizeIngredientList
+    .map(
+      (_name, i) =>
+        `<button type="button" class="ing-toggle" onclick="toggleCustomizeIngredient(${i})">${esc(_name)}</button>`,
+    )
+    .join('');
 
   const bd = document.getElementById('product-customize-backdrop');
   bd.style.display = 'flex';
@@ -2144,13 +1860,7 @@ document.getElementById('customize-add-btn')?.addEventListener('click', () => {
   const p = customizeDraftProduct;
   const ingredients = parseIngredientsFromDescription(p.description);
   const removed = ingredients.filter((x) => customizeRemoved.has(x));
-  const supplementsDetailed = supplementProducts
-    .filter((s) => (customizeSuppQty[s.id] || 0) > 0)
-    .map((s) => ({
-      name: s.name,
-      price: s.price,
-      qty: customizeSuppQty[s.id],
-    }));
+  const supplementsDetailed = [];
   const unitTotal = computeCustomizeTotal();
   const lineId = crypto.randomUUID();
   cart[lineId] = {
@@ -2184,11 +1894,6 @@ window.selectOrderType = function(type, btn) {
   orderType = type;
   document.querySelectorAll('.otype-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const showAddr = type === 'delivery' ? '' : 'none';
-  const af = document.getElementById('address-field');
-  const caf = document.getElementById('cart-address-field');
-  if (af) af.style.display = showAddr;
-  if (caf) caf.style.display = showAddr;
   updateCartTotals();
   updateCartPageTotals();
 };
@@ -2196,7 +1901,7 @@ window.selectOrderType = function(type, btn) {
 function updateCartTotals() {
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
-  const deliveryFee = (orderType === 'delivery' && restaurant.delivery_fee) ? restaurant.delivery_fee : 0;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
 
   document.getElementById('modal-subtotal').textContent = cur(subtotal);
@@ -2279,14 +1984,10 @@ window.closeOrderModal = function() {
 };
 
 window.placeOrder = async function() {
-  const { name, phone, address, notes, deliveryLat, deliveryLng } = readCheckoutFields();
+  const { name, phone, address, notes } = readCheckoutFields();
 
   if (!name) { toast(t('pub.errName'), 'error'); return; }
   if (!phone) { toast(t('pub.errPhone'), 'error'); return; }
-  if (orderType === 'delivery' && !address) {
-    toast(t('pub.errAddress'), 'error');
-    return;
-  }
 
   const items = Object.values(cart);
   if (items.length === 0) { toast(t('pub.errEmptyCart'), 'error'); return; }
@@ -2300,15 +2001,11 @@ window.placeOrder = async function() {
   }
 
   const subtotal = items.reduce((s, i) => s + i.qty * getLineUnitPrice(i), 0);
-  const deliveryFee = (orderType === 'delivery' && restaurant.delivery_fee) ? restaurant.delivery_fee : 0;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
   const orderNum = `CMD-${String(orderCounter).padStart(4, '0')}`;
 
-  let customerNotes = notes || null;
-  if (orderType === 'delivery' && deliveryLat != null && deliveryLng != null) {
-    const gpsLine = `📍 GPS: ${deliveryLat.toFixed(6)}, ${deliveryLng.toFixed(6)}`;
-    customerNotes = customerNotes ? `${customerNotes}\n${gpsLine}` : gpsLine;
-  }
+  const customerNotes = notes || null;
 
   const orderRow = {
     restaurant_id: restaurant.id,
@@ -2509,10 +2206,10 @@ function buildWhatsappOrderMessage({
   sourceType,
 }) {
   const typeLabels = {
-    delivery: t('wa.orderType.delivery'),
     pickup: t('wa.orderType.pickup'),
-    dine_in: t('wa.orderType.dine_in'),
+    dine_in: t('wa.orderType.table_general'),
     qr_table: t('wa.orderType.qr_table'),
+    delivery: t('wa.orderType.pickup'),
   };
   let msg = `🍽️ *${t('wa.restaurant')} : ${restaurantName}*\n`;
   msg += `📌 *${t('wa.order')} ${orderNumber}*\n`;
@@ -2522,6 +2219,10 @@ function buildWhatsappOrderMessage({
     const unit = getLineUnitPrice(i);
     const line = unit * i.qty;
     msg += `• ${formatOrderLineName(i)}\n   ${t('wa.qtyLine', { qty: i.qty, unit: cur(unit), line: cur(line) })}\n`;
+    const rem = i?.customization?.removed_ingredients || [];
+    if (rem.length) {
+      msg += `   ${t('wa.removed')}: ${rem.join(', ')}\n`;
+    }
   });
   msg += `\n💰 *${t('wa.subtotal')} : ${cur(subtotal)}*`;
   if (deliveryFee > 0) msg += `\n🚚 *${t('wa.delivery')} : ${cur(deliveryFee)}*`;

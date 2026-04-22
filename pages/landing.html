@@ -1,378 +1,165 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مينيو QR – منيو رقمي للمحلات الجزائرية</title>
+  <title>OneTap Menu — Paper menu to QR</title>
+  <meta name="description" content="Take a photo of your paper menu and get a digital QR menu for your restaurant." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/landing.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f4f1;
+      --card: #fff;
+      --ink: #1a1714;
+      --muted: #5c5650;
+      --accent: #c2410c;
+      --accent-soft: #fff4ed;
+      --radius: 16px;
+      --max: 520px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 20px 18px 48px; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0 28px;
+    }
+    .brand { font-weight: 700; font-size: 1rem; letter-spacing: -0.02em; }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cta:active { transform: scale(0.98); }
+    .hero {
+      margin-bottom: 36px;
+    }
+    h1 {
+      font-size: clamp(1.45rem, 5vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .lead {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 36ch;
+    }
+    .steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 32px 0 36px;
+    }
+    .steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-title { font-weight: 600; margin-bottom: 4px; }
+    .step-desc { font-size: 0.9rem; color: var(--muted); }
+    .cta-block {
+      margin-top: 8px;
+    }
+    .cta-block .cta {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1rem;
+    }
+    footer {
+      margin-top: 48px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <header>
+      <div class="brand">OneTap Menu</div>
+      <a class="cta" href="create-restaurant.html">Start for free</a>
+    </header>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <div class="logo">
-        <span class="logo-icon">▦</span>
-        <span class="logo-text">OneTap Menu</span>
-      </div>
-      <ul class="nav-links">
-        <li><a href="#how">كيف يخدم</a></li>
-        <li><a href="#pricing">الأسعار</a></li>
-        <li><a href="#features">المميزات</a></li>
-      </ul>
-      <a href="create-restaurant.html" class="nav-cta">ابدأ مجاناً</a>
+    <section class="hero">
+      <h1>Take a photo of your paper menu → get a QR digital menu instantly</h1>
+      <p class="lead">Customers scan, browse, and send their order on WhatsApp. You keep the menu simple.</p>
+    </section>
+
+    <ol class="steps" style="counter-reset: step;">
+      <li>
+        <span class="step-num" aria-hidden="true">1</span>
+        <div>
+          <div class="step-title">Photo</div>
+          <p class="step-desc">Snap a clear picture of your printed menu.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num" aria-hidden="true">2</span>
+        <div>
+          <div class="step-title">We pull out dishes and prices</div>
+          <p class="step-desc">Your items appear ready to edit.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num" aria-hidden="true">3</span>
+        <div>
+          <div class="step-title">QR ready</div>
+          <p class="step-desc">Print or share the code. Orders go to your WhatsApp.</p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="cta-block">
+      <a class="cta" href="create-restaurant.html">Start for free</a>
     </div>
-  </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg-blob blob-1"></div>
-    <div class="hero-bg-blob blob-2"></div>
-
-    <div class="hero-inner">
-
-      <!-- LEFT: TEXT -->
-      <div class="hero-text">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          متاح الآن للمحلات الجزائرية
-        </div>
-
-        <h1 class="hero-headline">
-          خلي الزبون يشوف<br />
-          <span class="headline-accent">المينيو ويطلب</span><br />
-          بسهولة
-        </h1>
-
-        <p class="hero-sub">
-          بمجرد مسح QR، الزبون يشوف المينيو من هاتفه ويطلب مباشرة بدون انتظار.
-        </p>
-
-        <ul class="hero-bullets">
-          <li>
-            <span class="bullet-icon">✦</span>
-            منيو رقمي واضح وسريع
-          </li>
-          <li>
-            <span class="bullet-icon">✦</span>
-            أسعار بالدينار الجزائري
-          </li>
-          <li>
-            <span class="bullet-icon">✦</span>
-            طلب مباشر من الهاتف
-          </li>
-          <li>
-            <span class="bullet-icon">✦</span>
-            يقلل وقت الانتظار بشكل كبير
-          </li>
-        </ul>
-
-        <div class="hero-actions">
-          <a href="get-started.html" class="btn-primary">
-            ابدأ الآن
-            <span class="btn-arrow">←</span>
-          </a>
-          <a href="/pages/demo-menu.html" class="btn-secondary">
-            🎯 جرّب الديمو مجاناً
-          </a>
-          <a href="#how" class="btn-secondary">
-            <span class="play-icon">▶</span>
-            شوف كيف يخدم
-          </a>
-        </div>
-
-        <div class="hero-social-proof">
-          <div class="proof-avatars">
-            <span class="avatar av1">م</span>
-            <span class="avatar av2">ك</span>
-            <span class="avatar av3">ع</span>
-          </div>
-          <p>+120 مطعم يستخدمه في الجزائر</p>
-        </div>
-      </div>
-
-      <!-- RIGHT: PHONES -->
-      <div class="hero-visual">
-
-        <!-- Phone Back -->
-        <div class="phone phone-back">
-          <div class="phone-frame">
-            <div class="phone-notch"></div>
-            <div class="phone-screen">
-              <div class="app-header">
-                <span class="app-logo-dot"></span>
-                <span class="app-name">مطعم النجمة</span>
-              </div>
-              <div class="app-cats">
-                <span class="cat active">الكل</span>
-                <span class="cat">مشاوي</span>
-                <span class="cat">سلطات</span>
-              </div>
-              <div class="app-items-mini">
-                <div class="mini-item">
-                  <div class="mini-img mi1"></div>
-                  <div class="mini-info">
-                    <span class="mi-name">طاجين دجاج</span>
-                    <span class="mi-price">850 دج</span>
-                  </div>
-                  <button class="mi-btn">أضف</button>
-                </div>
-                <div class="mini-item">
-                  <div class="mini-img mi2"></div>
-                  <div class="mini-info">
-                    <span class="mi-name">كسكس الغنم</span>
-                    <span class="mi-price">1200 دج</span>
-                  </div>
-                  <button class="mi-btn">أضف</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Phone Front -->
-        <div class="phone phone-front">
-          <div class="phone-frame">
-            <div class="phone-notch"></div>
-            <div class="phone-screen">
-              <div class="app-header">
-                <span class="app-logo-dot"></span>
-                <span class="app-name">مطعم النجمة ⭐</span>
-              </div>
-              <div class="app-cats">
-                <span class="cat active">مشاوي</span>
-                <span class="cat">شوربة</span>
-                <span class="cat">حلويات</span>
-              </div>
-              <div class="app-items">
-                <div class="app-item featured">
-                  <div class="item-img img-a"></div>
-                  <div class="item-body">
-                    <span class="item-name">مشوي مختلط</span>
-                    <span class="item-desc">دجاج، لحم، ميرقاز مشوي</span>
-                    <div class="item-footer">
-                      <span class="item-price">1800 دج</span>
-                      <button class="add-btn">أضف +</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="app-item">
-                  <div class="item-img img-b"></div>
-                  <div class="item-body">
-                    <span class="item-name">شيش طاووق</span>
-                    <span class="item-desc">مع صلصة الثوم</span>
-                    <div class="item-footer">
-                      <span class="item-price">950 دج</span>
-                      <button class="add-btn">أضف +</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="app-item">
-                  <div class="item-img img-c"></div>
-                  <div class="item-body">
-                    <span class="item-name">ميرقاز مشوي</span>
-                    <span class="item-desc">مع خبز الفرن</span>
-                    <div class="item-footer">
-                      <span class="item-price">700 دج</span>
-                      <button class="add-btn">أضف +</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="cart-bar">
-                <span>🛒 1 عناصر</span>
-                <span>اطلب الآن ←</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- QR Card -->
-        <div class="qr-card">
-          <div class="qr-graphic">
-            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-              <!-- QR pattern blocks -->
-              <rect x="4" y="4" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
-              <rect x="8" y="8" width="12" height="12" rx="1" fill="#1a1a2e"/>
-              <rect x="36" y="4" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
-              <rect x="40" y="8" width="12" height="12" rx="1" fill="#1a1a2e"/>
-              <rect x="4" y="36" width="20" height="20" rx="2" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
-              <rect x="8" y="40" width="12" height="12" rx="1" fill="#1a1a2e"/>
-              <!-- Data cells -->
-              <rect x="28" y="4" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="28" y="12" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="36" y="28" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="44" y="28" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="52" y="28" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="28" y="36" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="36" y="44" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="44" y="36" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="52" y="44" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="28" y="52" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="44" y="52" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="52" y="52" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="4" y="28" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="12" y="28" width="4" height="4" fill="#1a1a2e"/>
-              <rect x="20" y="28" width="4" height="4" fill="#1a1a2e"/>
-            </svg>
-          </div>
-          <div class="qr-steps">
-            <div class="qr-step">
-              <span class="qr-num">١</span>
-              <span>امسح QR</span>
-            </div>
-            <div class="qr-arrow-v">↓</div>
-            <div class="qr-step">
-              <span class="qr-num">٢</span>
-              <span>شوف المينيو</span>
-            </div>
-            <div class="qr-arrow-v">↓</div>
-            <div class="qr-step">
-              <span class="qr-num">٣</span>
-              <span>اطلب مباشرة</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="how" id="how">
-    <div class="section-inner">
-      <div class="section-label">كيف يخدم</div>
-      <h2 class="section-title">ثلاث خطوات وكمل</h2>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <div class="step-icon">📋</div>
-          <h3>سجّل محلك</h3>
-          <p>أدخل اسم محلك وأضف أصناف المينيو مع الأسعار بالدينار في دقائق.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <div class="step-icon">▦</div>
-          <h3>احصل على QR</h3>
-          <p>نولّدلك كود QR خاص بمحلك. اطبعه وحطه على الطاولات.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <div class="step-icon">📱</div>
-          <h3>الزبون يطلب</h3>
-          <p>الزبون يمسح الكود، يشوف المينيو ويطلب مباشرة من هاتفه.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="section-inner">
-      <div class="section-label">المميزات</div>
-      <h2 class="section-title">كل ما تحتاجه في مكان واحد</h2>
-      <div class="features-grid">
-        <div class="feat-card feat-large">
-          <div class="feat-icon-wrap">⚡</div>
-          <h3>سريع وخفيف</h3>
-          <p>المينيو يفتح في ثانية على أي هاتف، حتى بالأنترنت الضعيف.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon-wrap">💰</div>
-          <h3>أسعار بالدينار</h3>
-          <p>أضف الأسعار بـ DZD مباشرة.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon-wrap">✏️</div>
-          <h3>تعديل فوري</h3>
-          <p>غيّر الأسعار والأصناف في أي وقت.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon-wrap">📊</div>
-          <h3>إحصائيات</h3>
-          <p>شوف الأصناف الأكثر طلباً كل يوم.</p>
-        </div>
-        <div class="feat-card feat-accent">
-          <div class="feat-icon-wrap">🌙</div>
-          <h3>وضع ليلي</h3>
-          <p>المينيو يدعم الوضع الليلي تلقائياً.</p>
-        </div>
-        <div class="feat-card feat-large-2">
-          <div class="feat-icon-wrap">🔒</div>
-          <h3>آمن وموثوق</h3>
-          <p>بياناتك محفوظة بالكامل. لا تحتاج تطبيق، يخدم من المتصفح مباشرة.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="pricing" id="pricing">
-    <div class="section-inner">
-      <div class="section-label">الأسعار</div>
-      <h2 class="section-title">باش تبدا بدون مخاطرة</h2>
-      <div class="pricing-grid">
-        <div class="price-card">
-          <div class="price-tier">مجاني</div>
-          <div class="price-amount"><span>0</span> دج/شهر</div>
-          <ul class="price-features">
-            <li>✓ حتى 20 صنف</li>
-            <li>✓ QR واحد</li>
-            <li>✓ تعديل المينيو</li>
-            <li class="dim">✗ إحصائيات</li>
-            <li class="dim">✗ دعم مخصص</li>
-          </ul>
-          <a href="create-restaurant.html" class="btn-outline">ابدأ مجاناً</a>
-        </div>
-        <div class="price-card price-popular">
-          <div class="popular-badge">الأكثر طلباً</div>
-          <div class="price-tier">احترافي</div>
-          <div class="price-amount"><span>7000</span> دج/سنة</div>
-          <ul class="price-features">
-            <li>✓ أصناف غير محدودة</li>
-            <li>✓ عدة QR codes</li>
-            <li>✓ إحصائيات كاملة</li>
-            <li>✓ دعم مخصص</li>
-            <li>✓ وضع الطلب المباشر</li>
-          </ul>
-          <a href="get-started.html" class="btn-primary">ابدأ الآن</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA BOTTOM -->
-  <section class="cta-bottom">
-    <div class="cta-inner">
-      <div class="cta-bg-shape"></div>
-      <h2>جاهز تحوّل محلك؟</h2>
-      <p>ابدأ اليوم بدون بطاقة بنكية. سجّل وجرّب مجاناً.</p>
-      <a href="get-started.html" class="btn-primary btn-xl">
-        ابدأ الآن مجاناً
-        <span class="btn-arrow">←</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="logo">
-        <span class="logo-icon">▦</span>
-        <span class="logo-text">OneTap Menu</span>
-      </div>
-      <p class="footer-tagline">منيو رقمي للمحلات الجزائرية</p>
-      <div class="footer-links">
-        <a href="#">الشروط</a>
-        <a href="#">الخصوصية</a>
-        <a href="#">تواصل معنا</a>
-      </div>
-      <p class="footer-copy">© 2025 مينيوQR. جميع الحقوق محفوظة.</p>
-    </div>
-  </footer>
-
+    <footer>
+      <a href="login.html">Already have an account?</a>
+    </footer>
+  </div>
 </body>
 </html>

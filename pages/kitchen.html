@@ -271,17 +271,31 @@ function orderTypeLabelAr(type) {
 function thermalTicketHtml(order) {
   const loc = getRestaurantLocale(restaurant);
   const items = order.order_items || [];
-  const itemsHtml = items.map((i) => {
-    const removed = Array.isArray(i.removed_ingredients) ? i.removed_ingredients : [];
-    const supplements = Array.isArray(i.supplements) ? i.supplements : [];
+  const cleanItemName = (raw) =>
+    String(raw || '')
+      .replace(/\s*\([^()]*\)\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  const itemsHtml = items.map((item) => {
+    const removedDirect = Array.isArray(item?.removed_ingredients) ? item.removed_ingredients : [];
+    const removedCustom = Array.isArray(item?.customization?.removed_ingredients)
+      ? item.customization.removed_ingredients
+      : [];
+    const removed = removedDirect.length ? removedDirect : removedCustom;
+    const supplementsDirect = Array.isArray(item?.supplements) ? item.supplements : [];
+    const supplementsCustom = Array.isArray(item?.customization?.supplements)
+      ? item.customization.supplements
+      : [];
+    const supplements = supplementsDirect.length ? supplementsDirect : supplementsCustom;
+    const itemName = cleanItemName(item?.name || item?.product_name || '—');
+    const qty = Number(item?.quantity || 0);
     return `
       <div class="line-item">
         <div class="line-head">
-          <span class="line-name">${esc(i.product_name || '—')}</span>
-          <span class="line-qty">x${Number(i.quantity || 0)}</span>
+          <span class="line-name">${esc(`${qty}x  ${itemName}`)}</span>
         </div>
-        ${removed.length ? `<div class="line-removed">بدون: ${esc(removed.join(', '))}</div>` : ''}
-        ${supplements.length ? `<div class="line-supp">+ ${esc(supplements.map((s) => s?.name || '').filter(Boolean).join(', '))}</div>` : ''}
+        ${removed.length ? `<div class="line-removed">❌ بدون: ${esc(removed.join(', '))}</div>` : ''}
+        ${supplements.length ? `<div class="line-supp">➕ زيادة: ${esc(supplements.map((s) => `${s?.name || ''}${Number(s?.qty || 0) > 1 ? ` x${Number(s.qty)}` : ''}`).filter(Boolean).join(', '))}</div>` : ''}
       </div>
     `;
   }).join('');

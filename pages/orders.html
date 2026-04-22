@@ -751,7 +751,15 @@ function buildOrderCard(o) {
         </div>
         ${items.map(i => `
         <div class="oi-row">
-          <div>${esc(i.product_name)}</div>
+          <div>
+            ${esc(i.product_name)}
+            ${i.removed_ingredients && i.removed_ingredients.length > 0 
+              ? `<div style="font-size:.75rem;color:var(--red);margin-top:2px">بدون: ${i.removed_ingredients.join(', ')}</div>` 
+              : ''}
+            ${i.supplements && i.supplements.length > 0 
+              ? `<div style="font-size:.75rem;color:var(--green);margin-top:2px">+ ${i.supplements.map(s => s.name).join(', ')}</div>` 
+              : ''}
+          </div>
           <div style="text-align:center">${i.quantity}</div>
           <div style="text-align:right">${fmtCurrency(i.unit_price, getRestaurantCurrency(restaurant), loc)}</div>
           <div class="oi-total">${fmtCurrency(i.subtotal, getRestaurantCurrency(restaurant), loc)}</div>

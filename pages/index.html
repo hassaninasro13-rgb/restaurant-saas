@@ -1118,7 +1118,7 @@ import {
   getLang,
   setLang,
 } from '../js/shared.js';
-import { loadPublicMenuBySlug, getOpeningHoursForDay } from '../supabase/public-menu.js';
+import { loadPublicMenuBySlug } from '../supabase/public-menu.js';
 import { countOrdersForRestaurant, createOrderWithItems } from '../supabase/orders.js';
 import { resolveOrderSourceForPublicOrder } from '../supabase/order-sources.js';
 import { notifyNewOrderCreated } from '../supabase/email.js';
@@ -1398,27 +1398,27 @@ async function tryRestoreResolvedSourceSession(rest) {
     logoArea.innerHTML = `<div class="menu-logo-placeholder">${rest.name.charAt(0)}</div>`;
   }
 
-  // Opening hours badge
-  const { data: hours } = await getOpeningHoursForDay(rest.id, new Date().getDay());
-
-  let isOpen = false;
-  if (rest.is_open_override !== null) {
-    isOpen = rest.is_open_override;
-  } else if (hours && !hours.is_closed) {
-    const now = new Date();
-    const [oh, om] = hours.open_time.split(':').map(Number);
-    const [ch, cm] = hours.close_time.split(':').map(Number);
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    isOpen = nowMin >= oh * 60 + om && nowMin <= ch * 60 + cm;
+  // Opening badge (restaurants.opening_time / closing_time / is_open_manually)
+  function timeStrToMinutes(str) {
+    const s = String(str || '00:00:00').trim().slice(0, 8);
+    const [hh, mm] = s.split(':').map((x) => Number(x));
+    const h = Number.isFinite(hh) ? hh : 0;
+    const m = Number.isFinite(mm) ? mm : 0;
+    return h * 60 + m;
   }
-
-  const ot = hours ? String(hours.open_time || '').slice(0, 5) : '';
-  const ct = hours ? String(hours.close_time || '').slice(0, 5) : '';
-  const hoursLabel = isOpen
-    ? hours && ot && ct
-      ? t('pub.openHours', { open: ot, close: ct })
-      : t('pub.open')
-    : t('pub.closed');
+  const useSchedule = rest.is_open_manually !== false;
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const openMin = timeStrToMinutes(rest.opening_time || '09:00:00');
+  const closeMin = timeStrToMinutes(rest.closing_time || '22:00:00');
+  let withinHours = false;
+  if (closeMin >= openMin) {
+    withinHours = nowMin >= openMin && nowMin <= closeMin;
+  } else {
+    withinHours = nowMin >= openMin || nowMin <= closeMin;
+  }
+  const isOpen = useSchedule && withinHours;
+  const hoursLabel = !useSchedule ? 'مغلق حالياً' : isOpen ? 'مفتوح' : 'مغلق حالياً';
   document.getElementById('rest-hours-badge').innerHTML =
     `<div class="open-badge ${isOpen ? 'open' : 'closed'}">
       <span class="open-dot"></span>

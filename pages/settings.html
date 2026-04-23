@@ -264,6 +264,32 @@
       </div>
 
       <div class="settings-card">
+        <h3>ساعات العمل</h3>
+        <p class="settings-intro" style="margin-top:0;">يُعرض حالة «مفتوح» أو «مغلق حالياً» للزبائن على المنيو العام حسب الإعدادات أدناه.</p>
+        <div class="field-row" style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div class="field" style="flex:1;min-width:140px;">
+            <label for="field-simple-open">وقت الفتح</label>
+            <input type="time" id="field-simple-open" class="input" value="09:00">
+          </div>
+          <div class="field" style="flex:1;min-width:140px;">
+            <label for="field-simple-close">وقت الإغلاق</label>
+            <input type="time" id="field-simple-close" class="input" value="22:00">
+          </div>
+        </div>
+        <div class="wa-ordering-toggle-row" style="margin-top:18px;">
+          <div class="wa-ordering-copy">
+            <label for="toggle-is-open-manually" style="font-weight:700;font-size:.95rem;cursor:pointer;display:block;">فتح/إغلاق يدوي</label>
+            <p class="wa-ordering-hint">عند التفعيل، تُحسب الحالة من وقت الفتح والإغلاق. عند الإيقاف، يظهر للزبائن «مغلق حالياً» دائماً.</p>
+          </div>
+          <label class="wa-switch" aria-label="فتح/إغلاق يدوي">
+            <input type="checkbox" id="toggle-is-open-manually" checked>
+            <span class="wa-switch-slider"></span>
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary" style="margin-top:18px;" id="btn-save-simple-hours">حفظ</button>
+      </div>
+
+      <div class="settings-card">
         <h3>Affichage public</h3>
         <div class="field-row" style="display:flex;gap:16px;flex-wrap:wrap;">
           <div class="field" style="flex:1;min-width:160px;">
@@ -467,6 +493,27 @@ function syncWhatsappOrderingToggleFromRestaurant() {
     statusEl.className = enabled ? 'status-on' : 'status-off';
   }
 }
+
+document.getElementById('btn-save-simple-hours')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-save-simple-hours');
+  if (!restaurant?.id) return;
+  btn.disabled = true;
+  const opening_time = normalizeTime(document.getElementById('field-simple-open').value);
+  const closing_time = normalizeTime(document.getElementById('field-simple-close').value);
+  const is_open_manually = document.getElementById('toggle-is-open-manually').checked;
+  const { data, error } = await updateRestaurantForManager(restaurant.id, {
+    opening_time,
+    closing_time,
+    is_open_manually,
+  });
+  btn.disabled = false;
+  if (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  restaurant = { ...restaurant, ...(data || {}) };
+  toast('تم حفظ ساعات العمل', 'success');
+});
 
 document.getElementById('toggle-whatsapp-ordering')?.addEventListener('change', async (e) => {
   const cb = e.target;
@@ -800,6 +847,11 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   document.getElementById('field-phone').value = rest.phone || '';
   document.getElementById('field-whatsapp').value = rest.whatsapp || '';
   syncWhatsappOrderingToggleFromRestaurant();
+  const openSlot = String(rest.opening_time || '09:00:00').slice(0, 5);
+  const closeSlot = String(rest.closing_time || '22:00:00').slice(0, 5);
+  document.getElementById('field-simple-open').value = openSlot;
+  document.getElementById('field-simple-close').value = closeSlot;
+  document.getElementById('toggle-is-open-manually').checked = rest.is_open_manually !== false;
   document.getElementById('field-currency').value = rest.settings?.currency || 'DZD';
   document.getElementById('field-language').value = rest.settings?.language || 'fr';
   const tc = rest.settings?.theme_color || '#e85c2c';

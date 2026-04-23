@@ -114,6 +114,34 @@
   .product-item-cat { font-size: .75rem; color: var(--ink3); margin-bottom: 4px; }
   .product-item-price { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--accent); }
   .product-item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .product-vis-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: border-color .12s, background .12s, color .12s;
+    width: 100%;
+    white-space: nowrap;
+  }
+  .product-vis-toggle.is-visible {
+    color: #2f9e44;
+    border-color: rgba(47, 158, 68, 0.45);
+    background: rgba(47, 158, 68, 0.08);
+  }
+  .product-vis-toggle.is-hidden {
+    color: #c92a2a;
+    border-color: rgba(201, 42, 42, 0.4);
+    background: rgba(201, 42, 42, 0.06);
+  }
+  .product-vis-toggle:disabled { opacity: 0.55; cursor: wait; }
 
   .cat-filter-tabs {
     display: flex;
@@ -704,7 +732,7 @@ function renderProducts() {
           Modifier
         </button>
         <button type="button" class="btn btn-ghost btn-sm" data-action="toggle-stock"></button>
-        <button type="button" class="btn btn-ghost btn-sm" data-action="toggle-menu"></button>
+        <button type="button" class="product-vis-toggle" data-action="toggle-menu"></button>
         <button type="button" class="btn btn-danger btn-sm" data-action="delete">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
         </button>
@@ -736,17 +764,19 @@ function renderProducts() {
     const vis = p.is_visible !== false;
     const avail = p.is_available !== false;
     const badges = [];
-    if (!vis) badges.push('<span class="badge badge-gray">Hors menu</span>');
-    else if (!avail) badges.push('<span class="badge badge-amber">Indisponible</span>');
-    else badges.push('<span class="badge badge-green">En vente</span>');
+    if (!avail) badges.push('<span class="badge badge-amber">Indisponible</span>');
+    else if (vis) badges.push('<span class="badge badge-green">En vente</span>');
     row.querySelector('.product-item-badges').innerHTML = badges.join(' ');
     row.querySelector('[data-action="edit"]').onclick = () => editProduct(p.id);
     const stockBtn = row.querySelector('[data-action="toggle-stock"]');
     stockBtn.textContent = avail ? 'Rupture' : 'Réactiver stock';
     stockBtn.onclick = () => toggleAvail(p.id, avail);
     const menuBtn = row.querySelector('[data-action="toggle-menu"]');
-    menuBtn.textContent = vis ? 'Retirer du menu' : 'Mettre sur le menu';
-    menuBtn.onclick = () => toggleMenuVis(p.id, vis);
+    menuBtn.classList.toggle('is-visible', vis);
+    menuBtn.classList.toggle('is-hidden', !vis);
+    menuBtn.innerHTML = `<span aria-hidden="true">${vis ? '👁️' : '🚫'}</span><span>${vis ? 'ظاهر' : 'مخفي'}</span>`;
+    menuBtn.title = vis ? 'إخفاء من المنيو العام' : 'إظهار في المنيو العام';
+    menuBtn.onclick = () => toggleMenuVis(p.id);
     row.querySelector('[data-action="delete"]').onclick = () => deleteProduct(p.id);
   });
 }
@@ -980,11 +1010,27 @@ window.toggleAvail = async function(id, current) {
   await loadProducts();
 };
 
-window.toggleMenuVis = async function(id, currentlyVisible) {
-  const { error } = await setProductVisibleForRestaurant(id, restaurant.id, !currentlyVisible);
-  if (error) { toast(error.message, 'error'); return; }
-  toast(currentlyVisible ? 'Retiré du menu public' : 'Affiché sur le menu public', 'success');
-  await loadProducts();
+const togglingVisibilityIds = new Set();
+
+window.toggleMenuVis = async function (id) {
+  if (togglingVisibilityIds.has(id)) return;
+  const idx = allProducts.findIndex((x) => x.id === id);
+  if (idx < 0) return;
+  const prev = allProducts[idx];
+  const currentlyVisible = prev.is_visible !== false;
+  const next = !currentlyVisible;
+  togglingVisibilityIds.add(id);
+  allProducts[idx] = { ...prev, is_visible: next };
+  renderProducts();
+  const { error } = await setProductVisibleForRestaurant(id, restaurant.id, next);
+  togglingVisibilityIds.delete(id);
+  if (error) {
+    allProducts[idx] = { ...prev, is_visible: prev.is_visible };
+    renderProducts();
+    toast(error.message, 'error');
+    return;
+  }
+  toast(next ? '👁️ ظاهر في المنيو' : '🚫 مخفي عن المنيو', 'success');
 };
 
 window.deleteProduct = async function(id) {

@@ -1341,7 +1341,7 @@ async function tryRestoreResolvedSourceSession(rest) {
   whatsappOrderingEnabled = rest.whatsapp_ordering_enabled !== false;
   applyWhatsappOrderingUi();
   categories = cats;
-  products = prods;
+  products = (prods || []).filter((p) => p.is_visible !== false);
   orderedPizzaByCategory = new Map();
   const pizzaCategoryIds = (cats || []).filter((c) => isPizzaCategoryName(c.name)).map((c) => c.id);
   if (pizzaCategoryIds.length) {

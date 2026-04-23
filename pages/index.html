@@ -1940,6 +1940,40 @@ window.openProductCustomizeModal = function (productId) {
     )
     .join('');
 
+  // Supplements visibility rule: only for food categories (not drinks/desserts/etc.).
+  const currentProduct = {
+    ...p,
+    category_name: categories.find((c) => c.id === p.category_id)?.name || '',
+  };
+  const categoryName = (currentProduct?.category_name || '').toLowerCase();
+  const isExcluded = ['boisson', 'drink', 'مشروب', 'dessert', 'حلوى', 'glace', 'café', 'قهوة', 'jus', 'sweet']
+    .some((word) => categoryName.includes(word));
+
+  const supplementProducts = products.filter((sp) => {
+    const catName = categories.find((c) => c.id === sp.category_id)?.name || '';
+    return isSupplementsCategory(catName) && sp.id !== p.id;
+  });
+
+  const suppTitleEl = document.getElementById('customize-supp-title');
+  const suppBox = document.getElementById('customize-supplements');
+  if (suppTitleEl && suppBox) {
+    if (!isExcluded && supplementProducts.length > 0) {
+      suppTitleEl.hidden = false;
+      suppBox.hidden = false;
+      suppBox.innerHTML = supplementProducts
+        .map((sp) => `
+          <div class="supp-row">
+            <div class="supp-name">${esc(sp.name)}</div>
+            <div class="supp-price">+ ${cur(sp.price || 0)}</div>
+          </div>`)
+        .join('');
+    } else {
+      suppTitleEl.hidden = true;
+      suppBox.hidden = true;
+      suppBox.innerHTML = '';
+    }
+  }
+
   const bd = document.getElementById('product-customize-backdrop');
   bd.style.display = 'flex';
   bd.setAttribute('aria-hidden', 'false');

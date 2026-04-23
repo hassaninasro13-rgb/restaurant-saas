@@ -455,6 +455,32 @@
     min-width: 180px;
     font-size: .78rem;
   }
+
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .dashboard-header button,
+    .dashboard-header select {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+
+    .hero-preview {
+      height: 120px;
+    }
+
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 </style>
 </head>
 <body>

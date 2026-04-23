@@ -66,6 +66,9 @@
     padding: 20px 20px 16px;
     background: #fff;
     border-bottom: 1.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
   .menu-logo {
     width: 72px; height: 72px;
@@ -129,6 +132,9 @@
     scrollbar-width: none;
     padding: 0 16px;
     border-bottom: 1.5px solid var(--border);
+    position: sticky;
+    top: var(--menu-hero-info-height, 116px);
+    z-index: 99;
   }
   .cat-tabs-wrap::-webkit-scrollbar { display: none; }
   .cat-tabs {
@@ -1472,6 +1478,8 @@ async function tryRestoreResolvedSourceSession(rest) {
   buildMenu();
   updateCartFAB();
   syncCartPageVisibility();
+  updateStickyOffsets();
+  window.addEventListener('resize', updateStickyOffsets);
   hideLoader();
 })();
 
@@ -1495,6 +1503,13 @@ function persistCart() {
 
 function clearCartStorage() {
   clearCartStorageLs(String(slug || '').trim());
+}
+
+function updateStickyOffsets() {
+  const heroInfo = document.querySelector('.menu-hero-info');
+  if (!heroInfo) return;
+  const h = Math.ceil(heroInfo.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--menu-hero-info-height', `${h}px`);
 }
 
 function isCartPageMode() {
@@ -1743,7 +1758,6 @@ function buildMenu() {
     if (catProds.length === 0) return '';
     return `
     <div class="cat-section" id="section-${c.id}">
-      <div class="cat-section-title">${esc(c.name)}</div>
       ${catProds.map(p => buildProductRow(p)).join('')}
     </div>`;
   }).join('');
@@ -1767,6 +1781,7 @@ function qtyForProduct(productId) {
 }
 
 function buildProductRow(p, displayName = null) {
+  const cleanName = (name) => String(name || '').replace(/\s*\(.*?\)\s*/g, ' ').trim();
   const qty = qtyForProduct(p.id);
   const imgUrl = safeHttpUrl(p.image_url);
   const categoryName = categories.find((c) => c.id === p.category_id)?.name || '';
@@ -1774,7 +1789,7 @@ function buildProductRow(p, displayName = null) {
   const img = imgUrl
     ? `<img src="${attrEncode(imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : '';
-  const shownName = displayName || p.name;
+  const shownName = cleanName(displayName || p.name);
   return `
   <div class="product-row" id="prow-${p.id}" role="button" tabindex="0" onclick="openProductCustomizeModal('${p.id}')">
     <div class="product-row-img ${img ? '' : 'placeholder'}">

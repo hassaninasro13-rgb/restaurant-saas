@@ -74,11 +74,9 @@
     text-align: center;
   }
   .menu-logo {
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
+    margin-top: -60px;
+    position: relative;
+    z-index: 999;
     width: 120px; height: 120px;
     border-radius: 50%;
     object-fit: cover;
@@ -86,13 +84,13 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     background: var(--cream2);
     display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
   .menu-logo-placeholder {
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
+    margin-top: -60px;
+    position: relative;
+    z-index: 999;
     width: 120px; height: 120px;
     border-radius: 50%;
     background: var(--accent);
@@ -103,6 +101,8 @@
     font-size: 2rem;
     font-weight: 800;
     color: #fff;
+    margin-left: auto;
+    margin-right: auto;
   }
   .menu-rest-name {
     font-family: var(--font-display);
@@ -938,9 +938,9 @@
 <div class="menu-header">
   <div class="menu-hero" style="overflow: visible !important; position: relative;">
     <div class="menu-cover-placeholder" id="hero-placeholder"></div>
-    <div id="menu-logo-area"></div>
   </div>
   <div class="menu-hero-info">
+    <div id="menu-logo-area"></div>
     <div class="menu-rest-name" id="rest-name" data-i18n="pub.loading">Chargement…</div>
     <div class="menu-rest-meta">
       <span id="rest-address"></span>

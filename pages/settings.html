@@ -76,6 +76,73 @@
   .menu-preview-body { padding: 10px 12px; font-size: .8rem; }
   .menu-preview-item { display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.08); }
   .menu-preview-item:last-child { border-bottom: none; }
+  .wa-ordering-toggle-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .wa-ordering-toggle-row .wa-ordering-copy { flex: 1; min-width: 200px; }
+  .wa-ordering-toggle-row .wa-ordering-hint {
+    font-size: .8rem;
+    color: var(--ink2);
+    margin: 6px 0 0;
+    line-height: 1.45;
+  }
+  .wa-switch {
+    position: relative;
+    width: 52px;
+    height: 30px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .wa-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+  .wa-switch-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--cream3);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+  }
+  .wa-switch-slider::before {
+    content: '';
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    transition: transform .2s;
+  }
+  .wa-switch input:checked + .wa-switch-slider {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .wa-switch input:checked + .wa-switch-slider::before {
+    transform: translate(20px, -50%);
+  }
+  .wa-switch input:disabled + .wa-switch-slider {
+    opacity: .5;
+    cursor: wait;
+  }
+  .wa-ordering-status {
+    margin: 14px 0 0;
+    font-size: .88rem;
+    font-weight: 600;
+  }
+  .wa-ordering-status .status-on { color: #2f9e44; }
+  .wa-ordering-status .status-off { color: #c92a2a; }
 </style>
 </head>
 <body>
@@ -175,6 +242,25 @@
             <input type="tel" id="field-whatsapp" class="input" autocomplete="tel">
           </div>
         </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>WhatsApp — menu public</h3>
+        <div class="wa-ordering-toggle-row">
+          <div class="wa-ordering-copy">
+            <label for="toggle-whatsapp-ordering" style="font-weight:700;font-size:.95rem;cursor:pointer;display:block;">
+              تفعيل الطلب عبر WhatsApp
+            </label>
+            <p class="wa-ordering-hint">عند التفعيل، يمكن للزبائن إرسال الطلب عبر WhatsApp من صفحة المنيو. عند الإيقاف، يُخفى زر الطلب ويظهر تنبيه للزبائن.</p>
+          </div>
+          <label class="wa-switch" aria-label="تفعيل الطلب عبر WhatsApp">
+            <input type="checkbox" id="toggle-whatsapp-ordering" checked>
+            <span class="wa-switch-slider"></span>
+          </label>
+        </div>
+        <p class="wa-ordering-status" id="wa-ordering-status-line">
+          <span class="status-on" id="wa-ordering-status-text">مفعّل</span>
+        </p>
       </div>
 
       <div class="settings-card">
@@ -369,6 +455,35 @@ function normalizeTime(v) {
   }
   return t.slice(0, 8) || '12:00:00';
 }
+
+function syncWhatsappOrderingToggleFromRestaurant() {
+  const cb = document.getElementById('toggle-whatsapp-ordering');
+  const statusEl = document.getElementById('wa-ordering-status-text');
+  if (!cb || !restaurant) return;
+  const enabled = restaurant.whatsapp_ordering_enabled !== false;
+  cb.checked = enabled;
+  if (statusEl) {
+    statusEl.textContent = enabled ? 'مفعّل' : 'موقوف';
+    statusEl.className = enabled ? 'status-on' : 'status-off';
+  }
+}
+
+document.getElementById('toggle-whatsapp-ordering')?.addEventListener('change', async (e) => {
+  const cb = e.target;
+  if (!restaurant?.id) return;
+  const next = cb.checked;
+  cb.disabled = true;
+  const { data, error } = await updateRestaurantForManager(restaurant.id, { whatsapp_ordering_enabled: next });
+  cb.disabled = false;
+  if (error) {
+    toast(error.message, 'error');
+    cb.checked = !next;
+    return;
+  }
+  restaurant = { ...restaurant, ...(data || {}) };
+  syncWhatsappOrderingToggleFromRestaurant();
+  toast(next ? 'تم تفعيل الطلب عبر WhatsApp' : 'تم إيقاف الطلب عبر WhatsApp', 'success');
+});
 
 function renderLogoPreview() {
   const el = document.getElementById('logo-preview');
@@ -684,6 +799,7 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   document.getElementById('field-address').value = rest.address || '';
   document.getElementById('field-phone').value = rest.phone || '';
   document.getElementById('field-whatsapp').value = rest.whatsapp || '';
+  syncWhatsappOrderingToggleFromRestaurant();
   document.getElementById('field-currency').value = rest.settings?.currency || 'DZD';
   document.getElementById('field-language').value = rest.settings?.language || 'fr';
   const tc = rest.settings?.theme_color || '#e85c2c';

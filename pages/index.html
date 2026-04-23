@@ -419,6 +419,18 @@
   }
   .wa-order-btn:hover:not(:disabled) { background: var(--accent); }
   .wa-order-btn:disabled { opacity: .55; cursor: not-allowed; }
+  .pub-wa-ordering-off-note {
+    font-size: .84rem;
+    color: var(--ink2);
+    text-align: center;
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    background: var(--cream2);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    line-height: 1.45;
+  }
+  .pub-wa-ordering-off-note[hidden] { display: none !important; }
 
   .order-success-panel { display: none; text-align: center; padding: 8px 0 16px; }
   .order-success-panel.is-visible { display: block; }
@@ -964,11 +976,12 @@
         <span data-i18n="pub.total">Total</span>
         <span id="cart-page-total">—</span>
       </div>
+      <p class="pub-wa-ordering-off-note" id="cart-wa-ordering-off-note" hidden>الطلب عبر الهاتف غير متاح حالياً</p>
       <button type="button" class="cart-page-checkout-btn" id="cart-page-send-order-btn"
         data-i18n="pub.placeOrder" data-i18n-aria="pub.placeOrderAria">
         Commander
       </button>
-      <p style="font-size:.76rem;color:var(--ink3);margin:10px 0 0;text-align:center;line-height:1.4;" data-i18n="pub.checkoutDisclaimer">
+      <p id="cart-checkout-disclaimer" style="font-size:.76rem;color:var(--ink3);margin:10px 0 0;text-align:center;line-height:1.4;" data-i18n="pub.checkoutDisclaimer">
         En validant, votre commande est enregistrée pour le restaurant (aucun paiement en ligne pour l’instant).
       </p>
     </footer>
@@ -1056,6 +1069,7 @@
     </div>
   </div>
   <div class="order-modal-footer" id="order-modal-footer">
+    <p class="pub-wa-ordering-off-note" id="modal-wa-ordering-off-note" hidden>الطلب عبر الهاتف غير متاح حالياً</p>
     <p id="checkout-hint" style="font-size:.78rem;color:var(--ink3);margin:0 0 10px;text-align:center;" data-i18n="pub.checkoutHint">
       La commande est enregistrée, puis WhatsApp s’ouvre avec le message prêt à envoyer (si un numéro est configuré).
     </p>
@@ -1138,6 +1152,8 @@ let orderType = 'pickup';
 let orderCounter = 1;
 /** Set after menu load when URL contains ?source=… or legacy ?table=… */
 let resolvedSource = null;
+/** Mirrors `restaurants.whatsapp_ordering_enabled` (default true when column missing). */
+let whatsappOrderingEnabled = true;
 
 function esc(s) {
   return String(s ?? '')
@@ -1322,6 +1338,8 @@ async function tryRestoreResolvedSourceSession(rest) {
   }
 
   restaurant = rest;
+  whatsappOrderingEnabled = rest.whatsapp_ordering_enabled !== false;
+  applyWhatsappOrderingUi();
   categories = cats;
   products = prods;
   orderedPizzaByCategory = new Map();
@@ -1418,6 +1436,20 @@ async function tryRestoreResolvedSourceSession(rest) {
   syncCartPageVisibility();
   hideLoader();
 })();
+
+function applyWhatsappOrderingUi() {
+  const on = whatsappOrderingEnabled;
+  document.getElementById('modal-wa-ordering-off-note')?.toggleAttribute('hidden', on);
+  document.getElementById('cart-wa-ordering-off-note')?.toggleAttribute('hidden', on);
+  const modalBtn = document.getElementById('checkout-submit-btn');
+  const modalHint = document.getElementById('checkout-hint');
+  const cartBtn = document.getElementById('cart-page-send-order-btn');
+  const disc = document.getElementById('cart-checkout-disclaimer');
+  if (modalBtn) modalBtn.toggleAttribute('hidden', !on);
+  if (modalHint) modalHint.toggleAttribute('hidden', !on);
+  if (cartBtn) cartBtn.toggleAttribute('hidden', !on);
+  if (disc) disc.toggleAttribute('hidden', !on);
+}
 
 function persistCart() {
   persistCartLs(String(slug || '').trim(), cart);
@@ -1984,6 +2016,10 @@ window.closeOrderModal = function() {
 };
 
 window.placeOrder = async function() {
+  if (restaurant && restaurant.whatsapp_ordering_enabled === false) {
+    toast('الطلب عبر الهاتف غير متاح حالياً', 'error');
+    return;
+  }
   const { name, phone, address, notes } = readCheckoutFields();
 
   if (!name) { toast(t('pub.errName'), 'error'); return; }

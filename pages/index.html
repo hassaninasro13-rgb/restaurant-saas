@@ -47,6 +47,8 @@
     height: 220px;
     object-fit: cover;
     display: block;
+  position: relative;
+  z-index: 0;
     opacity: 1;
     overflow: visible;
   }
@@ -934,7 +936,7 @@
 
 <!-- MENU HEADER (sticky) -->
 <div class="menu-header">
-  <div class="menu-hero">
+  <div class="menu-hero" style="overflow: visible !important; position: relative;">
     <div class="menu-cover-placeholder" id="hero-placeholder"></div>
     <div id="menu-logo-area"></div>
   </div>

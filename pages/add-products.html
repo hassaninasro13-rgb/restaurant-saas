@@ -290,7 +290,11 @@
 
           <!-- Image Upload -->
           <div class="field">
-            <label>Photo du produit</label>
+            <label>صورة المنتج</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-pick-product-image">📷 إضافة صورة</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-remove-product-image" style="display:none;color:#c92a2a;font-weight:600;">حذف الصورة</button>
+            </div>
             <div class="img-upload-area" id="img-drop-area"
               onclick="document.getElementById('img-input').click()"
               ondragover="handleDragOver(event)"
@@ -299,11 +303,11 @@
               <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImageSelect(this)">
               <div class="img-upload-placeholder" id="img-placeholder">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
-                <span>Cliquez ou déposez une image</span>
-                <small>JPG, PNG, WebP, HEIC… — redimensionnement automatique</small>
+                <span>انقر أو اسحب صورة هنا</span>
+                <small>JPG, PNG, WebP — ضغط تلقائي</small>
               </div>
               <img id="img-preview" class="img-preview" src="" alt="" style="display:none">
-              <button class="img-remove-btn" id="img-remove-btn" onclick="removeImage(event)">✕</button>
+              <button type="button" class="img-remove-btn" id="img-remove-btn" onclick="removeImage(event)" title="حذف">✕</button>
             </div>
             <p class="img-opt-hint" id="img-opt-status" aria-live="polite"></p>
           </div>
@@ -424,7 +428,6 @@ import {
   setProductAvailableForRestaurant,
   setProductVisibleForRestaurant,
   deleteProductForRestaurant,
-  uploadProductImage,
 } from '../supabase/products.js';
 import {
   optimizeProductImage,
@@ -435,6 +438,50 @@ import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
 import { supabase } from '../supabase/client.js';
 
 setLang(getLang());
+
+const PRODUCT_IMAGES_BUCKET = 'product-images';
+
+function safeProductImageFilename(originalName) {
+  const ext = (String(originalName || '').split('.').pop() || 'jpg').replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'jpg';
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+}
+
+function storageObjectPathFromProductImageUrl(url) {
+  const s = String(url || '').trim();
+  const m = s.match(/\/object\/public\/product-images\/(.+?)(?:\?|$)/i);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+async function deleteProductImageFromBucketIfProductImages(imageUrl) {
+  const path = storageObjectPathFromProductImageUrl(imageUrl);
+  if (!path) return { error: null };
+  const { error } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).remove([path]);
+  return { error };
+}
+
+/**
+ * Upload to bucket `product-images` at `{restaurant_id}/{product_id}/{filename}`.
+ * @returns {{ publicUrl: string | null, error: Error | null }}
+ */
+async function uploadProductImageToBucket(restaurantId, productId, file) {
+  const name = safeProductImageFilename(file.name);
+  const path = `${restaurantId}/${productId}/${name}`;
+  const { error: uploadErr } = await supabase.storage
+    .from(PRODUCT_IMAGES_BUCKET)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type || 'image/jpeg',
+    });
+  if (uploadErr) return { publicUrl: null, error: uploadErr };
+  const { data } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path);
+  return { publicUrl: data?.publicUrl || null, error: null };
+}
+
+function syncProductImageAuxButtons() {
+  const has = document.getElementById('img-drop-area')?.classList.contains('has-image');
+  const rm = document.getElementById('btn-remove-product-image');
+  if (rm) rm.style.display = has ? 'inline-flex' : 'none';
+}
 
 let restaurant = null;
 let categories = [];
@@ -618,6 +665,14 @@ async function importMenuFromImage(file) {
     const file = e.target?.files?.[0];
     await importMenuFromImage(file);
     e.target.value = '';
+  });
+  document.getElementById('btn-pick-product-image')?.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    document.getElementById('img-input')?.click();
+  });
+  document.getElementById('btn-remove-product-image')?.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    removeImage(ev);
   });
   document.getElementById('btn-import-add-all')?.addEventListener('click', async () => {
     if (!importedMenuCategories.length) return;
@@ -815,7 +870,7 @@ async function previewImage(file) {
     type: file?.type || '(empty)',
   });
   try {
-    setImgOptStatus('Optimisation de l’image…');
+    setImgOptStatus('جاري تحسين الصورة…');
     const { file: outFile, blob, meta } = await optimizeProductImage(file);
     selectedFile = outFile;
     imageRemovedForEdit = false;
@@ -826,20 +881,51 @@ async function previewImage(file) {
     document.getElementById('img-placeholder').style.display = 'none';
     document.getElementById('img-remove-btn').style.display = 'flex';
     document.getElementById('img-drop-area').classList.add('has-image');
+    syncProductImageAuxButtons();
     const mbIn = (meta.inBytes / (1024 * 1024)).toFixed(1);
     const mbOut = (meta.outBytes / (1024 * 1024)).toFixed(2);
     setImgOptStatus(
-      `Prêt pour l’envoi (≤ 5 Mo) : ${meta.outW}×${meta.outH} px, JPEG — ${mbIn} Mo → ${mbOut} Mo`,
+      `≤ 5 م.ب — ${meta.outW}×${meta.outH} px — ${mbIn} → ${mbOut} م.ب`,
     );
     console.log('[OneTap products] optimized OK', {
       inBytes: meta.inBytes,
       outBytes: meta.outBytes,
     });
+
+    if (editingId) {
+      setImgOptStatus('جاري رفع الصورة…');
+      const prevUrl = allProducts.find((x) => x.id === editingId)?.image_url;
+      if (prevUrl && String(prevUrl).includes('/product-images/')) {
+        const { error: delErr } = await deleteProductImageFromBucketIfProductImages(prevUrl);
+        if (delErr) console.warn('[OneTap products] delete old image', delErr);
+      }
+      const { publicUrl, error: upErr } = await uploadProductImageToBucket(restaurant.id, editingId, outFile);
+      if (upErr || !publicUrl) throw upErr || new Error('فشل رفع الصورة');
+      URL.revokeObjectURL(previewObjectUrl);
+      previewObjectUrl = null;
+      preview.src = publicUrl;
+      selectedFile = null;
+      imageRemovedForEdit = false;
+      const { error: dbErr } = await updateProductForRestaurant(editingId, restaurant.id, { image_url: publicUrl });
+      if (dbErr) throw dbErr;
+      const ix = allProducts.findIndex((x) => x.id === editingId);
+      if (ix >= 0) allProducts[ix] = { ...allProducts[ix], image_url: publicUrl };
+      renderProducts();
+      setImgOptStatus(`تم الرفع — ${meta.outW}×${meta.outH} px`);
+      toast('تم حفظ صورة المنتج', 'success');
+    }
   } catch (err) {
-    console.error('[OneTap products] optimize failed', err?.code || err?.name, err);
-    selectedFile = null;
+    console.error('[OneTap products] optimize/upload failed', err?.code || err?.name, err);
+    if (!editingId) {
+      selectedFile = null;
+      revokePreviewObjectUrl();
+      document.getElementById('img-drop-area')?.classList.remove('has-image');
+      document.getElementById('img-placeholder').style.display = 'flex';
+      document.getElementById('img-preview').style.display = 'none';
+      syncProductImageAuxButtons();
+    }
     let msg =
-      'Impossible de traiter cette photo. Réessayez ou choisissez une autre image.';
+      err?.message || 'تعذر معالجة أو رفع الصورة. جرّب صورة أخرى.';
     if (err?.name === 'ProductImageError' || err?.code) {
       msg = err.message || msg;
     } else {
@@ -853,11 +939,12 @@ async function previewImage(file) {
   }
 }
 
-window.removeImage = function(e) {
+window.removeImage = function (e) {
   e.stopPropagation();
+  const rid = editingId;
+  const prevUrl = rid ? (allProducts.find((x) => x.id === rid)?.image_url || '') : '';
   selectedFile = null;
   revokePreviewObjectUrl();
-  if (editingId) imageRemovedForEdit = true;
   document.getElementById('img-preview').src = '';
   document.getElementById('img-preview').style.display = 'none';
   document.getElementById('img-placeholder').style.display = 'flex';
@@ -865,6 +952,38 @@ window.removeImage = function(e) {
   document.getElementById('img-drop-area').classList.remove('has-image');
   document.getElementById('img-input').value = '';
   setImgOptStatus('');
+  syncProductImageAuxButtons();
+
+  if (!rid) {
+    imageRemovedForEdit = true;
+    return;
+  }
+
+  void (async () => {
+    const { error } = await updateProductForRestaurant(rid, restaurant.id, { image_url: null });
+    if (error) {
+      toast(error.message, 'error');
+      if (prevUrl) {
+        const preview = document.getElementById('img-preview');
+        preview.src = prevUrl;
+        preview.style.display = '';
+        document.getElementById('img-placeholder').style.display = 'none';
+        document.getElementById('img-remove-btn').style.display = 'flex';
+        document.getElementById('img-drop-area').classList.add('has-image');
+        syncProductImageAuxButtons();
+      }
+      return;
+    }
+    if (prevUrl && String(prevUrl).includes('/product-images/')) {
+      const { error: delErr } = await deleteProductImageFromBucketIfProductImages(prevUrl);
+      if (delErr) console.warn('[OneTap products] storage remove', delErr);
+    }
+    const ix = allProducts.findIndex((x) => x.id === rid);
+    if (ix >= 0) allProducts[ix] = { ...allProducts[ix], image_url: null };
+    imageRemovedForEdit = false;
+    renderProducts();
+    toast('تم حذف الصورة', 'success');
+  })();
 };
 
 /* ── SAVE PRODUCT ── */
@@ -909,14 +1028,28 @@ window.saveProduct = async function() {
         return;
       }
     }
-    const { publicUrl, error: upErr } = await uploadProductImage(restaurant.id, selectedFile);
+  }
+
+  if (selectedFile && editingId) {
+    const { publicUrl, error: upErr } = await uploadProductImageToBucket(restaurant.id, editingId, selectedFile);
     if (upErr || !publicUrl) {
-      toast(upErr ? `Upload image : ${upErr.message}` : 'Upload image échoué', 'error');
+      toast(upErr ? `رفع الصورة: ${upErr.message}` : 'فشل رفع الصورة', 'error');
       btn.disabled = false;
       btn.textContent = 'Enregistrer le produit';
       return;
     }
     image_url = publicUrl;
+    selectedFile = null;
+    revokePreviewObjectUrl();
+    const pv = document.getElementById('img-preview');
+    if (pv) {
+      pv.src = publicUrl;
+      pv.style.display = '';
+      document.getElementById('img-placeholder').style.display = 'none';
+      document.getElementById('img-remove-btn').style.display = 'flex';
+      document.getElementById('img-drop-area').classList.add('has-image');
+      syncProductImageAuxButtons();
+    }
   }
 
   const compareRaw = document.getElementById('prod-compare-price').value.trim();
@@ -941,14 +1074,37 @@ window.saveProduct = async function() {
     position: Math.max(0, parseInt(document.getElementById('prod-position').value, 10) || 0),
     is_visible: document.getElementById('prod-visible').checked,
     is_available: document.getElementById('prod-available').checked,
-    image_url,
+    image_url: editingId ? image_url : (selectedFile ? null : image_url),
   };
 
   let error;
+  let newProductId = null;
   if (editingId) {
     ({ error } = await updateProductForRestaurant(editingId, restaurant.id, fields));
   } else {
-    ({ error } = await insertProductForRestaurant(restaurant.id, fields));
+    const ins = await insertProductForRestaurant(restaurant.id, fields);
+    error = ins.error;
+    newProductId = ins.data?.id || null;
+    if (!error && selectedFile && newProductId) {
+      const { publicUrl, error: upErr } = await uploadProductImageToBucket(restaurant.id, newProductId, selectedFile);
+      if (!upErr && publicUrl) {
+        const { error: up2 } = await updateProductForRestaurant(newProductId, restaurant.id, { image_url: publicUrl });
+        if (up2) toast(up2.message, 'warning');
+        const pv = document.getElementById('img-preview');
+        if (pv) {
+          pv.src = publicUrl;
+          pv.style.display = '';
+          document.getElementById('img-placeholder').style.display = 'none';
+          document.getElementById('img-remove-btn').style.display = 'flex';
+          document.getElementById('img-drop-area').classList.add('has-image');
+        }
+      } else if (upErr) {
+        toast(`رفع الصورة: ${upErr.message}`, 'warning');
+      }
+      selectedFile = null;
+      revokePreviewObjectUrl();
+      syncProductImageAuxButtons();
+    }
   }
 
   btn.disabled = false;
@@ -963,6 +1119,8 @@ window.saveProduct = async function() {
 window.editProduct = async function(id) {
   const { data: p } = await getProductForRestaurant(id, restaurant.id);
   if (!p) return;
+  selectedFile = null;
+  revokePreviewObjectUrl();
   editingId = id;
   imageRemovedForEdit = false;
   document.getElementById('prod-category').value = p.category_id;
@@ -984,6 +1142,7 @@ window.editProduct = async function(id) {
     document.getElementById('img-remove-btn').style.display = 'flex';
     document.getElementById('img-drop-area').classList.add('has-image');
   }
+  syncProductImageAuxButtons();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };

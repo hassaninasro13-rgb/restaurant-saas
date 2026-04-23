@@ -1721,7 +1721,9 @@ function buildMenu() {
 
 function safeHttpUrl(u) {
   const s = String(u || '').trim();
-  return /^https?:\/\//i.test(s) ? s : '';
+  if (!s) return '';
+  if (/^https?:\/\//i.test(s)) return s;
+  return '';
 }
 
 function attrEncode(s) {

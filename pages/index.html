@@ -28,7 +28,7 @@
   .menu-hero {
     position: relative;
     background: var(--ink);
-    overflow: hidden;
+    overflow: visible;
   }
   .menu-hero::after {
     content: '';
@@ -61,9 +61,9 @@
     background: radial-gradient(circle at 30% 50%, rgba(var(--accent-rgb), .35) 0%, transparent 60%);
   }
   .menu-hero-info {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
     padding: 0 20px 16px;
     background: #fff;
     border-bottom: 1.5px solid var(--border);

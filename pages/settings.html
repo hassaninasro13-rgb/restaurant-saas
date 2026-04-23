@@ -153,6 +153,12 @@
   .rh-schedule-table th { color: var(--ink2); font-weight: 600; font-size: .72rem; text-transform: none; }
   .rh-schedule-table input[type="time"] { max-width: 130px; }
   .rh-closed-mark { white-space: nowrap; min-width: 3.5rem; }
+  .welcome-char-counter {
+    font-size: .78rem;
+    color: var(--ink3);
+    margin: 8px 0 0;
+    text-align: left;
+  }
 </style>
 </head>
 <body>
@@ -252,6 +258,17 @@
             <input type="tel" id="field-whatsapp" class="input" autocomplete="tel">
           </div>
         </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>رسالة ترحيب</h3>
+        <p class="settings-intro" style="margin-top:0;">تظهر للزبائن أسفل معلومات المطعم في المنيو العام (حتى 200 حرف).</p>
+        <div class="field">
+          <label for="field-welcome-message">نص الترحيب</label>
+          <textarea id="field-welcome-message" class="textarea" maxlength="200" rows="3" placeholder="مثال: أهلاً بكم في مطعمنا! نتمنى لكم وجبة شهية 🍕"></textarea>
+          <p class="welcome-char-counter" id="welcome-char-counter">متبقي 200 حرف</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-save-welcome-message">حفظ</button>
       </div>
 
       <div class="settings-card">
@@ -535,6 +552,33 @@ function renderRestaurantHoursSchedule(rows) {
     })
     .join('');
 }
+
+function syncWelcomeMessageCounter() {
+  const el = document.getElementById('field-welcome-message');
+  const c = document.getElementById('welcome-char-counter');
+  if (!el || !c) return;
+  const left = Math.max(0, 200 - el.value.length);
+  c.textContent = `متبقي ${left} حرف`;
+}
+
+document.getElementById('field-welcome-message')?.addEventListener('input', syncWelcomeMessageCounter);
+
+document.getElementById('btn-save-welcome-message')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-save-welcome-message');
+  if (!restaurant?.id) return;
+  btn.disabled = true;
+  const welcome_message = String(document.getElementById('field-welcome-message')?.value || '').slice(0, 200).trim();
+  const { data, error } = await updateRestaurantForManager(restaurant.id, { welcome_message });
+  btn.disabled = false;
+  if (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  restaurant = { ...restaurant, ...(data || {}) };
+  document.getElementById('field-welcome-message').value = welcome_message;
+  syncWelcomeMessageCounter();
+  toast('تم حفظ رسالة الترحيب', 'success');
+});
 
 function syncWhatsappOrderingToggleFromRestaurant() {
   const cb = document.getElementById('toggle-whatsapp-ordering');
@@ -921,6 +965,8 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   document.getElementById('field-address').value = rest.address || '';
   document.getElementById('field-phone').value = rest.phone || '';
   document.getElementById('field-whatsapp').value = rest.whatsapp || '';
+  document.getElementById('field-welcome-message').value = rest.welcome_message != null ? String(rest.welcome_message) : '';
+  syncWelcomeMessageCounter();
   syncWhatsappOrderingToggleFromRestaurant();
   const { data: rhList, error: rhErr } = await supabase
     .from('restaurant_hours')

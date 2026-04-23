@@ -749,6 +749,22 @@
     color: var(--ink);
   }
   .source-order-banner[hidden] { display: none !important; }
+
+  .welcome-message-banner {
+    margin: 0 16px 14px;
+    padding: 14px 18px;
+    border-radius: var(--radius-xl);
+    border: 1.5px solid var(--accent);
+    background: linear-gradient(145deg, rgba(var(--accent-rgb), .1), rgba(255, 255, 255, .95));
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    line-height: 1.55;
+    font-size: .96rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .welcome-message-banner[hidden] { display: none !important; }
+  .welcome-message-banner .welcome-message-text { margin: 0; white-space: pre-wrap; }
   .cart-source-pill {
     font-size: .8rem;
     font-weight: 600;
@@ -911,6 +927,9 @@
       <span id="rest-address"></span>
       <span id="rest-hours-badge"></span>
     </div>
+  </div>
+  <div class="welcome-message-banner" id="welcome-message-banner" hidden>
+    <p class="welcome-message-text" id="welcome-message-text"></p>
   </div>
   <div class="cat-tabs-wrap" id="menu-cat-tabs-wrap">
     <div class="cat-tabs" id="cat-tabs"></div>
@@ -1432,6 +1451,17 @@ async function tryRestoreResolvedSourceSession(rest) {
       <span class="open-dot"></span>
       ${esc(hoursLabel)}
     </div>`;
+
+  const welcomeRaw = rest.welcome_message != null ? String(rest.welcome_message).trim() : '';
+  const welcomeEl = document.getElementById('welcome-message-banner');
+  const welcomeTxt = document.getElementById('welcome-message-text');
+  if (welcomeRaw && welcomeEl && welcomeTxt) {
+    welcomeTxt.textContent = welcomeRaw;
+    welcomeEl.hidden = false;
+  } else if (welcomeEl) {
+    welcomeEl.hidden = true;
+    if (welcomeTxt) welcomeTxt.textContent = '';
+  }
 
   applyRestaurantOrderTypeUi(rest);
 

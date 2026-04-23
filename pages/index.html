@@ -1398,7 +1398,7 @@ async function tryRestoreResolvedSourceSession(rest) {
     logoArea.innerHTML = `<div class="menu-logo-placeholder">${rest.name.charAt(0)}</div>`;
   }
 
-  // Opening badge (restaurants.opening_time / closing_time / is_open_manually)
+  // Opening badge: restaurant_hours for today's weekday (0=Sunday)
   function timeStrToMinutes(str) {
     const s = String(str || '00:00:00').trim().slice(0, 8);
     const [hh, mm] = s.split(':').map((x) => Number(x));
@@ -1406,19 +1406,27 @@ async function tryRestoreResolvedSourceSession(rest) {
     const m = Number.isFinite(mm) ? mm : 0;
     return h * 60 + m;
   }
-  const useSchedule = rest.is_open_manually !== false;
+  const dow = new Date().getDay();
+  const { data: rhRow } = await supabase
+    .from('restaurant_hours')
+    .select('is_open, opening_time, closing_time')
+    .eq('restaurant_id', rest.id)
+    .eq('day_of_week', dow)
+    .maybeSingle();
+
+  const rh = rhRow || { is_open: true, opening_time: '09:00:00', closing_time: '22:00:00' };
   const now = new Date();
   const nowMin = now.getHours() * 60 + now.getMinutes();
-  const openMin = timeStrToMinutes(rest.opening_time || '09:00:00');
-  const closeMin = timeStrToMinutes(rest.closing_time || '22:00:00');
+  const openMin = timeStrToMinutes(rh.opening_time || '09:00:00');
+  const closeMin = timeStrToMinutes(rh.closing_time || '22:00:00');
   let withinHours = false;
   if (closeMin >= openMin) {
     withinHours = nowMin >= openMin && nowMin <= closeMin;
   } else {
     withinHours = nowMin >= openMin || nowMin <= closeMin;
   }
-  const isOpen = useSchedule && withinHours;
-  const hoursLabel = !useSchedule ? 'مغلق حالياً' : isOpen ? 'مفتوح' : 'مغلق حالياً';
+  const isOpen = rh.is_open !== false && withinHours;
+  const hoursLabel = isOpen ? 'مفتوح' : 'مغلق حالياً';
   document.getElementById('rest-hours-badge').innerHTML =
     `<div class="open-badge ${isOpen ? 'open' : 'closed'}">
       <span class="open-dot"></span>

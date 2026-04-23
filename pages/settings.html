@@ -143,6 +143,16 @@
   }
   .wa-ordering-status .status-on { color: #2f9e44; }
   .wa-ordering-status .status-off { color: #c92a2a; }
+  .rh-schedule-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  .rh-schedule-table th, .rh-schedule-table td {
+    padding: 10px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .rh-schedule-table th { color: var(--ink2); font-weight: 600; font-size: .72rem; text-transform: none; }
+  .rh-schedule-table input[type="time"] { max-width: 130px; }
+  .rh-closed-mark { white-space: nowrap; min-width: 3.5rem; }
 </style>
 </head>
 <body>
@@ -265,28 +275,22 @@
 
       <div class="settings-card">
         <h3>ساعات العمل</h3>
-        <p class="settings-intro" style="margin-top:0;">يُعرض حالة «مفتوح» أو «مغلق حالياً» للزبائن على المنيو العام حسب الإعدادات أدناه.</p>
-        <div class="field-row" style="display:flex;gap:16px;flex-wrap:wrap;">
-          <div class="field" style="flex:1;min-width:140px;">
-            <label for="field-simple-open">وقت الفتح</label>
-            <input type="time" id="field-simple-open" class="input" value="09:00">
-          </div>
-          <div class="field" style="flex:1;min-width:140px;">
-            <label for="field-simple-close">وقت الإغلاق</label>
-            <input type="time" id="field-simple-close" class="input" value="22:00">
-          </div>
+        <p class="settings-intro" style="margin-top:0;">جدول أسبوعي يحدد للزبائن إن كان المطعم «مفتوحاً» أو «مغلقاً حالياً» على المنيو العام.</p>
+        <div style="overflow-x:auto;">
+          <table class="rh-schedule-table" id="rh-schedule-table">
+            <thead>
+              <tr>
+                <th>اليوم</th>
+                <th>مفتوح / مغلق</th>
+                <th>وقت الفتح</th>
+                <th>وقت الإغلاق</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rh-schedule-body"></tbody>
+          </table>
         </div>
-        <div class="wa-ordering-toggle-row" style="margin-top:18px;">
-          <div class="wa-ordering-copy">
-            <label for="toggle-is-open-manually" style="font-weight:700;font-size:.95rem;cursor:pointer;display:block;">فتح/إغلاق يدوي</label>
-            <p class="wa-ordering-hint">عند التفعيل، تُحسب الحالة من وقت الفتح والإغلاق. عند الإيقاف، يظهر للزبائن «مغلق حالياً» دائماً.</p>
-          </div>
-          <label class="wa-switch" aria-label="فتح/إغلاق يدوي">
-            <input type="checkbox" id="toggle-is-open-manually" checked>
-            <span class="wa-switch-slider"></span>
-          </label>
-        </div>
-        <button type="button" class="btn btn-primary" style="margin-top:18px;" id="btn-save-simple-hours">حفظ</button>
+        <button type="button" class="btn btn-primary" style="margin-top:18px;" id="btn-save-restaurant-hours">حفظ</button>
       </div>
 
       <div class="settings-card">
@@ -426,6 +430,7 @@ import {
   updateRestaurantForManager,
   uploadRestaurantLogo,
 } from '../supabase/restaurants.js';
+import { supabase } from '../supabase/client.js';
 import {
   hideLoader,
   toast,
@@ -454,6 +459,7 @@ import { enforceSubscriptionAccess } from '../supabase/subscriptions.js';
 setLang(getLang());
 
 const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const RH_AR_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const MENU_THEMES = {
   Classic: { primary_color: '#D4521A', background_color: '#ffffff', text_color: '#1a1a1a', font_family: 'Poppins' },
   Dark: { primary_color: '#d4af37', background_color: '#181818', text_color: '#f3f0e8', font_family: 'Poppins' },
@@ -477,9 +483,57 @@ function normalizeTime(v) {
   const t = String(v || '').trim();
   if (/^\d{1,2}:\d{2}$/.test(t)) {
     const [h, m] = t.split(':');
-    return `${h.padStart(2, '0')}:${m}:00`.slice(0, 8);
+    return `${h.padStart(2, '0')}:${String(m).padStart(2, '0')}:00`.slice(0, 8);
   }
   return t.slice(0, 8) || '12:00:00';
+}
+
+function timeInputToPgTime(v) {
+  return normalizeTime(v);
+}
+
+function applyRhRowOpenState(tr, isOpen) {
+  const oi = tr.querySelector('.rh-open-in');
+  const ci = tr.querySelector('.rh-close-in');
+  const mark = tr.querySelector('.rh-closed-mark');
+  if (oi) oi.disabled = !isOpen;
+  if (ci) ci.disabled = !isOpen;
+  if (mark) mark.style.visibility = isOpen ? 'hidden' : 'visible';
+}
+
+function renderRestaurantHoursSchedule(rows) {
+  const byDay = {};
+  for (let d = 0; d <= 6; d++) byDay[d] = null;
+  (rows || []).forEach((r) => {
+    const d = Number(r.day_of_week);
+    if (d >= 0 && d <= 6) byDay[d] = r;
+  });
+  const tbody = document.getElementById('rh-schedule-body');
+  if (!tbody) return;
+  tbody.innerHTML = [0, 1, 2, 3, 4, 5, 6]
+    .map((d) => {
+      const r = byDay[d] || {
+        day_of_week: d,
+        is_open: true,
+        opening_time: '09:00:00',
+        closing_time: '22:00:00',
+      };
+      const open = r.is_open !== false;
+      const ot = String(r.opening_time || '09:00:00').slice(0, 5);
+      const ct = String(r.closing_time || '22:00:00').slice(0, 5);
+      return `<tr data-rh-day="${d}">
+        <td style="font-weight:700;">${RH_AR_DAYS[d]}</td>
+        <td>
+          <label style="cursor:pointer;font-weight:600;">
+            <input type="checkbox" class="rh-is-open" ${open ? 'checked' : ''}> مفتوح
+          </label>
+        </td>
+        <td><input type="time" class="input rh-open-in" value="${ot}" ${open ? '' : 'disabled'}></td>
+        <td><input type="time" class="input rh-close-in" value="${ct}" ${open ? '' : 'disabled'}></td>
+        <td class="rh-closed-mark" style="color:#c92a2a;font-weight:700;visibility:${open ? 'hidden' : 'visible'}">مغلق</td>
+      </tr>`;
+    })
+    .join('');
 }
 
 function syncWhatsappOrderingToggleFromRestaurant() {
@@ -494,24 +548,45 @@ function syncWhatsappOrderingToggleFromRestaurant() {
   }
 }
 
-document.getElementById('btn-save-simple-hours')?.addEventListener('click', async () => {
-  const btn = document.getElementById('btn-save-simple-hours');
-  if (!restaurant?.id) return;
+document.getElementById('rh-schedule-table')?.addEventListener('change', (e) => {
+  const t = e.target;
+  if (!(t instanceof HTMLInputElement) || !t.classList.contains('rh-is-open')) return;
+  const tr = t.closest('tr');
+  if (!tr) return;
+  applyRhRowOpenState(tr, t.checked);
+});
+
+document.getElementById('btn-save-restaurant-hours')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-save-restaurant-hours');
+  const tbody = document.getElementById('rh-schedule-body');
+  if (!restaurant?.id || !tbody) return;
   btn.disabled = true;
-  const opening_time = normalizeTime(document.getElementById('field-simple-open').value);
-  const closing_time = normalizeTime(document.getElementById('field-simple-close').value);
-  const is_open_manually = document.getElementById('toggle-is-open-manually').checked;
-  const { data, error } = await updateRestaurantForManager(restaurant.id, {
-    opening_time,
-    closing_time,
-    is_open_manually,
+  const payload = [];
+  tbody.querySelectorAll('tr[data-rh-day]').forEach((tr) => {
+    const d = Number(tr.getAttribute('data-rh-day'));
+    const isOpen = tr.querySelector('.rh-is-open')?.checked ?? true;
+    payload.push({
+      restaurant_id: restaurant.id,
+      day_of_week: d,
+      is_open: isOpen,
+      opening_time: timeInputToPgTime(tr.querySelector('.rh-open-in')?.value),
+      closing_time: timeInputToPgTime(tr.querySelector('.rh-close-in')?.value),
+    });
+  });
+  const { error } = await supabase.from('restaurant_hours').upsert(payload, {
+    onConflict: 'restaurant_id,day_of_week',
   });
   btn.disabled = false;
   if (error) {
     toast(error.message, 'error');
     return;
   }
-  restaurant = { ...restaurant, ...(data || {}) };
+  const { data: rhList } = await supabase
+    .from('restaurant_hours')
+    .select('*')
+    .eq('restaurant_id', restaurant.id)
+    .order('day_of_week', { ascending: true });
+  renderRestaurantHoursSchedule(rhList || []);
   toast('تم حفظ ساعات العمل', 'success');
 });
 
@@ -847,11 +922,17 @@ document.getElementById('btn-save')?.addEventListener('click', async () => {
   document.getElementById('field-phone').value = rest.phone || '';
   document.getElementById('field-whatsapp').value = rest.whatsapp || '';
   syncWhatsappOrderingToggleFromRestaurant();
-  const openSlot = String(rest.opening_time || '09:00:00').slice(0, 5);
-  const closeSlot = String(rest.closing_time || '22:00:00').slice(0, 5);
-  document.getElementById('field-simple-open').value = openSlot;
-  document.getElementById('field-simple-close').value = closeSlot;
-  document.getElementById('toggle-is-open-manually').checked = rest.is_open_manually !== false;
+  const { data: rhList, error: rhErr } = await supabase
+    .from('restaurant_hours')
+    .select('*')
+    .eq('restaurant_id', rest.id)
+    .order('day_of_week', { ascending: true });
+  if (rhErr) {
+    toast('تعذر تحميل ساعات العمل (restaurant_hours).', 'warning');
+    renderRestaurantHoursSchedule([]);
+  } else {
+    renderRestaurantHoursSchedule(rhList || []);
+  }
   document.getElementById('field-currency').value = rest.settings?.currency || 'DZD';
   document.getElementById('field-language').value = rest.settings?.language || 'fr';
   const tc = rest.settings?.theme_color || '#e85c2c';

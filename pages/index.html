@@ -22,9 +22,7 @@
   /* HEADER */
   .menu-header {
     background: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
     box-shadow: 0 1px 0 var(--border);
   }
   .menu-hero {
@@ -63,12 +61,13 @@
     background: radial-gradient(circle at 30% 50%, rgba(var(--accent-rgb), .35) 0%, transparent 60%);
   }
   .menu-hero-info {
-    padding: 20px 20px 16px;
-    background: #fff;
-    border-bottom: 1.5px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 100;
+    padding: 20px 20px 16px;
+    background: #fff;
+    border-bottom: 1.5px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
   .menu-logo {
     width: 72px; height: 72px;
@@ -127,14 +126,14 @@
 
   /* CATEGORY TABS */
   .cat-tabs-wrap {
+    position: sticky;
+    top: 120px;
+    z-index: 99;
     background: #fff;
     overflow-x: auto;
     scrollbar-width: none;
     padding: 0 16px;
     border-bottom: 1.5px solid var(--border);
-    position: sticky;
-    top: var(--menu-hero-info-height, 116px);
-    z-index: 99;
   }
   .cat-tabs-wrap::-webkit-scrollbar { display: none; }
   .cat-tabs {
@@ -1478,8 +1477,6 @@ async function tryRestoreResolvedSourceSession(rest) {
   buildMenu();
   updateCartFAB();
   syncCartPageVisibility();
-  updateStickyOffsets();
-  window.addEventListener('resize', updateStickyOffsets);
   hideLoader();
 })();
 
@@ -1503,13 +1500,6 @@ function persistCart() {
 
 function clearCartStorage() {
   clearCartStorageLs(String(slug || '').trim());
-}
-
-function updateStickyOffsets() {
-  const heroInfo = document.querySelector('.menu-hero-info');
-  if (!heroInfo) return;
-  const h = Math.ceil(heroInfo.getBoundingClientRect().height);
-  document.documentElement.style.setProperty('--menu-hero-info-height', `${h}px`);
 }
 
 function isCartPageMode() {

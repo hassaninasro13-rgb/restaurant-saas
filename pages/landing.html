@@ -1,21 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OneTap Menu — Paper menu to QR</title>
-  <meta name="description" content="Take a photo of your paper menu and get a digital QR menu for your restaurant." />
+  <title>OneTap Menu — منيو ورقي إلى QR</title>
+  <meta name="description" content="صوّر منيوك الورقي واحصل على منيو رقمي بQR. طلبات عبر واتساب." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --cream: #faf7f4;
-      --cream-deep: #f0e8e0;
-      --cream-mid: #f5efe8;
       --accent: #d4521a;
       --accent-hover: #b84314;
-      --accent-soft: rgba(212, 82, 26, 0.1);
       --ink: #141210;
       --ink-muted: #5c5652;
       --ink-soft: #8a847e;
@@ -23,7 +20,6 @@
       --shadow: 0 4px 24px rgba(20, 18, 16, 0.06), 0 1px 3px rgba(20, 18, 16, 0.04);
       --shadow-lg: 0 24px 64px rgba(20, 18, 16, 0.08), 0 8px 24px rgba(20, 18, 16, 0.05);
       --radius: 20px;
-      --radius-sm: 14px;
       --max: 1120px;
     }
 
@@ -34,7 +30,7 @@
     body {
       font-family: "Inter", system-ui, -apple-system, sans-serif;
       color: var(--ink);
-      line-height: 1.5;
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       background: var(--cream);
     }
@@ -43,14 +39,14 @@
     a:hover { color: var(--accent); }
 
     .page {
-      background: linear-gradient(165deg, #fdfcfa 0%, var(--cream) 35%, #f3ebe4 72%, #efe6de 100%);
+      background: linear-gradient(195deg, #fdfcfa 0%, var(--cream) 38%, #f3ebe4 74%, #efe6de 100%);
       min-height: 100vh;
     }
 
     .nav {
       max-width: var(--max);
       margin: 0 auto;
-      padding: 20px 24px;
+      padding: 22px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -59,8 +55,8 @@
 
     .nav-brand {
       font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: -0.03em;
+      font-size: 1.08rem;
+      letter-spacing: -0.02em;
       color: var(--ink);
     }
 
@@ -73,8 +69,8 @@
       background: var(--accent);
       color: #fff !important;
       font-weight: 600;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 12px rgba(212, 82, 26, 0.35);
+      font-size: 0.92rem;
+      box-shadow: 0 2px 14px rgba(212, 82, 26, 0.38);
       transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
     }
 
@@ -82,44 +78,57 @@
       background: var(--accent-hover);
       color: #fff !important;
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(212, 82, 26, 0.4);
+      box-shadow: 0 6px 22px rgba(212, 82, 26, 0.42);
     }
 
     /* —— Hero —— */
     .hero {
       max-width: var(--max);
       margin: 0 auto;
-      padding: 12px 24px 72px;
+      padding: 8px 24px 76px;
     }
 
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 48px;
+      gap: 44px;
       align-items: center;
     }
 
     @media (min-width: 900px) {
       .hero-grid {
-        grid-template-columns: 1fr 1.05fr;
+        direction: ltr;
+        grid-template-columns: 1.08fr 1fr;
+        grid-template-areas: "phones copy";
         gap: 56px;
+        align-items: center;
+      }
+
+      .hero-copy {
+        grid-area: copy;
+        direction: rtl;
+        text-align: right;
+      }
+
+      .mockups-wrap {
+        grid-area: phones;
       }
     }
 
     .hero-copy h1 {
-      font-size: clamp(2rem, 4.5vw, 3.15rem);
+      font-size: clamp(1.85rem, 4.2vw, 3rem);
       font-weight: 800;
-      letter-spacing: -0.045em;
-      line-height: 1.08;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
       margin-bottom: 20px;
       color: var(--ink);
     }
 
     .hero-copy .lead {
-      font-size: clamp(1rem, 2vw, 1.15rem);
+      font-size: clamp(1.02rem, 2vw, 1.14rem);
       color: var(--ink-muted);
-      max-width: 34ch;
-      line-height: 1.55;
+      max-width: 38ch;
+      line-height: 1.75;
       margin-bottom: 32px;
     }
 
@@ -142,7 +151,7 @@
       font-size: 1rem;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(212, 82, 26, 0.35);
+      box-shadow: 0 4px 22px rgba(212, 82, 26, 0.36);
       transition: background 0.15s ease, transform 0.15s ease;
     }
 
@@ -158,8 +167,8 @@
       font-size: 0.95rem;
       color: var(--ink-muted);
       border: 1.5px solid rgba(20, 18, 16, 0.12);
-      background: rgba(255, 255, 255, 0.55);
-      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(10px);
     }
 
     .btn-ghost:hover {
@@ -167,7 +176,10 @@
       color: var(--accent);
     }
 
-    /* Phone mockups */
+    .mockups-wrap {
+      direction: ltr;
+    }
+
     .mockups {
       display: flex;
       justify-content: center;
@@ -221,7 +233,6 @@
       .phone--right { transform: rotate(7deg) translateY(-8px); }
     }
 
-    /* Left: paper menu */
     .paper-ui {
       height: 100%;
       background: linear-gradient(180deg, #f4e8d8 0%, #ebe0d0 100%);
@@ -232,10 +243,9 @@
     }
 
     .paper-title {
-      font-size: 0.62rem;
+      font-size: 0.68rem;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.06em;
       color: #6b5c4e;
       text-align: center;
       margin-bottom: 4px;
@@ -247,12 +257,12 @@
       background: rgba(90, 75, 62, 0.18);
     }
 
-    .paper-line:nth-child(3) { width: 92%; }
-    .paper-line:nth-child(4) { width: 78%; }
-    .paper-line:nth-child(5) { width: 88%; }
-    .paper-line:nth-child(6) { width: 65%; }
-    .paper-line:nth-child(7) { width: 95%; }
-    .paper-line:nth-child(8) { width: 70%; }
+    .paper-line:nth-child(3) { width: 92%; align-self: center; }
+    .paper-line:nth-child(4) { width: 78%; align-self: center; }
+    .paper-line:nth-child(5) { width: 88%; align-self: center; }
+    .paper-line:nth-child(6) { width: 65%; align-self: center; }
+    .paper-line:nth-child(7) { width: 95%; align-self: center; }
+    .paper-line:nth-child(8) { width: 70%; align-self: center; }
 
     .upload-badge {
       position: absolute;
@@ -263,7 +273,7 @@
       align-items: center;
       gap: 6px;
       padding: 8px 12px;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       border-radius: 999px;
       font-size: 0.58rem;
       font-weight: 700;
@@ -272,7 +282,6 @@
       white-space: nowrap;
     }
 
-    /* Right: digital menu + QR */
     .digital-ui {
       height: 100%;
       background: linear-gradient(180deg, #fff 0%, #faf9f8 100%);
@@ -287,6 +296,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 4px;
+      gap: 6px;
     }
 
     .digital-logo {
@@ -294,6 +304,7 @@
       height: 22px;
       border-radius: 8px;
       background: linear-gradient(135deg, var(--accent), #e87840);
+      flex-shrink: 0;
     }
 
     .digital-menu-name {
@@ -301,7 +312,7 @@
       font-weight: 800;
       color: var(--ink);
       flex: 1;
-      margin-left: 6px;
+      text-align: center;
     }
 
     .digital-qr {
@@ -315,6 +326,7 @@
       grid-template-rows: repeat(3, 1fr);
       gap: 1px;
       padding: 2px;
+      flex-shrink: 0;
     }
 
     .digital-qr span {
@@ -331,6 +343,7 @@
       align-items: center;
       padding: 6px 0;
       border-bottom: 1px solid rgba(20, 18, 16, 0.06);
+      gap: 8px;
     }
 
     .digital-row:last-of-type { border-bottom: none; }
@@ -345,18 +358,18 @@
       font-size: 0.52rem;
       font-weight: 700;
       color: var(--accent);
+      flex-shrink: 0;
     }
 
     .digital-cat {
-      font-size: 0.45rem;
+      font-size: 0.48rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       color: var(--ink-soft);
       margin-top: 6px;
     }
 
-    /* —— How it works —— */
+    /* —— Sections —— */
     .section {
       max-width: var(--max);
       margin: 0 auto;
@@ -364,22 +377,23 @@
     }
 
     .section-title {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.08em;
       color: var(--accent);
       margin-bottom: 12px;
     }
 
     .section-heading {
-      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-size: clamp(1.45rem, 3vw, 2rem);
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       margin-bottom: 40px;
+      line-height: 1.25;
     }
 
     .steps-row {
+      direction: ltr;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -411,7 +425,7 @@
       color: var(--ink-soft);
       font-size: 1.25rem;
       font-weight: 300;
-      opacity: 0.45;
+      opacity: 0.5;
     }
 
     @media (min-width: 768px) {
@@ -419,18 +433,19 @@
     }
 
     .step-card {
+      direction: rtl;
       background: var(--card);
       border-radius: var(--radius);
       padding: 28px 24px;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.85);
       height: 100%;
       text-align: center;
       transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .step-card:hover {
-      box-shadow: 0 8px 40px rgba(20, 18, 16, 0.1);
+      box-shadow: 0 10px 44px rgba(20, 18, 16, 0.1);
       transform: translateY(-2px);
     }
 
@@ -442,19 +457,19 @@
     }
 
     .step-card h3 {
-      font-size: 1.05rem;
+      font-size: 1.06rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       letter-spacing: -0.02em;
+      line-height: 1.35;
     }
 
     .step-card p {
       font-size: 0.9rem;
       color: var(--ink-muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* —— Features —— */
     .features-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -470,16 +485,18 @@
     }
 
     .feature-card {
+      direction: rtl;
       background: var(--card);
       border-radius: var(--radius);
       padding: 28px 22px;
       box-shadow: var(--shadow);
       border: 1px solid rgba(255, 255, 255, 0.9);
+      text-align: right;
       transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .feature-card:hover {
-      box-shadow: 0 12px 40px rgba(20, 18, 16, 0.08);
+      box-shadow: 0 12px 40px rgba(20, 18, 16, 0.09);
       transform: translateY(-3px);
     }
 
@@ -490,7 +507,7 @@
     }
 
     .feature-card h3 {
-      font-size: 1rem;
+      font-size: 1.02rem;
       font-weight: 700;
       margin-bottom: 8px;
       letter-spacing: -0.02em;
@@ -499,10 +516,9 @@
     .feature-card p {
       font-size: 0.88rem;
       color: var(--ink-muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* —— Social proof —— */
     .proof-banner {
       max-width: var(--max);
       margin: 0 auto 80px;
@@ -511,21 +527,21 @@
 
     .proof-inner {
       text-align: center;
-      padding: 20px 24px;
+      padding: 22px 24px;
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.68);
       border: 1px solid rgba(20, 18, 16, 0.06);
       box-shadow: var(--shadow);
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.98rem;
       color: var(--ink-muted);
+      line-height: 1.5;
     }
 
-    /* —— Footer —— */
     .footer {
-      border-top: 1px solid rgba(20, 18, 16, 0.06);
-      background: rgba(255, 255, 255, 0.4);
-      padding: 32px 24px 40px;
+      border-top: 1px solid rgba(20, 18, 16, 0.07);
+      background: rgba(255, 255, 255, 0.45);
+      padding: 34px 24px 42px;
     }
 
     .footer-inner {
@@ -534,7 +550,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
       text-align: center;
     }
 
@@ -542,7 +558,7 @@
       .footer-inner {
         flex-direction: row;
         justify-content: space-between;
-        text-align: left;
+        text-align: right;
       }
     }
 
@@ -553,14 +569,10 @@
 
     .footer-links {
       display: flex;
-      gap: 24px;
-      font-size: 0.88rem;
+      gap: 26px;
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--ink-muted);
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
     }
   </style>
 </head>
@@ -568,61 +580,63 @@
   <div class="page">
     <nav class="nav">
       <a href="landing.html" class="nav-brand">OneTap Menu</a>
-      <a class="nav-cta" href="create-restaurant.html">Start for free</a>
+      <a class="nav-cta" href="create-restaurant.html">ابدأ مجاناً</a>
     </nav>
 
     <header class="hero">
       <div class="hero-grid">
         <div class="hero-copy">
-          <h1>Take a photo of your paper menu → get a QR digital menu instantly</h1>
-          <p class="lead">Customers scan, browse, and send their order on WhatsApp. You keep the menu simple.</p>
+          <h1>صوّر منيوك الورقي ← احصل فوراً على منيو رقمي مع QR</h1>
+          <p class="lead">الزبون يمسح الرمز، يتصفّح القائمة، ويرسل طلبه عبر واتساب. أنت تحافظ على بساطة المنيو.</p>
           <div class="hero-cta-row">
-            <a class="btn-primary" href="create-restaurant.html">Start for free</a>
-            <a class="btn-ghost" href="login.html">Already have an account?</a>
+            <a class="btn-primary" href="create-restaurant.html">ابدأ مجاناً</a>
+            <a class="btn-ghost" href="login.html">لديك حساب؟</a>
           </div>
         </div>
 
-        <div class="mockups" aria-hidden="true">
-          <div class="phone phone--left">
-            <div class="phone-screen">
-              <div class="paper-ui">
-                <div class="paper-title">Menu</div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
+        <div class="mockups-wrap">
+          <div class="mockups" aria-hidden="true">
+            <div class="phone phone--left">
+              <div class="phone-screen">
+                <div class="paper-ui">
+                  <div class="paper-title">منيو ورقي</div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                  <div class="paper-line"></div>
+                </div>
+                <div class="upload-badge">📤 جاري الرفع…</div>
               </div>
-              <div class="upload-badge">📤 Uploading…</div>
             </div>
-          </div>
-          <div class="phone phone--right">
-            <div class="phone-screen">
-              <div class="digital-ui">
-                <div class="digital-header">
-                  <div class="digital-logo"></div>
-                  <span class="digital-menu-name">Your menu</span>
-                  <div class="digital-qr" aria-hidden="true">
-                    <span></span><span></span><span></span>
-                    <span></span><span></span><span></span>
-                    <span></span><span></span><span></span>
+            <div class="phone phone--right">
+              <div class="phone-screen">
+                <div class="digital-ui">
+                  <div class="digital-header">
+                    <div class="digital-logo"></div>
+                    <span class="digital-menu-name">منيوك</span>
+                    <div class="digital-qr" aria-hidden="true">
+                      <span></span><span></span><span></span>
+                      <span></span><span></span><span></span>
+                      <span></span><span></span><span></span>
+                    </div>
                   </div>
-                </div>
-                <div class="digital-cat">Mains</div>
-                <div class="digital-row">
-                  <span class="digital-dish">Couscous royal</span>
-                  <span class="digital-price">850 DA</span>
-                </div>
-                <div class="digital-row">
-                  <span class="digital-dish">Chakhchoukha</span>
-                  <span class="digital-price">750 DA</span>
-                </div>
-                <div class="digital-cat">Drinks</div>
-                <div class="digital-row">
-                  <span class="digital-dish">Citronnade</span>
-                  <span class="digital-price">150 DA</span>
+                  <div class="digital-cat">أطباق</div>
+                  <div class="digital-row">
+                    <span class="digital-dish">كسكس ملكي</span>
+                    <span class="digital-price">850 دج</span>
+                  </div>
+                  <div class="digital-row">
+                    <span class="digital-dish">شخشوخة</span>
+                    <span class="digital-price">750 دج</span>
+                  </div>
+                  <div class="digital-cat">مشروبات</div>
+                  <div class="digital-row">
+                    <span class="digital-dish">عصير ليمون</span>
+                    <span class="digital-price">150 دج</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -632,73 +646,73 @@
     </header>
 
     <section class="section" id="how">
-      <p class="section-title">How it works</p>
-      <h2 class="section-heading">From paper to pixels in three steps</h2>
+      <p class="section-title">كيف يعمل؟</p>
+      <h2 class="section-heading">من الورق إلى الشاشة في ثلاث خطوات</h2>
 
       <div class="steps-row">
         <div class="step-card-wrap">
           <article class="step-card">
             <span class="step-icon" aria-hidden="true">📸</span>
-            <h3>Take a photo</h3>
-            <p>Snap a clear picture of your printed menu.</p>
+            <h3>صوّر منيوك</h3>
+            <p>التقط صورة واضحة لمنيوك المطبوع.</p>
           </article>
         </div>
         <div class="step-arrow" aria-hidden="true">→</div>
         <div class="step-card-wrap">
           <article class="step-card">
             <span class="step-icon" aria-hidden="true">🤖</span>
-            <h3>AI extracts categories and prices</h3>
-            <p>Your items appear ready to edit.</p>
+            <h3>الذكاء الاصطناعي يستخرج الفئات والأسعار</h3>
+            <p>تظهر أصنافك جاهزة للتعديل والمراجعة.</p>
           </article>
         </div>
         <div class="step-arrow" aria-hidden="true">→</div>
         <div class="step-card-wrap">
           <article class="step-card">
             <span class="step-icon" aria-hidden="true">📲</span>
-            <h3>Share your QR menu</h3>
-            <p>Print or share the code. Orders go to your WhatsApp.</p>
+            <h3>شارك منيو QR الخاص بك</h3>
+            <p>اطبع الرمز أو شاركه. الطلبات تصلك على واتساب.</p>
           </article>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <p class="section-title">Why OneTap</p>
-      <h2 class="section-heading">Everything you need to go digital</h2>
+      <p class="section-title">لماذا OneTap؟</p>
+      <h2 class="section-heading">كل ما تحتاجه للانتقال الرقمي بسهولة</h2>
       <div class="features-grid">
         <article class="feature-card">
           <span class="feature-icon" aria-hidden="true">📷</span>
-          <h3>AI Menu Import</h3>
-          <p>Take a photo, AI does the rest</p>
+          <h3>استيراد المنيو بالذكاء الاصطناعي</h3>
+          <p>صوّر وAI يكمل الباقي</p>
         </article>
         <article class="feature-card">
           <span class="feature-icon" aria-hidden="true">✏️</span>
-          <h3>Easy Editing</h3>
-          <p>Change prices in seconds</p>
+          <h3>تعديل سهل</h3>
+          <p>غيّر الأسعار في ثوانٍ</p>
         </article>
         <article class="feature-card">
           <span class="feature-icon" aria-hidden="true">📱</span>
-          <h3>QR Code Ready</h3>
-          <p>Print or share instantly</p>
+          <h3>QR Code جاهز</h3>
+          <p>اطبع أو شارك فوراً</p>
         </article>
         <article class="feature-card">
           <span class="feature-icon" aria-hidden="true">💬</span>
-          <h3>WhatsApp Orders</h3>
-          <p>Customers order directly on WhatsApp</p>
+          <h3>طلبات WhatsApp</h3>
+          <p>الزبائن يطلبون مباشرة عبر WhatsApp</p>
         </article>
       </div>
     </section>
 
     <div class="proof-banner">
-      <div class="proof-inner">Already used by restaurants in Algeria 🇩🇿</div>
+      <div class="proof-inner">يستخدمه مطاعم في الجزائر بالفعل 🇩🇿</div>
     </div>
 
     <footer class="footer">
       <div class="footer-inner">
         <p class="footer-copy">OneTap Menu © 2025</p>
         <div class="footer-links">
-          <a href="login.html">Login</a>
-          <a href="mailto:hello@onetap.menu">Contact</a>
+          <a href="login.html">تسجيل الدخول</a>
+          <a href="mailto:hello@onetap.menu">التواصل</a>
         </div>
       </div>
     </footer>

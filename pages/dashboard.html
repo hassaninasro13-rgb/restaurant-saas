@@ -456,30 +456,63 @@
     font-size: .78rem;
   }
 
+  /* ── MOBILE LAYOUT ── */
   @media (max-width: 768px) {
     .dashboard-header {
       flex-wrap: wrap;
       gap: 8px;
       padding: 10px;
     }
-
     .dashboard-header button,
     .dashboard-header select {
       font-size: 0.8rem;
       padding: 6px 10px;
     }
-
-    .hero-preview {
-      height: 120px;
+    .hero-preview { height: 120px; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .stats-cards { grid-template-columns: 1fr 1fr; }
+    .quick-actions {
+      grid-template-columns: repeat(2, 1fr);
     }
-
-    .dashboard-grid {
+    .finance-stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .welcome-branding {
+      display: none;
+    }
+    #dash-categories-container,
+    #dash-products-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .dash-cat-table,
+    .dash-prod-table {
+      min-width: 520px;
+    }
+    #orders-container .order-row {
+      min-width: 480px;
+    }
+    #orders-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .btn { min-height: 40px; }
+    .btn-sm { min-height: 36px; font-size: .8rem; }
+    .status-select { min-height: 36px; }
+  }
+  @media (max-width: 480px) {
+    .finance-stats-grid {
       grid-template-columns: 1fr;
     }
-
-    .stats-cards {
-      grid-template-columns: 1fr 1fr;
+    .quick-actions {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
+    .quick-action-card { padding: 14px 10px; }
+    .quick-action-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 8px; }
+    .quick-action-card h4 { font-size: .82rem; }
+    .quick-action-card p { font-size: .72rem; }
+    .welcome-banner { padding: 20px 16px; }
   }
 </style>
 </head>

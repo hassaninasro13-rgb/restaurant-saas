@@ -939,6 +939,7 @@
     .customize-backdrop { align-items: center; padding: 24px; }
     .customize-sheet { border-radius: var(--radius-lg); max-height: 85vh; }
   }
+
 </style>
 </head>
 <body>
@@ -1198,6 +1199,7 @@ let customizeIngredientList = [];
 let customizeRemoved = new Set();
 let orderCurrency = 'DZD';
 let orderLocale = 'fr-DZ';
+
 function cur(amount) {
   return fmtCurrency(amount, orderCurrency, orderLocale);
 }
@@ -1824,8 +1826,10 @@ function buildMenu() {
   body.innerHTML = tabs.map((tab, idx) => {
     const content = tab.sections
       .map((sec) => {
+        const validProds = sec.products.filter((p) => p.name && String(p.name).trim());
+        if (!validProds.length) return '';
         const sectionHeader = `<div class="section-header">── ${esc(sec.name)} ──</div>`;
-        return `${sectionHeader}${sec.products.map((p) => buildProductRow(p)).join('')}`;
+        return `${sectionHeader}${validProds.map((p) => buildProductRow(p)).join('')}`;
       })
       .join('');
     return `
@@ -1910,8 +1914,9 @@ window.removeFromCart = function(productId) {
 function refreshProductRow(productId) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
+  const cat = categories.find(c => c.id === p.category_id);
   const row = document.getElementById(`prow-${productId}`);
-  if (row) row.outerHTML = buildProductRow(p);
+  if (row) row.outerHTML = buildProductRow(p, cat);
 }
 
 function updateCartFAB() {
@@ -2451,6 +2456,8 @@ document.getElementById('btn-wa-copy')?.addEventListener('click', async () => {
 document.getElementById('btn-order-done').addEventListener('click', () => {
   closeOrderModal();
 });
+
 </script>
+
 </body>
 </html>

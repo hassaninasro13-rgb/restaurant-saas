@@ -202,7 +202,7 @@
     align-items: center;
     gap: 8px;
   }
-  .menu-section-header {
+  .section-header {
     font-size: 12px;
     font-weight: 700;
     color: var(--primary, #D4521A);
@@ -1247,18 +1247,26 @@ function isPizzaCategoryName(name) {
   return String(name || '').toLowerCase().includes('pizza');
 }
 
-function getMenuTabGroup(category) {
-  const name = String(category?.name || '')
+const CATEGORY_GROUP_RULES = [
+  { root: 'pizza', terms: ['pizza'], label: 'بيتزا' },
+  { root: 'plat', terms: ['plat'], label: 'Plat' },
+  { root: 'sandwich', terms: ['sandwich'], label: 'سندويش' },
+  { root: 'burger', terms: ['burger'], label: 'برغر' },
+  { root: 'box', terms: ['box'], label: 'Box' },
+  { root: 'gratin', terms: ['gratin'], label: 'Gratin' },
+];
+
+function normalizeCategoryName(name) {
+  return String(name || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
-  if (name.includes('pizza')) {
-    return { key: 'pizza', label: 'بيتزا' };
-  }
-  if (name.includes('sandwich') || name.includes('burger')) {
-    return { key: 'sandwich', label: 'سندويش' };
-  }
-  return { key: `cat-${category.id}`, label: category.name };
+}
+
+function detectCategoryRoot(name) {
+  const n = normalizeCategoryName(name);
+  const hit = CATEGORY_GROUP_RULES.find((r) => r.terms.some((t) => n.includes(t)));
+  return hit?.root || null;
 }
 
 function productPlaceholderEmoji(categoryName) {
@@ -1772,9 +1780,7 @@ document.getElementById('cart-order-success-done')?.addEventListener('click', ()
 
 function buildMenu() {
   const body = document.getElementById('menu-body');
-  const tabs = [];
-  const byKey = new Map();
-  for (const c of menuCategories) {
+  const catEntries = menuCategories.map((c) => {
     const catProds = products
       .filter((p) => p.category_id === c.id)
       .sort((a, b) => {
@@ -1782,13 +1788,28 @@ function buildMenu() {
         const sb = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
         return sa - sb;
       });
-    if (!catProds.length) continue;
-    const grp = getMenuTabGroup(c);
-    if (!byKey.has(grp.key)) {
-      byKey.set(grp.key, { key: grp.key, label: grp.label, sections: [] });
-      tabs.push(byKey.get(grp.key));
+    return { category: c, products: catProds, root: detectCategoryRoot(c.name) };
+  }).filter((x) => x.products.length > 0);
+
+  const rootCounts = new Map();
+  catEntries.forEach((x) => {
+    if (!x.root) return;
+    rootCounts.set(x.root, (rootCounts.get(x.root) || 0) + 1);
+  });
+
+  const tabs = [];
+  const byKey = new Map();
+  for (const entry of catEntries) {
+    const c = entry.category;
+    const shouldGroup = entry.root && (rootCounts.get(entry.root) || 0) >= 2;
+    const grpRule = CATEGORY_GROUP_RULES.find((r) => r.root === entry.root);
+    const grpKey = shouldGroup ? `group-${entry.root}` : `cat-${c.id}`;
+    const grpLabel = shouldGroup ? (grpRule?.label || c.name) : c.name;
+    if (!byKey.has(grpKey)) {
+      byKey.set(grpKey, { key: grpKey, label: grpLabel, sections: [] });
+      tabs.push(byKey.get(grpKey));
     }
-    byKey.get(grp.key).sections.push({ id: c.id, name: c.name, products: catProds });
+    byKey.get(grpKey).sections.push({ id: c.id, name: c.name, products: entry.products });
   }
 
   const tabsEl = document.getElementById('cat-tabs');
@@ -1803,9 +1824,7 @@ function buildMenu() {
   body.innerHTML = tabs.map((tab, idx) => {
     const content = tab.sections
       .map((sec) => {
-        const sectionHeader = tab.key === 'pizza'
-          ? `<div class="menu-section-header">── ${esc(sec.name)} ──</div>`
-          : '';
+        const sectionHeader = `<div class="section-header">── ${esc(sec.name)} ──</div>`;
         return `${sectionHeader}${sec.products.map((p) => buildProductRow(p)).join('')}`;
       })
       .join('');

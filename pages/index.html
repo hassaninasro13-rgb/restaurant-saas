@@ -1247,6 +1247,20 @@ function isPizzaCategoryName(name) {
   return String(name || '').toLowerCase().includes('pizza');
 }
 
+function getMenuTabGroup(category) {
+  const name = String(category?.name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  if (name.includes('pizza')) {
+    return { key: 'pizza', label: 'بيتزا' };
+  }
+  if (name.includes('sandwich') || name.includes('burger')) {
+    return { key: 'sandwich', label: 'سندويش' };
+  }
+  return { key: `cat-${category.id}`, label: category.name };
+}
+
 function productPlaceholderEmoji(categoryName) {
   const n = String(categoryName || '')
     .toLowerCase()
@@ -1757,27 +1771,47 @@ document.getElementById('cart-order-success-done')?.addEventListener('click', ()
 });
 
 function buildMenu() {
-  const tabsEl = document.getElementById('cat-tabs');
-  tabsEl.innerHTML = menuCategories.map((c, i) =>
-    `<button type="button" class="cat-tab-btn ${i === 0 ? 'active' : ''}" onclick="scrollToSection('${c.id}', this)">${esc(c.name)}</button>`
-  ).join('');
   const body = document.getElementById('menu-body');
-  if (menuCategories.length === 0) {
-    body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
-    return;
-  }
-  body.innerHTML = menuCategories.map((c, idx) => {
+  const tabs = [];
+  const byKey = new Map();
+  for (const c of menuCategories) {
     const catProds = products
-      .filter(p => p.category_id === c.id)
+      .filter((p) => p.category_id === c.id)
       .sort((a, b) => {
         const sa = Number.isFinite(Number(a?.sort_order)) ? Number(a.sort_order) : Number.MAX_SAFE_INTEGER;
         const sb = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
         return sa - sb;
       });
-    if (catProds.length === 0) return '';
+    if (!catProds.length) continue;
+    const grp = getMenuTabGroup(c);
+    if (!byKey.has(grp.key)) {
+      byKey.set(grp.key, { key: grp.key, label: grp.label, sections: [] });
+      tabs.push(byKey.get(grp.key));
+    }
+    byKey.get(grp.key).sections.push({ id: c.id, name: c.name, products: catProds });
+  }
+
+  const tabsEl = document.getElementById('cat-tabs');
+  tabsEl.innerHTML = tabs.map((t, i) =>
+    `<button type="button" class="cat-tab-btn ${i === 0 ? 'active' : ''}" onclick="scrollToSection('${t.key}', this)">${esc(t.label)}</button>`
+  ).join('');
+
+  if (tabs.length === 0) {
+    body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
+    return;
+  }
+  body.innerHTML = tabs.map((tab, idx) => {
+    const content = tab.sections
+      .map((sec) => {
+        const sectionHeader = tab.key === 'pizza'
+          ? `<div class="menu-section-header">── ${esc(sec.name)} ──</div>`
+          : '';
+        return `${sectionHeader}${sec.products.map((p) => buildProductRow(p)).join('')}`;
+      })
+      .join('');
     return `
-    <div class="cat-section ${idx === 0 ? 'active' : ''}" id="section-${c.id}">
-      ${catProds.map(p => buildProductRow(p)).join('')}
+    <div class="cat-section ${idx === 0 ? 'active' : ''}" id="section-${tab.key}">
+      ${content}
     </div>`;
   }).join('');
 }

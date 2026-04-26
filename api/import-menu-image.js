@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-opus-4-5',
-        max_tokens: 2500,
+        max_tokens: 4000,
         system: 'You are a menu parser. Extract all categories and products from the menu image.\nSTRICT RULES:\n1. Every visual section header = ONE separate category (e.g. Pizza Medium, Miga Pizza, Pizza L are THREE separate categories, NOT subcategories)\n2. Every item listed under a section header = one product inside that category\n3. Clean ALL names: remove any parentheses and content inside them, trim extra spaces\n4. ingredients = comma-separated string of all ingredients listed, empty string if none\n5. price = number only, no currency symbol\n6. category_order starts at 0 and increases by 1\n7. product_order starts at 0 within each category\n8. If you find Supplément section, create separate category named Suppléments\nReturn ONLY valid JSON, no markdown, no backticks:\n{categories:[{name:string,category_order:number,products:[{name:string,price:number,ingredients:string,product_order:number}]}]}',
         messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: image_mime_type, data: image_base64 } }, { type: 'text', text: prompt }] }]
       })

@@ -601,20 +601,18 @@ async function importMenuFromImage(file) {
     const cats = Array.isArray(payload?.categories) ? payload.categories : [];
     importedMenuCategories = cats.map((cat) => ({
       name: String(cat?.name || '').trim() || 'Other',
-      sections: (cat.sections || []).map((sec, secIdx) => ({
-        title: String(sec?.title || '').trim(),
-        section_order: Number.isFinite(Number(sec?.section_order)) ? Number(sec.section_order) : secIdx,
-        products: (Array.isArray(sec?.products) ? sec.products : [])
-          .map((p, prodIdx) => ({
-            name: String(p?.name || '').trim(),
-            price: normalizePrice(p?.price),
-            ingredients: String(p?.ingredients || '').trim(),
-            product_order: Number.isFinite(Number(p?.product_order)) ? Number(p.product_order) : prodIdx,
-          }))
-          .filter(p => p.name && p.price >= 0),
-      })).filter(sec => sec.products.length > 0),
-    })).filter(cat => cat.sections && cat.sections.length > 0);
-    const totalItems = importedMenuCategories.reduce((s, c) => s + (c.sections || []).reduce((s2, sec) => s2 + sec.products.length, 0), 0);
+      category_order: cat.category_order || 0,
+      products: (cat.products || [])
+        .map((p, idx) => ({
+          name: String(p?.name || '').trim(),
+          price: Number(p?.price) || 0,
+          ingredients: String(p?.ingredients || '').trim(),
+          product_order: Number.isFinite(Number(p?.product_order)) ? Number(p.product_order) : idx
+        }))
+        .filter(p => p.name && p.price >= 0)
+    })).filter(cat => cat.products && cat.products.length > 0);
+
+    const totalItems = importedMenuCategories.reduce((s, c) => s + (c.products || []).length, 0);
     if (!totalItems) {
       toast('لم يتم العثور على منتجات قابلة للإضافة', 'warning');
     } else {

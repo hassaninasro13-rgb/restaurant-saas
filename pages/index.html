@@ -186,7 +186,11 @@
   .menu-body {
     padding: 0 16px 120px;
   }
-  .cat-section { margin-top: 28px; }
+  .cat-section {
+    margin-top: 28px;
+    display: none;
+  }
+  .cat-section.active { display: block; }
   .cat-section-title {
     font-family: var(--font-display);
     font-size: 1.1rem;
@@ -1762,7 +1766,7 @@ function buildMenu() {
     body.innerHTML = `<div class="no-cat-msg">🍽️ ${esc(t('pub.menuSoon'))}</div>`;
     return;
   }
-  body.innerHTML = menuCategories.map(c => {
+  body.innerHTML = menuCategories.map((c, idx) => {
     const catProds = products
       .filter(p => p.category_id === c.id)
       .sort((a, b) => {
@@ -1772,7 +1776,7 @@ function buildMenu() {
       });
     if (catProds.length === 0) return '';
     return `
-    <div class="cat-section" id="section-${c.id}">
+    <div class="cat-section ${idx === 0 ? 'active' : ''}" id="section-${c.id}">
       ${catProds.map(p => buildProductRow(p)).join('')}
     </div>`;
   }).join('');
@@ -2021,8 +2025,9 @@ document.getElementById('customize-add-btn')?.addEventListener('click', () => {
 window.scrollToSection = function(catId, btn) {
   document.querySelectorAll('.cat-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  document.querySelectorAll('.cat-section').forEach((sec) => sec.classList.remove('active'));
   const el = document.getElementById(`section-${catId}`);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (el) el.classList.add('active');
 };
 
 window.selectOrderType = function(type, btn) {
